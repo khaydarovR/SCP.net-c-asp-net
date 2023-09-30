@@ -1,20 +1,40 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SCP.DAL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SCP.Domain.Entity;
+using System.Net.NetworkInformation;
+using System.Reflection;
 
 namespace SCP.Application.Common
 {
     public static class ConfigureServicesExtensions
     {
-        public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureApplication(this IServiceCollection services, IConfiguration config)
         {
             //конфигурация приложения
             services.InjectDB(config);
+            services.Configure<MyOptions>(config.GetSection(nameof(MyOptions)));
+            services.AddHttpContextAccessor();
+
+            services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 4;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddUserManager<UserManager<AppUser>>()
+            .AddErrorDescriber<IdentityMessageRu>();
+
+            services.AddMediatR(cfg =>
+                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             return services;
         }
