@@ -2,5 +2,9 @@
 {
     public enum RecRightEnum
     {
+        See,
+        Read,
+        Edit,
+        Delete,
     }
 }

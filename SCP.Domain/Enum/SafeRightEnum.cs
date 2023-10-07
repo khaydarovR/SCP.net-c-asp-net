@@ -1,6 +1,15 @@
 ﻿namespace SCP.Domain.Enum
 {
-    public enum SafeRightEnum
+    public enum ClaimValuesEnum
     {
+        InviteUser,
+
+        RemoveUser,
+
+        EditUserRecordRight,
+
+        EditSafe,
+
+        TemporarilyBlocked,
     }
 }

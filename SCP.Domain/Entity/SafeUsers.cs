@@ -9,6 +9,7 @@ namespace SCP.Domain.Entity
 
         public Guid SafeId { get; set; }
         public Safe Safe { get; set; }
-        public SafeRightEnum Right { get; set; }
+        
+        public ICollection<SafeUsersClaims> SafeUsersClaims { get; set; }
     }
 }

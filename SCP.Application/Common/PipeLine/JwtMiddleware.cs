@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -43,15 +44,12 @@ namespace SCP.Application.Common.PipeLine
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     RequireExpirationTime = true,
-                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.FromMinutes(5)
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-                // attach user to context on successful jwt validation
-                context.Items["User"] = await userManager.FindByIdAsync(userId);
+                var identity = new ClaimsIdentity(jwtToken.Claims, JwtBearerDefaults.AuthenticationScheme);
+                context.User = new ClaimsPrincipal(identity);
             }
             catch
             {

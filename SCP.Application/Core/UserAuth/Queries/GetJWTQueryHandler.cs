@@ -21,13 +21,11 @@ namespace SCP.Application.UserAuth.Queries
     public class GetJWTQueryHandler : IRequestHandler<GetJWTQuery, string>
     {
         private readonly UserManager<AppUser> userManager;
-        private readonly IOptions<MyOptions> options;
         private readonly JwtService jwtService;
 
-        public GetJWTQueryHandler(UserManager<AppUser> userManager, IOptions<MyOptions> options, JwtService jwtService)
+        public GetJWTQueryHandler(UserManager<AppUser> userManager, JwtService jwtService)
         {
             this.userManager = userManager;
-            this.options = options;
             this.jwtService = jwtService;
         }
         public async Task<string> Handle(GetJWTQuery request, CancellationToken cancellationToken)
