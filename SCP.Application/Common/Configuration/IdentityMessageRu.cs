@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace SCP.Application.Common
+namespace SCP.Application.Common.Configuration
 {
     public class IdentityMessageRu : IdentityErrorDescriber
     {

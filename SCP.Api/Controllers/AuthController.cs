@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Middleware;
-using SCP.Application.UserAuth.Comands;
-using SCP.Application.UserAuth.Queries;
+using SCP.Application.Core.UserAuth.Comands;
+using SCP.Application.Core.UserAuth.Queries;
 using System.Security.Claims;
 
 namespace SCP.Api.Controllers

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using SCP.Application.Common;
+using SCP.Application.Common.Exceptions;
 using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Entity;
@@ -8,11 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCP.Application.UserAuth.Comands
+namespace SCP.Application.Core.UserAuth.Comands
 {
     public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, Guid>
     {
@@ -34,16 +36,20 @@ namespace SCP.Application.UserAuth.Comands
             if (result.Succeeded)
             {
                 var dbUser = await userManager.FindByEmailAsync(request.Email);
-                var claimRes = await userManager.AddClaimAsync(dbUser, new Claim(ClaimTypes.Role, SystemRoles.User));
+                var claims = new Claim[] {
+                    new Claim(ClaimTypes.Role, SystemRoles.User)
+                };
+
+                var claimRes = await userManager.AddClaimsAsync(dbUser, claims);
                 if (claimRes.Succeeded)
                 {
                     return dbUser.Id;
                 }
 
-                throw new BLException(claimRes.Errors.First().Description);
+                throw new BLException(HttpStatusCode.BadRequest, claimRes.Errors.First().Description);
             }
 
-            throw new BLException(result.Errors.First().Description);
+            throw new BLException(HttpStatusCode.BadRequest, result.Errors.First().Description);
         }
     }
 }

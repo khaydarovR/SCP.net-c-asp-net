@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCP.Application.UserAuth.Queries
+namespace SCP.Application.Core.UserAuth.Queries
 {
     public class GetJWTQuery : IRequest<string>
     {

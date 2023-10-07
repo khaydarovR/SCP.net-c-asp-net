@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
 using System.Net.NetworkInformation;
 using System.Reflection;
 
-namespace SCP.Application.Common
+namespace SCP.Application.Common.Configuration
 {
     public static class ConfigureServicesExtensions
     {
@@ -35,6 +36,8 @@ namespace SCP.Application.Common
 
             services.AddMediatR(cfg =>
                  cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+            services.AddScoped<JwtService>();
 
             return services;
         }

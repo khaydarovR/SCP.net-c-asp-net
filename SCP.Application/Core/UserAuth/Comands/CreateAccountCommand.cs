@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCP.Application.UserAuth.Comands
+namespace SCP.Application.Core.UserAuth.Comands
 {
-    public class CreateAccountCommand: IRequest<Guid>
+    public class CreateAccountCommand : IRequest<Guid>
     {
         public string UserName { get; set; }
         public string Email { get; set; }
