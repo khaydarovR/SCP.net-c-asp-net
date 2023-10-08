@@ -17,4 +17,8 @@
     <ProjectReference Include="..\SCP.DAL\SCP.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Core\Safe\Queries\" />
+  </ItemGroup>
+
 </Project>

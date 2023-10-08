@@ -2,7 +2,7 @@
 
 namespace SCP.Domain.Entity
 {
-    public class SafeUsers
+    public class SafeUsers: BaseEntity
     {
         public Guid AppUserId { get; set; }
         public AppUser AppUser { get; set; }
@@ -10,6 +10,6 @@ namespace SCP.Domain.Entity
         public Guid SafeId { get; set; }
         public Safe Safe { get; set; }
         
-        public ICollection<SafeUsersClaims> SafeUsersClaims { get; set; }
+        public ICollection<SafeUsersClaim> Claims { get; set; }
     }
 }

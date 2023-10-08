@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SCP.DAL;
@@ -11,9 +12,11 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231008132845_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +167,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("At")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 10, 8, 13, 39, 43, 307, DateTimeKind.Utc).AddTicks(8802));
+                        .HasDefaultValue(new DateTime(2023, 10, 8, 13, 28, 44, 959, DateTimeKind.Utc).AddTicks(2383));
 
                     b.Property<Guid>("RecordId")
                         .HasColumnType("uuid");
@@ -324,10 +327,6 @@ namespace SCP.DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("EKey")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Title")

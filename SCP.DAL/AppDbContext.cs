@@ -21,6 +21,7 @@ namespace SCP.DAL
         public DbSet<AppUser> AppUsers { get; set; }
 
         public DbSet<Safe> Safes { get; set; }
+        public DbSet<SafeUsersClaim> SafeClaims { get; set; }
         public DbSet<SafeUsers> SafeUsers { get; set; }
         public DbSet<RecUsers> RecUsers { get; set; }
         public DbSet<Rec> Records { get; set; }
@@ -41,9 +42,7 @@ namespace SCP.DAL
             appUserBuilder.HasIndex(c => c.Id).IsUnique();
 
             modelBuilder.Entity<SafeUsers>()
-                .HasKey(sc => new { sc.SafeId, sc.AppUserId });
-            modelBuilder.Entity<SafeUsers>()
-                .Property(c => c.Right).IsRequired();
+                .HasKey(su => su.Id);
 
             modelBuilder.Entity<RecUsers>()
                 .HasKey(ru => new { ru.RecordId, ru.AppUserId });
@@ -90,6 +89,13 @@ namespace SCP.DAL
             whiteIpsBuilder.HasOne(c => c.AppUser)
                 .WithMany(s => s.WhiteIPs)
                 .HasForeignKey(c => c.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            var safeClaimsBuilder = modelBuilder.Entity<SafeUsersClaim>();
+            safeClaimsBuilder.HasOne(c => c.UserForSafe)
+                .WithMany(s => s.Claims)
+                .HasForeignKey(c => c.UserForSafeId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

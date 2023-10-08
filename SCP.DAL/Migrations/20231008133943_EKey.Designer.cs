@@ -12,8 +12,8 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230930110500_TestInit")]
-    partial class TestInit
+    [Migration("20231008133943_EKey")]
+    partial class EKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -167,7 +167,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("At")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 9, 30, 11, 5, 0, 423, DateTimeKind.Utc).AddTicks(7430));
+                        .HasDefaultValue(new DateTime(2023, 10, 8, 13, 39, 43, 307, DateTimeKind.Utc).AddTicks(8802));
 
                     b.Property<Guid>("RecordId")
                         .HasColumnType("uuid");
@@ -322,7 +322,15 @@ namespace SCP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("BotApiKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EKey")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
@@ -339,20 +347,43 @@ namespace SCP.DAL.Migrations
 
             modelBuilder.Entity("SCP.Domain.Entity.SafeUsers", b =>
                 {
-                    b.Property<Guid>("SafeId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("AppUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Right")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("SafeId")
+                        .HasColumnType("uuid");
 
-                    b.HasKey("SafeId", "AppUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
+                    b.HasIndex("SafeId");
+
                     b.ToTable("SafeUsers");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.SafeUsersClaim", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClaimValue")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserForSafeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserForSafeId");
+
+                    b.ToTable("SafeClaims");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.WhiteIPList", b =>
@@ -497,6 +528,17 @@ namespace SCP.DAL.Migrations
                     b.Navigation("Safe");
                 });
 
+            modelBuilder.Entity("SCP.Domain.Entity.SafeUsersClaim", b =>
+                {
+                    b.HasOne("SCP.Domain.Entity.SafeUsers", "UserForSafe")
+                        .WithMany("Claims")
+                        .HasForeignKey("UserForSafeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserForSafe");
+                });
+
             modelBuilder.Entity("SCP.Domain.Entity.WhiteIPList", b =>
                 {
                     b.HasOne("SCP.Domain.Entity.AppUser", "AppUser")
@@ -529,6 +571,11 @@ namespace SCP.DAL.Migrations
                     b.Navigation("Records");
 
                     b.Navigation("SafeUsers");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.SafeUsers", b =>
+                {
+                    b.Navigation("Claims");
                 });
 #pragma warning restore 612, 618
         }
