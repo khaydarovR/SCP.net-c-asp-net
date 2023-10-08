@@ -1,23 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using SCP.Application.Common;
-using SCP.Application.Common.Configuration;
 using SCP.Application.Common.Exceptions;
 using SCP.Application.Core.UserAuth.Queries;
 using SCP.Application.Services;
 using SCP.Domain.Entity;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCP.Application.UserAuth.Queries
 {
+    /// <summary>
+    /// Генерация и отпарвка JWT токена для пользователя
+    /// </summary>
     public class GetJWTQueryHandler : IRequestHandler<GetJWTQuery, string>
     {
         private readonly UserManager<AppUser> userManager;
@@ -28,6 +20,8 @@ namespace SCP.Application.UserAuth.Queries
             this.userManager = userManager;
             this.jwtService = jwtService;
         }
+
+
         public async Task<string> Handle(GetJWTQuery request, CancellationToken cancellationToken)
         {
             var user = await userManager.FindByEmailAsync(request.Email);

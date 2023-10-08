@@ -20,28 +20,28 @@ namespace SCP.Application.Common.PipeLine
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, UserManager<AppUser> userManager, IOptions<MyOptions> options)
+        public async Task Invoke(HttpContext context, IOptions<MyOptions> options)
         {
-            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var token = context.Request.Headers["Authorization"].FirstOrDefault();
 
             if (token != null)
-                AttachUserToContext(context, userManager, token, options.Value.JWT_KEY);
+                AttachUserToContext(context, token, options);
 
             await _next(context);
         }
 
-        private async void AttachUserToContext(HttpContext context, UserManager<AppUser> userManager,
-            string token, string jwtKey)
+        private async void AttachUserToContext(HttpContext context, string token, IOptions<MyOptions> opt)
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(jwtKey);
+                var key = Encoding.ASCII.GetBytes(opt.Value.JWT_KEY);
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
+                    ValidateIssuer = true,
+                    ValidIssuer = opt.Value.JWT_ISSUER,
                     ValidateAudience = false,
                     RequireExpirationTime = true,
                     ClockSkew = TimeSpan.FromMinutes(5)

@@ -19,17 +19,15 @@ namespace SCP.Api.Controllers
 
 
         [HttpPost(nameof(SignUp))]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<Guid>> SignUp([FromBody] CreateAccountCommand createAccount)
+        public async Task<ActionResult<Unit>> SignUp([FromBody] CreateAccountCommand createAccount)
         {
             var command = createAccount;
-            var guid = await Mediator.Send(command);
-            return Ok(guid);
+            await Mediator.Send(command);
+            return Ok();
         }
 
-        [HttpPost(nameof(SignIn))]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<Guid>> SignIn([FromBody] GetJWTQuery getJWTQuery)
+        [HttpGet(nameof(SignIn))]
+        public async Task<ActionResult<string>> SignIn([FromQuery] GetJWTQuery getJWTQuery)
         {
             var query = getJWTQuery;
             var token = await Mediator.Send(query);

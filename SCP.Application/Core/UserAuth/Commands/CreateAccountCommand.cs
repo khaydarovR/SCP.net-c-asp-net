@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SCP.Application.Core.UserAuth.Comands
 {
-    public class CreateAccountCommand : IRequest<Guid>
+    public class CreateAccountCommand : IRequest<Unit>
     {
         public string UserName { get; set; }
         public string Email { get; set; }

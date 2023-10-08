@@ -37,6 +37,7 @@ namespace SCP.Application.Services
                     new Claim(ClaimTypes.Role, await GetRoleFromClaims(user)),
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
+                Issuer = options.Value.JWT_ISSUER,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

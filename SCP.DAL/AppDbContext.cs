@@ -2,12 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SCP.Domain.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCP.DAL
 {
@@ -54,6 +48,7 @@ namespace SCP.DAL
             safeBuilder.HasIndex(c => c.Id).IsUnique();
             safeBuilder.Property(c => c.Title).IsRequired();
             safeBuilder.Property(c => c.Description).IsRequired(false);
+            safeBuilder.Property(c => c.EKey).IsRequired(false);
 
 
             var recordBuilder = modelBuilder.Entity<Rec>();

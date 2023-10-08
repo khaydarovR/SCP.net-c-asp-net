@@ -38,6 +38,7 @@ namespace SCP.Application.Common.Configuration
                  cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddScoped<JwtService>();
+            services.AddScoped<CryptorService>();
 
             return services;
         }

@@ -1,12 +1,9 @@
-﻿using MediatR;
-
-namespace SCP.Application.Core.Safens.Commands
+﻿namespace SCP.Api.DTO
 {
-    public class CreateSafeCommand: IRequest<Unit>
+    public class CreateSafeDTO
     {
         public string Title { get; init; }
         public string? Description { get; init; }
         public string? ClearKey { get; init; }
-
     }
 }

@@ -1,30 +1,25 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
-using SCP.Application.Common;
 using SCP.Application.Common.Exceptions;
-using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Entity;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Net;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCP.Application.Core.UserAuth.Comands
 {
-    public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, Guid>
+    /// <summary>
+    /// Создание пользователя с claim ом в БД
+    /// </summary>
+    public class CreateAccountHandler : IRequestHandler<CreateAccountCommand, Unit>
     {
         private readonly UserManager<AppUser> userManager;
 
-        public CreateAccountCommandHandler(UserManager<AppUser> userManager)
+        public CreateAccountHandler(UserManager<AppUser> userManager)
         {
             this.userManager = userManager;
         }
-        public async Task<Guid> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
             var model = new AppUser
             {
@@ -43,7 +38,7 @@ namespace SCP.Application.Core.UserAuth.Comands
                 var claimRes = await userManager.AddClaimsAsync(dbUser, claims);
                 if (claimRes.Succeeded)
                 {
-                    return dbUser.Id;
+                    return Unit.Value;
                 }
 
                 throw new BLException(HttpStatusCode.BadRequest, claimRes.Errors.First().Description);

@@ -9,7 +9,7 @@ namespace SCP.Api.Middleware
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var user = (AppUser)context.HttpContext.Items["User"];
+            var user = context.HttpContext.User.Claims.FirstOrDefault();
             if (user == null)
             {
                 // not logged in
