@@ -19,7 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common\Helpers\" />
     <Folder Include="Common\Mapping\" />
+    <Folder Include="Common\PipeLine\" />
     <Folder Include="Core\Safe\Queries\" />
   </ItemGroup>
 

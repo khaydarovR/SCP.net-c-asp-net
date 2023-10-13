@@ -37,8 +37,8 @@ namespace SCP.Application.Core.Safens.Commands
                 BotApiKey = string.Empty,
             };
 
-            await appDbContext.Safes.AddAsync(model);
-            await appDbContext.SaveChangesAsync();
+            await appDbContext.Safes.AddAsync(model, cancellationToken);
+            await appDbContext.SaveChangesAsync(cancellationToken);
             return Unit.Value;
         }
     }
