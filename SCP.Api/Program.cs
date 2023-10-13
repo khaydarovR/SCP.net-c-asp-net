@@ -4,6 +4,9 @@ using SCP.Api.ConfigureWebApi;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.PipeLine;
 using System.Reflection;
+using System.Text;
+
+Console.OutputEncoding = Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -3,12 +3,9 @@
     public class ActivityLog : BaseEntity
     {
         public DateTime At { get; set; }
-        public string Text { get; set; }
+        public string LogText { get; set; }
 
         public Guid RecordId { get; set; }
-        public Rec Record { get; set; }
-
-        public Guid AppUsreId { get; set; }
-        public AppUser AppUser { get; set; }
+        public Record Record { get; set; }
     }
 }

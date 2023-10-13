@@ -1,10 +1,8 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
-using SCP.Api.Middleware;
-using SCP.Application.Core.UserAuth.Comands;
-using SCP.Application.Core.UserAuth.Queries;
-using System.Security.Claims;
+using SCP.Api.Controllers.Base;
+using SCP.Api.DTO;
+using SCP.Application.Core.UserAuth;
 
 namespace SCP.Api.Controllers
 {
@@ -12,26 +10,28 @@ namespace SCP.Api.Controllers
     [ApiController]
     public class AuthController : CustomController
     {
-        public AuthController()
-        {
+        private readonly UserAuthCore userAuthCore;
 
+        public AuthController(UserAuthCore userAuthCore)
+        {
+            this.userAuthCore = userAuthCore;
         }
 
 
         [HttpPost(nameof(SignUp))]
-        public async Task<ActionResult<Unit>> SignUp([FromBody] CreateAccountCommand createAccount)
+        public async Task<ActionResult> SignUp([FromBody] CreateAccountDTO dto)
         {
-            var command = createAccount;
-            await Mediator.Send(command);
-            return Ok();
+            var command = dto.Adapt<CreateAccountCommand>();
+            var res = await userAuthCore.CreateAccount(command);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
         [HttpGet(nameof(SignIn))]
-        public async Task<ActionResult<string>> SignIn([FromQuery] GetJWTQuery getJWTQuery)
+        public async Task<ActionResult<string>> SignIn([FromQuery] SignInDTO dto)
         {
-            var query = getJWTQuery;
-            var token = await Mediator.Send(query);
-            return Ok(token);
+            var query = dto.Adapt<GetJwtQuery>();
+            var res = await userAuthCore.GetJwt(query);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
     }

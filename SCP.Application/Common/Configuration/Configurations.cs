@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SCP.Application.Core.Safe;
+using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
@@ -34,11 +36,11 @@ namespace SCP.Application.Common.Configuration
             .AddUserManager<UserManager<AppUser>>()
             .AddErrorDescriber<IdentityMessageRu>();
 
-            services.AddMediatR(cfg =>
-                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
             services.AddScoped<JwtService>();
             services.AddScoped<CryptorService>();
+
+            services.AddScoped<UserAuthCore>();
+            services.AddScoped<SafeCore>();
 
             return services;
         }

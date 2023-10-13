@@ -12,8 +12,8 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231008132845_Init")]
-    partial class Init
+    [Migration("20231013191219_3pk")]
+    partial class _3pk
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,24 +161,24 @@ namespace SCP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AppUsreId")
+                    b.Property<Guid?>("AppUserId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("At")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 10, 8, 13, 28, 44, 959, DateTimeKind.Utc).AddTicks(2383));
+                        .HasDefaultValue(new DateTime(2023, 10, 13, 19, 12, 19, 107, DateTimeKind.Utc).AddTicks(9166));
+
+                    b.Property<string>("LogText")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("RecordId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUsreId");
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("Id")
                         .IsUnique();
@@ -259,7 +259,56 @@ namespace SCP.DAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.Rec", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.Bot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AppUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EApiKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Bots");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.BotRight", b =>
+                {
+                    b.Property<Guid>("SafeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.HasKey("SafeId", "BotId", "ClaimValue");
+
+                    b.HasIndex("BotId");
+
+                    b.ToTable("BotRights");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.Record", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -298,7 +347,7 @@ namespace SCP.DAL.Migrations
                     b.ToTable("Records");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.RecUsers", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.RecordRight", b =>
                 {
                     b.Property<Guid>("RecordId")
                         .HasColumnType("uuid");
@@ -313,7 +362,7 @@ namespace SCP.DAL.Migrations
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("RecUsers");
+                    b.ToTable("RecordRights");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.Safe", b =>
@@ -322,11 +371,10 @@ namespace SCP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BotApiKey")
-                        .IsRequired()
+                    b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("EKey")
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
@@ -341,45 +389,22 @@ namespace SCP.DAL.Migrations
                     b.ToTable("Safes");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.SafeUsers", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.SafeRight", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("SafeId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("AppUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("SafeId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("SafeId", "AppUserId", "ClaimValue");
 
                     b.HasIndex("AppUserId");
 
-                    b.HasIndex("SafeId");
-
-                    b.ToTable("SafeUsers");
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.SafeUsersClaim", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ClaimValue")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserForSafeId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserForSafeId");
-
-                    b.ToTable("SafeClaims");
+                    b.ToTable("SafeRights");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.WhiteIPList", b =>
@@ -458,24 +483,46 @@ namespace SCP.DAL.Migrations
 
             modelBuilder.Entity("SCP.Domain.Entity.ActivityLog", b =>
                 {
-                    b.HasOne("SCP.Domain.Entity.AppUser", "AppUser")
+                    b.HasOne("SCP.Domain.Entity.AppUser", null)
                         .WithMany("ChangerHistory")
-                        .HasForeignKey("AppUsreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AppUserId");
 
-                    b.HasOne("SCP.Domain.Entity.Rec", "Record")
+                    b.HasOne("SCP.Domain.Entity.Record", "Record")
                         .WithMany("ActivityLog")
                         .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
-
                     b.Navigation("Record");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.Rec", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.Bot", b =>
+                {
+                    b.HasOne("SCP.Domain.Entity.AppUser", null)
+                        .WithMany("Bots")
+                        .HasForeignKey("AppUserId");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.BotRight", b =>
+                {
+                    b.HasOne("SCP.Domain.Entity.Bot", "Bot")
+                        .WithMany("Rights")
+                        .HasForeignKey("BotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SCP.Domain.Entity.Safe", "Safe")
+                        .WithMany()
+                        .HasForeignKey("SafeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bot");
+
+                    b.Navigation("Safe");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.Record", b =>
                 {
                     b.HasOne("SCP.Domain.Entity.Safe", "Safe")
                         .WithMany("Records")
@@ -486,53 +533,34 @@ namespace SCP.DAL.Migrations
                     b.Navigation("Safe");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.RecUsers", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.RecordRight", b =>
                 {
-                    b.HasOne("SCP.Domain.Entity.AppUser", "AppUser")
+                    b.HasOne("SCP.Domain.Entity.AppUser", null)
                         .WithMany("RecUsers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SCP.Domain.Entity.Rec", "Record")
-                        .WithMany()
+                    b.HasOne("SCP.Domain.Entity.Record", null)
+                        .WithMany("UserRights")
                         .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Record");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.SafeUsers", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.SafeRight", b =>
                 {
-                    b.HasOne("SCP.Domain.Entity.AppUser", "AppUser")
+                    b.HasOne("SCP.Domain.Entity.AppUser", null)
                         .WithMany("SafeUsers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SCP.Domain.Entity.Safe", "Safe")
+                    b.HasOne("SCP.Domain.Entity.Safe", null)
                         .WithMany("SafeUsers")
                         .HasForeignKey("SafeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Safe");
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.SafeUsersClaim", b =>
-                {
-                    b.HasOne("SCP.Domain.Entity.SafeUsers", "UserForSafe")
-                        .WithMany("Claims")
-                        .HasForeignKey("UserForSafeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserForSafe");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.WhiteIPList", b =>
@@ -548,6 +576,8 @@ namespace SCP.DAL.Migrations
 
             modelBuilder.Entity("SCP.Domain.Entity.AppUser", b =>
                 {
+                    b.Navigation("Bots");
+
                     b.Navigation("ChangerHistory");
 
                     b.Navigation("RecUsers");
@@ -557,9 +587,16 @@ namespace SCP.DAL.Migrations
                     b.Navigation("WhiteIPs");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.Rec", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.Bot", b =>
+                {
+                    b.Navigation("Rights");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.Record", b =>
                 {
                     b.Navigation("ActivityLog");
+
+                    b.Navigation("UserRights");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.Safe", b =>
@@ -567,11 +604,6 @@ namespace SCP.DAL.Migrations
                     b.Navigation("Records");
 
                     b.Navigation("SafeUsers");
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.SafeUsers", b =>
-                {
-                    b.Navigation("Claims");
                 });
 #pragma warning restore 612, 618
         }

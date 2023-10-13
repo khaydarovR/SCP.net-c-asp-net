@@ -15,12 +15,13 @@ namespace SCP.DAL
         public DbSet<AppUser> AppUsers { get; set; }
 
         public DbSet<Safe> Safes { get; set; }
-        public DbSet<SafeUsersClaim> SafeClaims { get; set; }
-        public DbSet<SafeUsers> SafeUsers { get; set; }
-        public DbSet<RecUsers> RecUsers { get; set; }
-        public DbSet<Rec> Records { get; set; }
+        public DbSet<SafeRight> SafeRights { get; set; }
+        public DbSet<RecordRight> RecordRights { get; set; }
+        public DbSet<Record> Records { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<WhiteIPList> WhiteIPs { get; set; }
+        public DbSet<Bot> Bots { get; set;  }
+        public DbSet<BotRight> BotRights { get; set;  }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -35,12 +36,24 @@ namespace SCP.DAL
             appUserBuilder.HasKey(c => c.Id);
             appUserBuilder.HasIndex(c => c.Id).IsUnique();
 
-            modelBuilder.Entity<SafeUsers>()
-                .HasKey(su => su.Id);
+            modelBuilder.Entity<SafeRight>()
+                .HasKey(sr => new {sr.SafeId, sr.AppUserId, sr.ClaimValue});
+            modelBuilder.Entity<SafeRight>()
+                .Property(rc => rc.ClaimValue);
 
-            modelBuilder.Entity<RecUsers>()
+
+            var botModelBuilder = modelBuilder.Entity<Bot>();
+            appUserBuilder.HasKey(c => c.Id);
+            appUserBuilder.HasIndex(c => c.Id).IsUnique();
+
+            modelBuilder.Entity<BotRight>()
+                .HasKey(br => new { br.SafeId, br.BotId, br.ClaimValue });
+            modelBuilder.Entity<SafeRight>()
+                .Property(rc => rc.ClaimValue);
+
+            modelBuilder.Entity<RecordRight>()
                 .HasKey(ru => new { ru.RecordId, ru.AppUserId });
-            modelBuilder.Entity<RecUsers>()
+            modelBuilder.Entity<RecordRight>()
                 .Property(c => c.Right).IsRequired();
 
             var safeBuilder = modelBuilder.Entity<Safe>();
@@ -51,7 +64,7 @@ namespace SCP.DAL
             safeBuilder.Property(c => c.EKey).IsRequired(false);
 
 
-            var recordBuilder = modelBuilder.Entity<Rec>();
+            var recordBuilder = modelBuilder.Entity<Record>();
             recordBuilder.HasKey(c => c.Id);
             recordBuilder.HasIndex(c => c.Id).IsUnique();
             recordBuilder.Property(c => c.Title).IsRequired();
@@ -67,15 +80,11 @@ namespace SCP.DAL
             var changesBuilder = modelBuilder.Entity<ActivityLog>();
             changesBuilder.HasKey(c => c.Id);
             changesBuilder.HasIndex(c => c.Id).IsUnique();
-            changesBuilder.Property(c => c.Text).IsRequired();
+            changesBuilder.Property(c => c.LogText).IsRequired();
             changesBuilder.Property(c => c.At).HasDefaultValue(DateTime.UtcNow);
             changesBuilder.HasOne(c => c.Record)
                 .WithMany(s => s.ActivityLog)
                 .HasForeignKey(c => c.RecordId)
-                .OnDelete(DeleteBehavior.Cascade);
-            changesBuilder.HasOne(c => c.AppUser)
-                .WithMany(s => s.ChangerHistory)
-                .HasForeignKey(c => c.AppUsreId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             var whiteIpsBuilder = modelBuilder.Entity<WhiteIPList>();
@@ -87,11 +96,7 @@ namespace SCP.DAL
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            var safeClaimsBuilder = modelBuilder.Entity<SafeUsersClaim>();
-            safeClaimsBuilder.HasOne(c => c.UserForSafe)
-                .WithMany(s => s.Claims)
-                .HasForeignKey(c => c.UserForSafeId)
-                .OnDelete(DeleteBehavior.Cascade);
+            
         }
     }
 }

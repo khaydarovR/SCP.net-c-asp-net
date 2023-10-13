@@ -3,6 +3,6 @@
     public class SystemRoles
     {
         public const string User = "Пользователь";
-        public const string Admin = "Админ";
+        public const string Admin = "BOS Админ";
     }
 }

@@ -27,13 +27,12 @@ namespace SCP.Application.Services
 
         public async Task<string> GenerateJwtToken(AppUser user)
         {
-            // generate token that is valid for 1 days
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(options.Value.JWT_KEY);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, await GetRoleFromClaims(user)),
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),

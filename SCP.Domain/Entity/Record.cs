@@ -1,6 +1,6 @@
 ﻿namespace SCP.Domain.Entity
 {
-    public class Rec : BaseEntity
+    public class Record : BaseEntity
     {
         public string Title { get; set; } = null!;
         public string Login { get; set; } = null!;
@@ -12,5 +12,6 @@
         public Safe Safe { get; set; }
 
         public ICollection<ActivityLog> ActivityLog { get; set; }
+        public ICollection<RecordRight> UserRights { get; set; }
     }
 }

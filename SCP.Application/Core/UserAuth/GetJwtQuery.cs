@@ -1,16 +1,16 @@
-﻿using MediatR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCP.Application.Core.UserAuth.Comands
+namespace SCP.Application.Core.UserAuth
 {
-    public class CreateAccountCommand : IRequest<Unit>
+    public class GetJwtQuery
     {
-        public string UserName { get; set; }
         public string Email { get; set; }
+
         public string Password { get; set; }
+
     }
 }

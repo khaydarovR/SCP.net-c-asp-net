@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Mapster" Version="7.4.0" />
-    <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.2" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.2" />
@@ -20,9 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Helpers\" />
-    <Folder Include="Common\Mapping\" />
-    <Folder Include="Common\PipeLine\" />
-    <Folder Include="Core\Safe\Queries\" />
   </ItemGroup>
 
 </Project>

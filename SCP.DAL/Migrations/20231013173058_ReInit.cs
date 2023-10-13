@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SCP.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class ReInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,7 @@ namespace SCP.DAL.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    BotApiKey = table.Column<string>(type: "text", nullable: false)
+                    EKey = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -173,6 +173,27 @@ namespace SCP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Bots",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    EApiKey = table.Column<string>(type: "text", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AppUserId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bots", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bots_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WhiteIPs",
                 columns: table => new
                 {
@@ -215,24 +236,49 @@ namespace SCP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SafeUsers",
+                name: "SafeRights",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SafeId = table.Column<Guid>(type: "uuid", nullable: false)
+                    SafeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimValue = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SafeUsers", x => x.Id);
+                    table.PrimaryKey("PK_SafeRights", x => new { x.SafeId, x.AppUserId });
                     table.ForeignKey(
-                        name: "FK_SafeUsers_AspNetUsers_AppUserId",
+                        name: "FK_SafeRights_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SafeUsers_Safes_SafeId",
+                        name: "FK_SafeRights_Safes_SafeId",
+                        column: x => x.SafeId,
+                        principalTable: "Safes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BotRights",
+                columns: table => new
+                {
+                    BotId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SafeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimValue = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BotRights", x => new { x.SafeId, x.BotId });
+                    table.ForeignKey(
+                        name: "FK_BotRights_Bots_BotId",
+                        column: x => x.BotId,
+                        principalTable: "Bots",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BotRights_Safes_SafeId",
                         column: x => x.SafeId,
                         principalTable: "Safes",
                         principalColumn: "Id",
@@ -244,20 +290,19 @@ namespace SCP.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    At = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 10, 8, 13, 28, 44, 959, DateTimeKind.Utc).AddTicks(2383)),
-                    Text = table.Column<string>(type: "text", nullable: false),
+                    At = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 10, 13, 17, 30, 58, 755, DateTimeKind.Utc).AddTicks(2789)),
+                    LogText = table.Column<string>(type: "text", nullable: false),
                     RecordId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AppUsreId = table.Column<Guid>(type: "uuid", nullable: false)
+                    AppUserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ActivityLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ActivityLogs_AspNetUsers_AppUsreId",
-                        column: x => x.AppUsreId,
+                        name: "FK_ActivityLogs_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ActivityLogs_Records_RecordId",
                         column: x => x.RecordId,
@@ -267,7 +312,7 @@ namespace SCP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RecUsers",
+                name: "RecordRights",
                 columns: table => new
                 {
                     AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -276,44 +321,25 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecUsers", x => new { x.RecordId, x.AppUserId });
+                    table.PrimaryKey("PK_RecordRights", x => new { x.RecordId, x.AppUserId });
                     table.ForeignKey(
-                        name: "FK_RecUsers_AspNetUsers_AppUserId",
+                        name: "FK_RecordRights_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RecUsers_Records_RecordId",
+                        name: "FK_RecordRights_Records_RecordId",
                         column: x => x.RecordId,
                         principalTable: "Records",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "SafeClaims",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserForSafeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClaimValue = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SafeClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SafeClaims_SafeUsers_UserForSafeId",
-                        column: x => x.UserForSafeId,
-                        principalTable: "SafeUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
-                name: "IX_ActivityLogs_AppUsreId",
+                name: "IX_ActivityLogs_AppUserId",
                 table: "ActivityLogs",
-                column: "AppUsreId");
+                column: "AppUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ActivityLogs_Id",
@@ -370,6 +396,21 @@ namespace SCP.DAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_BotRights_BotId",
+                table: "BotRights",
+                column: "BotId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bots_AppUserId",
+                table: "Bots",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecordRights_AppUserId",
+                table: "RecordRights",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Records_Id",
                 table: "Records",
                 column: "Id",
@@ -381,30 +422,15 @@ namespace SCP.DAL.Migrations
                 column: "SafeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecUsers_AppUserId",
-                table: "RecUsers",
+                name: "IX_SafeRights_AppUserId",
+                table: "SafeRights",
                 column: "AppUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SafeClaims_UserForSafeId",
-                table: "SafeClaims",
-                column: "UserForSafeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Safes_Id",
                 table: "Safes",
                 column: "Id",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SafeUsers_AppUserId",
-                table: "SafeUsers",
-                column: "AppUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SafeUsers_SafeId",
-                table: "SafeUsers",
-                column: "SafeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WhiteIPs_AppUserId",
@@ -440,10 +466,13 @@ namespace SCP.DAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "RecUsers");
+                name: "BotRights");
 
             migrationBuilder.DropTable(
-                name: "SafeClaims");
+                name: "RecordRights");
+
+            migrationBuilder.DropTable(
+                name: "SafeRights");
 
             migrationBuilder.DropTable(
                 name: "WhiteIPs");
@@ -452,10 +481,10 @@ namespace SCP.DAL.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Records");
+                name: "Bots");
 
             migrationBuilder.DropTable(
-                name: "SafeUsers");
+                name: "Records");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

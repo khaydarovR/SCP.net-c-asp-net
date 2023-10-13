@@ -19,4 +19,8 @@
     <ProjectReference Include="..\SCP.Application\SCP.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="VM\" />
+  </ItemGroup>
+
 </Project>
