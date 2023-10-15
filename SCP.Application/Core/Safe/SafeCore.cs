@@ -3,6 +3,8 @@ using SCP.Application.Services;
 using SCP.Domain.Entity;
 using SCP.Domain;
 using SCP.DAL;
+using Microsoft.AspNetCore.Identity;
+using SCP.Application.Core.UserAuth;
 
 namespace SCP.Application.Core.Safe
 {
@@ -34,20 +36,27 @@ namespace SCP.Application.Core.Safe
             };
             await dbContext.Safes.AddAsync(model);
 
-            var safeRights = SystemSafeClaims.AllClaims
-                .Select(c => new SafeRight { ClaimValue = c, AppUserId = command.UserId, SafeId = model.Id });
-            await dbContext.SafeRights.AddRangeAsync(safeRights);
+            var cliamValues = SystemSafeClaims.AllClaims
+                .Where(c => c != SystemSafeClaims.TemporarilyBlocked)
+                .Select(c => new SafeRight { AppUserId = command.UserId, SafeId = model.Id, ClaimValue = c })
+                .ToList();
+
+            await dbContext.SafeRights.AddRangeAsync(cliamValues);
 
             await dbContext.SaveChangesAsync();
 
             return new CoreResponse<bool>(true);
         }
 
-        //var safes = await dbContext.Safes
-        //    .Include(s => s.SafeUsers).ThenInclude(su => su.Claims)
-        //    .Where(s => s.SafeUsers.Any(su => su.AppUserId == request.UserId))
-        //    .Where(s => s.SafeUsers.Any(su => su.Claims.Any(c => c.ClaimValue == SystemSafeClaims.ItIsThisSafeCreator)))
-        //    .ToListAsync();
+        public async Task<CoreResponse<List<Domain.Entity.Safe>>> GetLinkedSafes(GetLinkedSafesQuery query)
+        {
+            //var safes = await dbContext.Safes
+            //    .Include(s => s.SafeUsers).ThenInclude(su => su.Claims)
+            //    .Where(s => s.SafeUsers.Any(su => su.AppUserId == request.UserId))
+            //    .Where(s => s.SafeUsers.Any(su => su.Claims.Any(c => c.ClaimValue == SystemSafeClaims.ItIsThisSafeCreator)))
+            //    .ToListAsync();
+            return new CoreResponse<List<Domain.Entity.Safe>>();
+        }
     }
 
 

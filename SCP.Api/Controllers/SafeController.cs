@@ -4,6 +4,7 @@ using SCP.Api.Middleware;
 using Mapster;
 using SCP.Application.Core.Safe;
 using SCP.Api.Controllers.Base;
+using SCP.Application.Core.UserAuth;
 
 namespace SCP.Api.Controllers
 {
@@ -34,14 +35,15 @@ namespace SCP.Api.Controllers
         }
 
         /// <summary>
-        /// Получение всех сейфов текущего пользователя (или пользователя по id)
+        /// Получение всех связанных сейфов с текущим пользователем
         /// </summary>
         /// <returns></returns>
-        [HttpGet(nameof(GetMySafes))]
-        public async Task<ActionResult> GetMySafes([FromQuery] string? userId)
+        [HttpGet(nameof(GetLinked))]
+        public async Task<ActionResult> GetLinked()
         {
-
-            return Ok();
+            var query = new GetLinkedSafesQuery(ContextUserId);
+            var res = await safeCore.GetLinkedSafes(query);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
     }
 }
