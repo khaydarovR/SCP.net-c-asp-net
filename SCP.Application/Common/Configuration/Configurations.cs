@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SCP.Application.Core.Record;
 using SCP.Application.Core.Safe;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
@@ -41,6 +42,7 @@ namespace SCP.Application.Common.Configuration
 
             services.AddScoped<UserAuthCore>();
             services.AddScoped<SafeCore>();
+            services.AddScoped<RecordCore>();
 
             return services;
         }

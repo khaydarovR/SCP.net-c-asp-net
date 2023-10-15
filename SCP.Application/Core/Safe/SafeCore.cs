@@ -5,6 +5,7 @@ using SCP.Domain;
 using SCP.DAL;
 using Microsoft.AspNetCore.Identity;
 using SCP.Application.Core.UserAuth;
+using Microsoft.EntityFrameworkCore;
 
 namespace SCP.Application.Core.Safe
 {
@@ -50,12 +51,13 @@ namespace SCP.Application.Core.Safe
 
         public async Task<CoreResponse<List<Domain.Entity.Safe>>> GetLinkedSafes(GetLinkedSafesQuery query)
         {
-            //var safes = await dbContext.Safes
-            //    .Include(s => s.SafeUsers).ThenInclude(su => su.Claims)
-            //    .Where(s => s.SafeUsers.Any(su => su.AppUserId == request.UserId))
-            //    .Where(s => s.SafeUsers.Any(su => su.Claims.Any(c => c.ClaimValue == SystemSafeClaims.ItIsThisSafeCreator)))
-            //    .ToListAsync();
-            return new CoreResponse<List<Domain.Entity.Safe>>();
+            var safes = await dbContext.Safes
+                .Include(s => s.SafeUsers)
+                .Where(s => s.SafeUsers.Any(su => su.AppUserId == query.UserId))
+                .Where(s => s.SafeUsers.Any(su => su.ClaimValue == SystemSafeClaims.ItIsThisSafeCreator))
+                .ToListAsync();
+
+            return new CoreResponse<List<Domain.Entity.Safe>>(safes);
         }
     }
 
