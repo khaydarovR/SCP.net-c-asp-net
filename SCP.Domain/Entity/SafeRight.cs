@@ -9,5 +9,6 @@ namespace SCP.Domain.Entity
         public Guid SafeId { get; set; }
         
         public string ClaimValue { get; set; }
+        public DateTime DeadDate{ get; set; }
     }
 }

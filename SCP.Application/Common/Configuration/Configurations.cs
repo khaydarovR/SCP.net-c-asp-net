@@ -38,7 +38,8 @@ namespace SCP.Application.Common.Configuration
             .AddErrorDescriber<IdentityMessageRu>();
 
             services.AddScoped<JwtService>();
-            services.AddScoped<CryptorService>();
+            services.AddSingleton<SymmetricCryptoService>();
+            services.AddSingleton<AsymmetricCryptoService>();
 
             services.AddScoped<UserAuthCore>();
             services.AddScoped<SafeCore>();

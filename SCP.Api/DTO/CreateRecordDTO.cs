@@ -6,8 +6,6 @@
         public string Login { get; set; }
         public string Pw { get; set; }
         public string Secret { get; set; }
-        public bool IsDeleted { get; set; }
         public string SafeId { get; set; }
-
     }
 }

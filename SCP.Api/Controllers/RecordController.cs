@@ -13,11 +13,13 @@ namespace SCP.Api.Controllers
             this.recordCore = recordCore;
         }
 
-
-        public Task<ActionResult> Create()
+        [HttpGet("{recId}")]
+        public async Task<IActionResult> GetSecret(string recId, [FromHeader(Name = "Pub-Key")] string clientPublicKey)
         {
-            var res = recordCore.
-            return Ok();
+            var comand = new ReadRecordCommand { PubKeyFromClient = clientPublicKey, RecordId = Guid.Parse(recId)};
+            var response = await recordCore.ReadRecord(comand);
+            return Ok(response);
         }
+
     }
 }

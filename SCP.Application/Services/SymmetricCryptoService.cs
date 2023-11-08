@@ -5,11 +5,11 @@ using System.Text;
 
 namespace SCP.Application.Services
 {
-    public class CryptorService
+    public class SymmetricCryptoService
     {
         private readonly IOptions<MyOptions> myOptions;
 
-        public CryptorService(IOptions<MyOptions> myOptions)
+        public SymmetricCryptoService(IOptions<MyOptions> myOptions)
         {
             this.myOptions = myOptions;
         }

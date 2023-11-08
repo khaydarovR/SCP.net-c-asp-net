@@ -9,4 +9,10 @@ namespace SCP.Application.Core.Record
     public class CreateRecordCommand
     {
     }
+
+    public class ReadRecordCommand
+    {
+        public string PubKeyFromClient {  get; set; }
+        public Guid RecordId {  get; set; }
+    }
 }

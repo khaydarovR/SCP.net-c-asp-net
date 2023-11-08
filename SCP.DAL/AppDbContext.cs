@@ -61,16 +61,17 @@ namespace SCP.DAL
             safeBuilder.HasIndex(c => c.Id).IsUnique();
             safeBuilder.Property(c => c.Title).IsRequired();
             safeBuilder.Property(c => c.Description).IsRequired(false);
-            safeBuilder.Property(c => c.EKey).IsRequired(false);
+            safeBuilder.Property(c => c.PrivateK).IsRequired(false);
+            safeBuilder.Property(c => c.PublicK).IsRequired(false);
 
 
             var recordBuilder = modelBuilder.Entity<Record>();
             recordBuilder.HasKey(c => c.Id);
             recordBuilder.HasIndex(c => c.Id).IsUnique();
             recordBuilder.Property(c => c.Title).IsRequired();
-            recordBuilder.Property(c => c.Login).IsRequired();
-            recordBuilder.Property(c => c.Pw).IsRequired();
-            recordBuilder.Property(c => c.Secret).IsRequired(false);
+            recordBuilder.Property(c => c.ELogin).IsRequired();
+            recordBuilder.Property(c => c.EPw).IsRequired();
+            recordBuilder.Property(c => c.ESecret).IsRequired(false);
             recordBuilder.Property(c => c.IsDeleted).HasDefaultValue(false);
             recordBuilder.HasOne(c => c.Safe)
                 .WithMany(s => s.Records)
