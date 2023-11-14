@@ -44,11 +44,11 @@ namespace SCP.Application.Core.Safe
             };
             await dbContext.Safes.AddAsync(model);
 
-            var cliamValues = SystemSafeClaims.AllClaims
-                .Select(c => new SafeRight { AppUserId = command.UserId, SafeId = model.Id, ClaimValue = c })
+            var permisions = SystemSafePermisons.AllClaims
+                .Select(c => new SafeRight { AppUserId = command.UserId, SafeId = model.Id, Permission = c })
                 .ToList();
 
-            await dbContext.SafeRights.AddRangeAsync(cliamValues);
+            await dbContext.SafeRights.AddRangeAsync(permisions);
 
             await dbContext.SaveChangesAsync();
 
@@ -60,7 +60,7 @@ namespace SCP.Application.Core.Safe
             var safes = await dbContext.Safes
                 .Include(s => s.SafeUsers)
                 .Where(s => s.SafeUsers.Any(su => su.AppUserId == query.UserId))
-                .Where(s => s.SafeUsers.Any(su => su.ClaimValue == SystemSafeClaims.ItIsThisSafeCreator))
+                .Where(s => s.SafeUsers.Any(su => su.Permission == SystemSafePermisons.ItIsThisSafeCreator))
                 .ToListAsync();
 
             return new CoreResponse<List<Domain.Entity.Safe>>(safes);

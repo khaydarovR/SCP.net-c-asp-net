@@ -7,8 +7,10 @@
         public string EApiKey { get; set; }
 
         public Guid OwnerId {  get; set; }
+        public AppUser Owner { get; set; }
 
-        public ICollection<BotRight> Rights { get; set; }
+        public virtual IList<BotRight> Rights { get; set; }
+        public virtual IList<BotWhiteIP> WhiteIPs { get; set; }
 
     }
 }

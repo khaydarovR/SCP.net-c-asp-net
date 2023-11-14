@@ -6,14 +6,10 @@ using System.Threading.Tasks;
 
 namespace SCP.Domain.Entity
 {
-    public class BotRight
+    public class BotWhiteIP : BaseEntity
     {
         public Guid BotId { get; set; }
-
-        public Guid SafeId { get; set; }
-
-        public string Permission { get; set; }
-        public DateTime DeadDate { get; set; }
-
+        public Bot Bot { get; set; }
+        public string AllowFrom { get; set; }
     }
 }

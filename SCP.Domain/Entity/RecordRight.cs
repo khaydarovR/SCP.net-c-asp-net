@@ -7,6 +7,6 @@ namespace SCP.Domain.Entity
     {
         public Guid AppUserId { get; set; }
         public Guid RecordId { get; set; }
-        public RecRightEnum Right { get; set; }
+        public RecRightEnum EnumPermission { get; set; }
     }
 }

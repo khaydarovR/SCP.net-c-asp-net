@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SCP.Domain.Entity;
 
 namespace SCP.DAL
@@ -16,10 +17,11 @@ namespace SCP.DAL
 
         public DbSet<Safe> Safes { get; set; }
         public DbSet<SafeRight> SafeRights { get; set; }
-        public DbSet<RecordRight> RecordRights { get; set; }
         public DbSet<Record> Records { get; set; }
+        public DbSet<RecordRight> RecordRights { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
-        public DbSet<WhiteIPList> WhiteIPs { get; set; }
+        public DbSet<UserWhiteIP> UserWhiteIPs { get; set; }
+        public DbSet<BotWhiteIP> BotWhiteIPs { get; set; }
         public DbSet<Bot> Bots { get; set;  }
         public DbSet<BotRight> BotRights { get; set;  }
 
@@ -32,72 +34,252 @@ namespace SCP.DAL
         {
             base.OnModelCreating(modelBuilder);
 
-            var appUserBuilder = modelBuilder.Entity<AppUser>();
-            appUserBuilder.HasKey(c => c.Id);
-            appUserBuilder.HasIndex(c => c.Id).IsUnique();
-
-            modelBuilder.Entity<SafeRight>()
-                .HasKey(sr => new {sr.SafeId, sr.AppUserId, sr.ClaimValue});
-            modelBuilder.Entity<SafeRight>()
-                .Property(rc => rc.ClaimValue);
+            var appUserModelBuilder = modelBuilder.Entity<AppUser>();
+            ConfigureAppUser(appUserModelBuilder);
 
 
             var botModelBuilder = modelBuilder.Entity<Bot>();
-            appUserBuilder.HasKey(c => c.Id);
-            appUserBuilder.HasIndex(c => c.Id).IsUnique();
+            ConfigureBot(botModelBuilder);
 
-            modelBuilder.Entity<BotRight>()
-                .HasKey(br => new { br.SafeId, br.BotId, br.ClaimValue });
-            modelBuilder.Entity<SafeRight>()
-                .Property(rc => rc.ClaimValue);
+            var botRightModelBuilder = modelBuilder.Entity<BotRight>();
+            ConfigureBotRight(botRightModelBuilder);
 
-            modelBuilder.Entity<RecordRight>()
-                .HasKey(ru => new { ru.RecordId, ru.AppUserId });
-            modelBuilder.Entity<RecordRight>()
-                .Property(c => c.Right).IsRequired();
 
             var safeBuilder = modelBuilder.Entity<Safe>();
-            safeBuilder.HasKey(c => c.Id);
-            safeBuilder.HasIndex(c => c.Id).IsUnique();
-            safeBuilder.Property(c => c.Title).IsRequired();
-            safeBuilder.Property(c => c.Description).IsRequired(false);
-            safeBuilder.Property(c => c.PrivateK).IsRequired(false);
-            safeBuilder.Property(c => c.PublicK).IsRequired(false);
+            ConfigureSafe(safeBuilder);
+
+            var safeRightModelBuilder = modelBuilder.Entity<SafeRight>();
+            ConfigureSafeRight(safeRightModelBuilder);
 
 
-            var recordBuilder = modelBuilder.Entity<Record>();
-            recordBuilder.HasKey(c => c.Id);
-            recordBuilder.HasIndex(c => c.Id).IsUnique();
-            recordBuilder.Property(c => c.Title).IsRequired();
-            recordBuilder.Property(c => c.ELogin).IsRequired();
-            recordBuilder.Property(c => c.EPw).IsRequired();
-            recordBuilder.Property(c => c.ESecret).IsRequired(false);
-            recordBuilder.Property(c => c.IsDeleted).HasDefaultValue(false);
-            recordBuilder.HasOne(c => c.Safe)
-                .WithMany(s => s.Records)
-                .HasForeignKey(c => c.SafeId)
-                .OnDelete(DeleteBehavior.Cascade);
+            var recordModelBuilder = modelBuilder.Entity<Record>();
+            ConfigureRecord(recordModelBuilder);
 
-            var changesBuilder = modelBuilder.Entity<ActivityLog>();
-            changesBuilder.HasKey(c => c.Id);
-            changesBuilder.HasIndex(c => c.Id).IsUnique();
-            changesBuilder.Property(c => c.LogText).IsRequired();
-            changesBuilder.Property(c => c.At).HasDefaultValue(DateTime.UtcNow);
-            changesBuilder.HasOne(c => c.Record)
-                .WithMany(s => s.ActivityLog)
-                .HasForeignKey(c => c.RecordId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            var whiteIpsBuilder = modelBuilder.Entity<WhiteIPList>();
-            whiteIpsBuilder.HasIndex(c => c.Id).IsUnique();
-            whiteIpsBuilder.Property(c => c.WhiteIp).IsRequired();
-            whiteIpsBuilder.HasOne(c => c.AppUser)
-                .WithMany(s => s.WhiteIPs)
-                .HasForeignKey(c => c.AppUserId)
-                .OnDelete(DeleteBehavior.Cascade);
+            var recordRightBuilder = modelBuilder.Entity<RecordRight>();
+            ConfigureRecordRight(recordRightBuilder);
 
 
-            
+            var activityLogBuilder = modelBuilder.Entity<ActivityLog>();
+            ConfigureActivityLog(activityLogBuilder);
+
+
+            var userWhiteIPBuilder = modelBuilder.Entity<UserWhiteIP>();
+            ConfigureUserWhiteIps(userWhiteIPBuilder);
+
+            var botWhiteIpModelBuilder = modelBuilder.Entity<BotWhiteIP>();
+            ConfigureBotIP(botWhiteIpModelBuilder);
+
+        }
+
+        private static void ConfigureUserWhiteIps(EntityTypeBuilder<UserWhiteIP> userWhiteIPBuilder)
+        {
+            // Key and index configurations
+            userWhiteIPBuilder.HasKey(uwip => uwip.Id);
+            userWhiteIPBuilder.HasIndex(uwip => uwip.Id).IsUnique();
+
+            // Property configurations
+            userWhiteIPBuilder.Property(uwip => uwip.AllowFrom).IsRequired();
+
+            // Relationship configurations
+            userWhiteIPBuilder.HasOne(uwip => uwip.AppUser)
+                              .WithMany(au => au.WhiteIPs)
+                              .HasForeignKey(uwip => uwip.AppUserId)
+                              .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void ConfigureActivityLog(EntityTypeBuilder<ActivityLog> activityLogBuilder)
+        {
+            // Key and index configurations
+            activityLogBuilder.HasKey(a => a.Id);
+            activityLogBuilder.HasIndex(a => a.Id).IsUnique();
+
+            // Property configurations
+            activityLogBuilder.Property(a => a.At).IsRequired();
+            activityLogBuilder.Property(a => a.LogText).IsRequired();
+
+            // Relationship configurations
+            activityLogBuilder.HasOne(a => a.Record)
+                              .WithMany(r => r.ActivityLogs) 
+                              .HasForeignKey(a => a.RecordId)
+                              .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void ConfigureRecordRight(EntityTypeBuilder<RecordRight> recordRightBuilder)
+        {
+            // Key configurations
+            // In this case, a composite primary key would be appropriate given 
+            // a unique record should be maintained per user per record.
+            recordRightBuilder.HasKey(rr => new { rr.AppUserId, rr.RecordId });
+
+        }
+
+        private static void ConfigureSafe(EntityTypeBuilder<Safe> safeBuilder)
+        {
+            // Key and index configurations
+            safeBuilder.HasKey(s => s.Id);
+            safeBuilder.HasIndex(s => s.Id).IsUnique();
+
+            // Property configurations
+            safeBuilder.Property(s => s.Title).IsRequired();
+            safeBuilder.Property(s => s.Description).IsRequired(false);
+            safeBuilder.Property(s => s.PrivateK).IsRequired(false);
+            safeBuilder.Property(s => s.PublicK).IsRequired(false);
+
+            // Relationship configurations
+            safeBuilder.HasMany(s => s.Records)
+                       .WithOne()
+                       .HasForeignKey(r => r.SafeId)
+                       .OnDelete(DeleteBehavior.Cascade);
+            safeBuilder.HasMany(s => s.SafeUsers)
+                       .WithOne()
+                       .HasForeignKey(su => su.SafeId)
+                       .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void ConfigureAppUser(EntityTypeBuilder<AppUser> appUserModelBuilder)
+        {
+
+            // Property settings
+            appUserModelBuilder.Property(au => au.CreatedDate)
+                               .IsRequired()
+                               .HasDefaultValue(DateTime.UtcNow);
+
+            // Relationships
+            appUserModelBuilder.HasMany(au => au.SafeRights)
+                               .WithOne()
+                               .HasForeignKey(su => su.AppUserId)
+                               .OnDelete(DeleteBehavior.Cascade);
+
+            appUserModelBuilder.HasMany(au => au.RecordRights)
+                               .WithOne()
+                               .HasForeignKey(ru => ru.AppUserId)
+                               .OnDelete(DeleteBehavior.Cascade);
+
+            appUserModelBuilder.HasMany(au => au.WhiteIPs)
+                               .WithOne()
+                               .HasForeignKey(wip => wip.AppUserId)
+                               .OnDelete(DeleteBehavior.Cascade);
+
+            appUserModelBuilder.HasMany(au => au.Bots)
+                               .WithOne()
+                               .HasForeignKey(b => b.Id)
+                               .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void ConfigureSafeRight(EntityTypeBuilder<SafeRight> safeRightModelBuilder)
+        {
+            // Setting primary key
+            safeRightModelBuilder.HasKey(r => r.Id);
+
+            // Setting uniqueness of Id
+            safeRightModelBuilder.HasIndex(r => r.Id).IsUnique();
+
+            // Properties settings
+            safeRightModelBuilder.Property(sr => sr.Permission)
+                                 .IsRequired()
+                                 .HasMaxLength(200);
+
+            safeRightModelBuilder.Property(sr => sr.DeadDate)
+                                 .IsRequired();
+        }
+
+        private static void ConfigureBotRight(EntityTypeBuilder<BotRight> botRightModelBuilder)
+        {
+            // Composite Key Configuration
+            botRightModelBuilder.HasKey(br => new { br.BotId, br.SafeId });
+
+            // Properties settings
+            botRightModelBuilder.Property(br => br.Permission)
+                                .IsRequired()
+                                .HasMaxLength(200);
+
+            botRightModelBuilder.Property(br => br.DeadDate)
+                                .IsRequired();
+
+        }
+
+        private static void ConfigureRecord(EntityTypeBuilder<Record> recordModelBuilder)
+        {
+
+            // Setting primary key
+            recordModelBuilder.HasKey(r => r.Id);
+
+            // Setting uniqueness of Id
+            recordModelBuilder.HasIndex(r => r.Id).IsUnique();
+
+            // Properties settings
+            recordModelBuilder.Property(r => r.Title)
+                              .IsRequired()
+                              .HasMaxLength(100);
+            recordModelBuilder.Property(r => r.ELogin)
+                              .IsRequired(false)
+                              .HasMaxLength(500);
+            recordModelBuilder.Property(r => r.EPw)
+                              .IsRequired(false)
+                              .HasMaxLength(500);
+            recordModelBuilder.Property(r => r.ESecret)
+                              .HasMaxLength(500);
+            recordModelBuilder.Property(r => r.ForResource)
+                              .IsRequired(false)
+                              .HasMaxLength(200);
+
+            // Setting default value for IsDeleted
+            recordModelBuilder.Property(r => r.IsDeleted)
+                              .HasDefaultValue(false);
+
+            // Relationships settings
+            recordModelBuilder.HasOne(r => r.Safe)
+                              .WithMany(s => s.Records)
+                              .HasForeignKey(r => r.SafeId)
+                              .OnDelete(DeleteBehavior.Cascade);
+
+        }
+
+        private static void ConfigureBotIP(EntityTypeBuilder<BotWhiteIP> botWhiteIpModelBuilder)
+        {
+            // Setting primary key
+            botWhiteIpModelBuilder.HasKey(b => b.Id);
+
+            // Setting uniqueness of Id
+            botWhiteIpModelBuilder.HasIndex(b => b.Id).IsUnique();
+
+            // Properties settings
+            botWhiteIpModelBuilder.Property(b => b.AllowFrom)
+                                  .IsRequired()
+                                  .HasMaxLength(100);
+
+            // Relationships settings
+            botWhiteIpModelBuilder.HasOne(b => b.Bot)
+                                  .WithMany(b => b.WhiteIPs)
+                                  .HasForeignKey(b => b.BotId)
+                                  .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void ConfigureBot(EntityTypeBuilder<Bot> botModelBuilder)
+        {
+            // Setting primary key
+            botModelBuilder.HasKey(b => b.Id);
+
+            // Setting uniqueness of Id
+            botModelBuilder.HasIndex(b => b.Id).IsUnique();
+
+            // Properties settings
+            botModelBuilder.Property(b => b.Name)
+                           .IsRequired()
+                           .HasMaxLength(100);
+            botModelBuilder.Property(b => b.Description)
+                           .IsRequired()
+                           .HasMaxLength(500);
+            botModelBuilder.Property(b => b.EApiKey)
+                           .IsRequired()
+                           .HasMaxLength(100);
+
+            // Relationships settings
+            botModelBuilder.HasOne(b => b.Owner)
+                           .WithMany(u => u.Bots)
+                           .HasForeignKey(b => b.OwnerId)
+                           .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

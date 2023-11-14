@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SCP.Domain.Entity
 {
-    public class WhiteIPList : BaseEntity
+    public class UserWhiteIP : BaseEntity
     {
         public Guid AppUserId { get; set; }
         public AppUser AppUser { get; set; }
-        public string WhiteIp { get; set; }
+        public string AllowFrom { get; set; }
     }
 }

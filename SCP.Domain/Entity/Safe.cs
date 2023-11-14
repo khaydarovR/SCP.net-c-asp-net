@@ -8,7 +8,7 @@ namespace SCP.Domain.Entity
         public string Description { get; set; } = null!;
         public string PrivateK { get; set; } = null!;
         public string PublicK { get; set; } = null!;
-        public ICollection<Record> Records { get; set; }
-        public ICollection<SafeRight> SafeUsers { get; set; }
+        public virtual IList<Record> Records { get; set; }
+        public virtual IList<SafeRight> SafeUsers { get; set; }
     }
 }

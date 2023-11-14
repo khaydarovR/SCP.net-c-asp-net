@@ -6,10 +6,9 @@ namespace SCP.Domain.Entity
     public class AppUser : IdentityUser<Guid>
     {
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        public IList<SafeRight> SafeUsers { get; set; }
-        public IList<RecordRight> RecUsers { get; set; }
-        public ICollection<ActivityLog> ChangerHistory { get; set; }
-        public ICollection<WhiteIPList> WhiteIPs { get; set; }
-        public ICollection<Bot> Bots { get; set; }
+        public virtual IList<SafeRight> SafeRights { get; set; }
+        public virtual IList<RecordRight> RecordRights { get; set; }
+        public virtual IList<UserWhiteIP> WhiteIPs { get; set; }
+        public virtual IList<Bot> Bots { get; set; }
     }
 }
