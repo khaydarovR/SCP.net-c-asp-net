@@ -1,6 +1,6 @@
-﻿namespace SCP.Api.Responses
+﻿namespace SCP.Application.Common.Response
 {
-    public class ReadRecordResonse
+    public class ReadRecordResponse
     {
         public string Title { get; set; }
         public string ESecret { get; set; }

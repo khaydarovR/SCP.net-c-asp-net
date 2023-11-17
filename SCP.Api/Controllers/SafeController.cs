@@ -5,6 +5,7 @@ using Mapster;
 using SCP.Application.Core.Safe;
 using SCP.Api.Controllers.Base;
 using SCP.Application.Core.UserAuth;
+using SCP.Application.Core.Record;
 
 namespace SCP.Api.Controllers
 {
@@ -43,6 +44,20 @@ namespace SCP.Api.Controllers
         {
             var query = new GetLinkedSafesQuery(ContextUserId);
             var res = await safeCore.GetLinkedSafes(query);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
+
+        /// <summary>
+        /// Получение публичного ключа сейфа для отправки зашифрованной записи
+        /// </summary>
+        /// <param name="recId"></param>
+        /// <param name="clientPublicKey"></param>
+        /// <returns></returns>
+        [HttpGet("Pubk/{safeId}")]
+        public async Task<IActionResult> GetPubKForSafe(string safeId)
+        {
+            var res = await safeCore.GetPubKForSafe(safeId);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
     }

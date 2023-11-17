@@ -30,7 +30,7 @@ namespace SCP.Api.Controllers
         public async Task<ActionResult<string>> SignIn([FromQuery] SignInDTO dto)
         {
             var query = dto.Adapt<GetJwtQuery>();
-            var res = await userAuthCore.GetJwt(query);
+            var res = await userAuthCore.GetJwtAndClaims(query);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 

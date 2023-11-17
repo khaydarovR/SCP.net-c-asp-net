@@ -2,9 +2,9 @@
 {
     public enum RecRightEnum
     {
-        See,
-        Read,
-        Edit,
-        Delete,
+        See = 0,
+        Read = 1,
+        Edit = 2,
+        Delete = 3,
     }
 }

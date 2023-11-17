@@ -17,8 +17,4 @@
     <ProjectReference Include="..\SCP.DAL\SCP.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Helpers\" />
-  </ItemGroup>
-
 </Project>

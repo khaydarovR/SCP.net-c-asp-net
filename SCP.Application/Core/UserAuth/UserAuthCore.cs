@@ -6,10 +6,11 @@ using System.Net;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using SCP.Application.Services;
+using SCP.Application.Common.Response;
 
 namespace SCP.Application.Core.UserAuth
 {
-    public class UserAuthCore
+    public class UserAuthCore : BaseCore
     {
         private readonly UserManager<AppUser> userManager;
         private readonly JwtService jwtService;
@@ -49,23 +50,27 @@ namespace SCP.Application.Core.UserAuth
 
 
 
-        public async Task<CoreResponse<string>> GetJwt(GetJwtQuery query)
+        public async Task<CoreResponse<AuthResponse>> GetJwtAndClaims(GetJwtQuery query)
         {
             var user = await userManager.FindByEmailAsync(query.Email);
             if (user == null)
             {
-                return new CoreResponse<string>("Логин или пароль не верный");
+                return Bad<AuthResponse>("Логин или пароль не верный");
             }
 
             var pwIsVerifyed = await userManager.CheckPasswordAsync(user, query.Password);
             if (pwIsVerifyed == false)
             {
-                return new CoreResponse<string>("Логин или пароль не верный");
+                return Bad<AuthResponse>("Логин или пароль не верный");
             }
 
             var token = await jwtService.GenerateJwtToken(user);
 
-            return new CoreResponse<string>(token, true);
+            return Good(new AuthResponse { 
+                UserId = user.Id.ToString(),
+                Jwt = token,
+                UserName = user.UserName!
+            });
         }
     }
 }

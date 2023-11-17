@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
+using SCP.Api.DTO;
 using SCP.Application.Core.Record;
 
 namespace SCP.Api.Controllers
@@ -14,12 +16,24 @@ namespace SCP.Api.Controllers
         }
 
         [HttpGet("{recId}")]
-        public async Task<IActionResult> GetSecret(string recId, [FromHeader(Name = "Pub-Key")] string clientPublicKey)
+        public async Task<IActionResult> GetRecord(string recId, [FromHeader(Name = "Pub-Key")] string clientPublicKey)
         {
             var comand = new ReadRecordCommand { PubKeyFromClient = clientPublicKey, RecordId = Guid.Parse(recId)};
-            var response = await recordCore.ReadRecord(comand);
-            return Ok(response);
+            var res = await recordCore.ReadRecord(comand);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateRecord([FromBody] CreateRecordDTO dto)
+        {
+            var comand = dto.Adapt<CreateRecordCommand>();
+            comand.UserId = ContextUserId.ToString();
+            var res = await recordCore.CreateRecord(comand);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
 
     }
 }

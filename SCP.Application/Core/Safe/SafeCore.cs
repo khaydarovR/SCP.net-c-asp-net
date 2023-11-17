@@ -24,15 +24,12 @@ namespace SCP.Application.Core.Safe
         public async Task<CoreResponse<bool>> CreateUserSafe(CreateSafeCommand command)
         {
             var rsa = new RSACryptoServiceProvider(2048);
-                                                          
+
             string publicKey = rsa.ToXmlString(false);
             string privateKey = rsa.ToXmlString(true);
 
-            //string? encryptedKeyForSafe = string.Empty;
-            //if (command.ClearKey != null)
-            //{
-            //    encryptedKeyForSafe = cryptorService.EncryptWithSecretKey(command.ClearKey);
-            //}
+            // Encrypt private key before saving
+            var encryptedPrivateKey = cryptorService.EncryptWithSecretKey(privateKey);
 
             var model = new Domain.Entity.Safe
             {
@@ -40,7 +37,7 @@ namespace SCP.Application.Core.Safe
                 Title = command.Title,
                 Description = command.Description ?? "",
                 PublicK = publicKey,
-                PrivateK = privateKey,
+                EPrivateK = encryptedPrivateKey
             };
             await dbContext.Safes.AddAsync(model);
 
@@ -55,6 +52,8 @@ namespace SCP.Application.Core.Safe
             return new CoreResponse<bool>(true);
         }
 
+
+
         public async Task<CoreResponse<List<Domain.Entity.Safe>>> GetLinkedSafes(GetLinkedSafesQuery query)
         {
             var safes = await dbContext.Safes
@@ -64,6 +63,19 @@ namespace SCP.Application.Core.Safe
                 .ToListAsync();
 
             return new CoreResponse<List<Domain.Entity.Safe>>(safes);
+        }
+
+        public async Task<CoreResponse<string>> GetPubKForSafe(string safeId)
+        {
+            var safe = await dbContext.Safes
+                .FirstOrDefaultAsync(s => s.Id == Guid.Parse(safeId));
+
+            if (safe == null)
+            {
+                return new CoreResponse<string>("Сейф не найден", false);
+            }
+
+            return new CoreResponse<string>(safe.PublicK);
         }
     }
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SCP.Api.ConfigureWebApi;
@@ -38,7 +39,8 @@ app.UseCors(x => x
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
 
-
 app.MapControllers();
+
+app.MapGet("ping", () => "pong");
 
 app.Run();
