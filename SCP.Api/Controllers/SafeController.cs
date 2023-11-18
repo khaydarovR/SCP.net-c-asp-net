@@ -26,8 +26,8 @@ namespace SCP.Api.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost(nameof(CreateMySafe))]
-        public async Task<ActionResult> CreateMySafe(CreateSafeDTO dto)
+        [HttpPost(nameof(CreateMy))]
+        public async Task<ActionResult> CreateMy(CreateSafeDTO dto)
         {
             var command = dto.Adapt<CreateSafeCommand>();
             command.UserId = ContextUserId;

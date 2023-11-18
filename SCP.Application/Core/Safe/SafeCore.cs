@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 
 namespace SCP.Application.Core.Safe
 {
-    public class SafeCore
+    public class SafeCore: BaseCore
     {
         private readonly SymmetricCryptoService cryptorService;
         private readonly AppDbContext dbContext;
@@ -23,6 +23,11 @@ namespace SCP.Application.Core.Safe
 
         public async Task<CoreResponse<bool>> CreateUserSafe(CreateSafeCommand command)
         {
+            if (string.IsNullOrEmpty(command.Title))
+            {
+                return Bad<bool>("Название сейфа не может быть пустым");
+            }
+
             var rsa = new RSACryptoServiceProvider(2048);
 
             string publicKey = rsa.ToXmlString(false);
