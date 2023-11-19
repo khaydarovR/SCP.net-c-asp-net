@@ -13,6 +13,6 @@ namespace SCP.Api.DTO
 
 
         public string Signature { get; set; } = null!;
-        public string ClientPubK { get; set; } = null!;
+        public string ClientPrivK { get; set; } = null!;
     }
 }

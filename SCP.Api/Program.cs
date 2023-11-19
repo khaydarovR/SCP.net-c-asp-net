@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using SCP.Api.ConfigureWebApi;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.PipeLine;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Reflection;
 using System.Text;
 
@@ -24,7 +25,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+        {
+            c.Interceptors = new InterceptorFunctions
+            {
+                RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI3Y2MwNjY3Ni00NmFhLTRmNzgtODNkNS0yZjJjYzBhYTBkZWUiLCJyb2xlIjoi0J_QvtC70YzQt9C-0LLQsNGC0LXQu9GMIiwibmJmIjoxNzAwMzMzNDUwLCJleHAiOjE3MDA0MTk4NTAsImlhdCI6MTcwMDMzMzQ1MCwiaXNzIjoiQk9TIn0.YKoTsBq4cjXeKxiRD5AI2wvCyV88U-_-X1Pij2hqpVI'; return req; }"
+            };
+        });
 }
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();

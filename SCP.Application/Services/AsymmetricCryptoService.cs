@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Security;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -16,18 +18,66 @@ namespace SCP.Application.Services
             RSA = new RSACryptoServiceProvider(2048);
         }
 
-        public string Encrypt(string plaintext, string publicKey)
+        public string DecryptData(string encryptedText, string privateKey)
         {
-            RSA.FromXmlString(publicKey);
-            var plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
-            return Convert.ToBase64String(RSA.Encrypt(plaintextBytes, false));
+            byte[] encryptedBytes = Convert.FromBase64String(encryptedText);  // Convert encrypted text into bytes
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048))
+            {
+                try
+                {
+                    rsa.ImportFromPem(privateKey); // Setting privateKey 
+
+                    byte[] decryptedBytes = rsa.Decrypt(encryptedBytes, false);  //// false for PKCS#1 padding
+                    string decryptedData = Encoding.UTF8.GetString(decryptedBytes);  // Convert bytes to string
+                    return decryptedData;  // Return decrypted text
+                }
+                finally
+                {
+                    rsa.PersistKeyInCsp = false; // Clear rsa key container
+                }
+            }
         }
 
-        public string Decrypt(string encryptedText, string privateKey)
+
+        public (string publicKey, string privateKey) GenerateKeys(int keySize = 2048)
         {
-            RSA.FromXmlString(privateKey);
-            var encryptedBytes = Convert.FromBase64String(encryptedText);
-            return Encoding.UTF8.GetString(RSA.Decrypt(encryptedBytes, false));
+            using (var rsa = new RSACryptoServiceProvider(keySize))
+            {
+                try
+                {
+                    var privateKey = rsa.ExportParameters(true);
+                    var publicKey = rsa.ExportParameters(false);
+
+                    return (PublicKey: ExportPublicKeyToPemString(publicKey),
+                            PrivateKey: ExportPrivateKeyToPemString(privateKey));
+                }
+                finally
+                {
+                    rsa.PersistKeyInCsp = false;
+                }
+            }
         }
+
+        public string ExportPublicKeyToPemString(RSAParameters publParams)
+        {
+            var stringWriter = new StringWriter();
+            var pemWriter = new PemWriter(stringWriter);
+            var publicKey = DotNetUtilities.GetRsaPublicKey(publParams);
+            pemWriter.WriteObject(publicKey);
+            pemWriter.Writer.Flush();
+            return stringWriter.ToString();
+        }
+
+        public string ExportPrivateKeyToPemString(RSAParameters privParams)
+        {
+            var stringWriter = new StringWriter();
+            var pemWriter = new PemWriter(stringWriter);
+            var privateKey = DotNetUtilities.GetRsaKeyPair(privParams);
+            pemWriter.WriteObject(privateKey);
+            pemWriter.Writer.Flush();
+            return stringWriter.ToString();
+        }
+
+
     }
 }

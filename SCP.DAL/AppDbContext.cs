@@ -122,8 +122,8 @@ namespace SCP.DAL
             // Property configurations
             safeBuilder.Property(s => s.Title).IsRequired();
             safeBuilder.Property(s => s.Description).IsRequired(false);
-            safeBuilder.Property(s => s.EPrivateK).IsRequired(false);
-            safeBuilder.Property(s => s.PublicK).IsRequired(false);
+            safeBuilder.Property(s => s.EPrivateKpem).IsRequired(false);
+            safeBuilder.Property(s => s.PublicKpem).IsRequired(false);
 
             // Relationship configurations
             safeBuilder.HasMany(s => s.Records)

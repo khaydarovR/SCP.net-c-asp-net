@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SCP.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class initn3 : Migration
+    public partial class init0 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,7 @@ namespace SCP.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 11, 14, 20, 27, 53, 18, DateTimeKind.Utc).AddTicks(4285)),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 11, 18, 18, 49, 27, 890, DateTimeKind.Utc).AddTicks(8574)),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -59,8 +59,8 @@ namespace SCP.DAL.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    PrivateK = table.Column<string>(type: "text", nullable: true),
-                    PublicK = table.Column<string>(type: "text", nullable: true)
+                    EPrivateKpem = table.Column<string>(type: "text", nullable: true),
+                    PublicKpem = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -241,6 +241,7 @@ namespace SCP.DAL.Migrations
                 name: "SafeRights",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SafeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Permission = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
@@ -248,7 +249,7 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SafeRights", x => new { x.AppUserId, x.SafeId });
+                    table.PrimaryKey("PK_SafeRights", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SafeRights_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
@@ -432,6 +433,17 @@ namespace SCP.DAL.Migrations
                 name: "IX_Records_SafeId",
                 table: "Records",
                 column: "SafeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SafeRights_AppUserId",
+                table: "SafeRights",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SafeRights_Id",
+                table: "SafeRights",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SafeRights_SafeId",

@@ -16,7 +16,7 @@ namespace SCP.Application.Core.Record
         public string SafeId { get; set; }
 
         public string Signature { get; set; } = null!;
-        public string ClientPubK { get; set; } = null!;
+        public string ClientPrivK { get; set; } = null!;
         public string UserId { get; set; } = null!;
     }
 }

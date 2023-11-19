@@ -26,7 +26,7 @@ namespace SCP.Api.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateRecord([FromBody] CreateRecordDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateRecordDTO dto)
         {
             var comand = dto.Adapt<CreateRecordCommand>();
             comand.UserId = ContextUserId.ToString();

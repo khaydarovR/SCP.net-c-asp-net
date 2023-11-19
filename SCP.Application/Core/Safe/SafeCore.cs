@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using SCP.Application.Core.UserAuth;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using SCP.Application.Common.Response;
+using Mapster;
 
 namespace SCP.Application.Core.Safe
 {
@@ -14,11 +16,13 @@ namespace SCP.Application.Core.Safe
     {
         private readonly SymmetricCryptoService cryptorService;
         private readonly AppDbContext dbContext;
+        private readonly AsymmetricCryptoService asymmetricCrypto;
 
-        public SafeCore(SymmetricCryptoService cryptorService, AppDbContext dbContext)
+        public SafeCore(SymmetricCryptoService cryptorService, AppDbContext dbContext, AsymmetricCryptoService asymmetricCrypto)
         {
             this.cryptorService = cryptorService;
             this.dbContext = dbContext;
+            this.asymmetricCrypto = asymmetricCrypto;
         }
 
         public async Task<CoreResponse<bool>> CreateUserSafe(CreateSafeCommand command)
@@ -28,21 +32,23 @@ namespace SCP.Application.Core.Safe
                 return Bad<bool>("Название сейфа не может быть пустым");
             }
 
-            var rsa = new RSACryptoServiceProvider(2048);
+            var keys = asymmetricCrypto.GenerateKeys();
+            Console.WriteLine("Public Key: " + keys.publicKey);
+            Console.WriteLine("Private Key: " + keys.privateKey);
 
-            string publicKey = rsa.ToXmlString(false);
-            string privateKey = rsa.ToXmlString(true);
+            string PublickKeySPKIPem = keys.publicKey;
+            string PrivateKeyPkcs8Pem = keys.privateKey;
+
 
             // Encrypt private key before saving
-            var encryptedPrivateKey = cryptorService.EncryptWithSecretKey(privateKey);
-
+            var EPrivateKeyPkcs8 = cryptorService.EncryptWithSecretKey(PrivateKeyPkcs8Pem);
             var model = new Domain.Entity.Safe
             {
                 Id = Guid.NewGuid(),
                 Title = command.Title,
                 Description = command.Description ?? "",
-                PublicK = publicKey,
-                EPrivateK = encryptedPrivateKey
+                PublicKpem = PublickKeySPKIPem,
+                EPrivateKpem = EPrivateKeyPkcs8
             };
             await dbContext.Safes.AddAsync(model);
 
@@ -59,28 +65,32 @@ namespace SCP.Application.Core.Safe
 
 
 
-        public async Task<CoreResponse<List<Domain.Entity.Safe>>> GetLinkedSafes(GetLinkedSafesQuery query)
+        public async Task<CoreResponse<List<GetLinkedSafeResponse>>> GetMy(GetLinkedSafesQuery query)
         {
             var safes = await dbContext.Safes
                 .Include(s => s.SafeUsers)
                 .Where(s => s.SafeUsers.Any(su => su.AppUserId == query.UserId))
                 .Where(s => s.SafeUsers.Any(su => su.Permission == SystemSafePermisons.ItIsThisSafeCreator))
+                .ProjectToType<GetLinkedSafeResponse>()
                 .ToListAsync();
 
-            return new CoreResponse<List<Domain.Entity.Safe>>(safes);
+
+            return Good(safes);
         }
 
-        public async Task<CoreResponse<string>> GetPubKForSafe(string safeId)
+        public CoreResponse<string> GetPubKForSafe(string safeId)
         {
-            var safe = await dbContext.Safes
-                .FirstOrDefaultAsync(s => s.Id == Guid.Parse(safeId));
+            var safePubK = dbContext.Safes
+                .Where(s => s.Id == Guid.Parse(safeId))
+                .Select(s => s.PublicKpem)
+                .FirstOrDefault();
 
-            if (safe == null)
+            if (safePubK == null)
             {
                 return new CoreResponse<string>("Сейф не найден", false);
             }
 
-            return new CoreResponse<string>(safe.PublicK);
+            return Good(safePubK);
         }
     }
 

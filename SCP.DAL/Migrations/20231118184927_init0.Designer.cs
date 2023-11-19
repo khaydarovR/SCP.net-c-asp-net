@@ -12,8 +12,8 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231114204933_initn4")]
-    partial class initn4
+    [Migration("20231118184927_init0")]
+    partial class init0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,7 +197,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 11, 14, 20, 49, 33, 764, DateTimeKind.Utc).AddTicks(210));
+                        .HasDefaultValue(new DateTime(2023, 11, 18, 18, 49, 27, 890, DateTimeKind.Utc).AddTicks(8574));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -403,10 +403,10 @@ namespace SCP.DAL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("PrivateK")
+                    b.Property<string>("EPrivateKpem")
                         .HasColumnType("text");
 
-                    b.Property<string>("PublicK")
+                    b.Property<string>("PublicKpem")
                         .HasColumnType("text");
 
                     b.Property<string>("Title")

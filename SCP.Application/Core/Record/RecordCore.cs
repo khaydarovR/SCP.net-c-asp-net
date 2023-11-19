@@ -14,22 +14,28 @@ namespace SCP.Application.Core.Record
     {
         private readonly AppDbContext dbContext;
         private readonly AsymmetricCryptoService asymmetricCryptoService;
+        private readonly SymmetricCryptoService symmetricCrypto;
+
         public RecordCore(AppDbContext dbContext,
-                          AsymmetricCryptoService asymmetricCryptoService)
+                          AsymmetricCryptoService asymmetricCryptoService,
+                          SymmetricCryptoService symmetricCrypto)
         {
             this.dbContext = dbContext;
             this.asymmetricCryptoService = asymmetricCryptoService;
+            this.symmetricCrypto = symmetricCrypto;
         }
 
         public async Task<CoreResponse<bool>> CreateRecord(CreateRecordCommand command)
         {
-            var rawData = command.Login + command.Pw + command.Secret;
+            var rawData = command.Secret;
+            var prk = GetPrivateKeyFromSafe(command.SafeId);
+            var clearData = asymmetricCryptoService.DecryptData(rawData, prk);
 
-            var signatureIsValid = RSAUtils.VerifySignature(command.ClientPubK, rawData, command.Signature);
-            if (signatureIsValid == false )
-            {
-                return Bad<bool>("Цифровая подпись не прошла проверку");
-            }
+            //var signatureIsValid = RSAUtils.VerifySignature(command.ClientPrivK, rawData, command.Signature);
+            //if (signatureIsValid == false )
+            //{
+            //    return Bad<bool>("Цифровая подпись не прошла проверку");
+            //}
 
             var recordId = Guid.NewGuid();
             dbContext.Records.Add(new Domain.Entity.Record
@@ -56,6 +62,18 @@ namespace SCP.Application.Core.Record
             return Good(true);
         }
 
+        private string GetPrivateKeyFromSafe(string safeId)
+        {
+            var ePrivateKey = dbContext.Safes
+                .Where(s => s.Id == Guid.Parse(safeId))
+                .Select(s => s.EPrivateKpem)
+                .FirstOrDefault();
+
+            var privateKey = this.symmetricCrypto.DecryptWithSecretKey(ePrivateKey);
+
+            return privateKey;
+            
+        }
 
 
         /// <summary>
@@ -70,12 +88,12 @@ namespace SCP.Application.Core.Record
                     .FirstAsync(r => r.Id == command.RecordId);
 
                 // Decrypt the secret using the user's private key
-                string dSecret = asymmetricCryptoService.Decrypt(rec.ESecret, rec.Safe.EPrivateK);
+                //string dSecret = asymmetricCryptoService.DecryptWithRSA(rec.Safe.EPrivateKpem, rec.ESecret);
 
-                // Encrypt this plain text using client's public key
-                string eSecret = asymmetricCryptoService.Encrypt(dSecret, command.PubKeyFromClient);
+                //// Encrypt this plain text using client's public key
+                //string eSecret = asymmetricCryptoService.DecryptWithRSA(command.PubKeyFromClient, dSecret);
 
-                var data = new ReadRecordResponse { ESecret = eSecret };
+                var data = new ReadRecordResponse { ESecret = "emty" };
                 return new CoreResponse<ReadRecordResponse>(data);
             }
         }

@@ -194,7 +194,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 11, 15, 18, 31, 9, 753, DateTimeKind.Utc).AddTicks(3657));
+                        .HasDefaultValue(new DateTime(2023, 11, 18, 18, 49, 27, 890, DateTimeKind.Utc).AddTicks(8574));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -400,10 +400,10 @@ namespace SCP.DAL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("EPrivateK")
+                    b.Property<string>("EPrivateKpem")
                         .HasColumnType("text");
 
-                    b.Property<string>("PublicK")
+                    b.Property<string>("PublicKpem")
                         .HasColumnType("text");
 
                     b.Property<string>("Title")

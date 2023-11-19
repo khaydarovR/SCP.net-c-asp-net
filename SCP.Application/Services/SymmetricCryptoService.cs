@@ -20,9 +20,9 @@ namespace SCP.Application.Services
             byte[] array;
             using (Aes aes = Aes.Create())
             {
-                var base64Key = DeriveAes256Key(myOptions.Value.CRT_KEY);
+                var validKey = DeriveAes256Key(myOptions.Value.CRT_KEY);
 
-                aes.Key = Convert.FromBase64String(base64Key);
+                aes.Key = Convert.FromBase64String(validKey);
                 aes.IV = iv;
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
                 using (MemoryStream memoryStream = new MemoryStream())
@@ -46,7 +46,8 @@ namespace SCP.Application.Services
             byte[] buffer = Convert.FromBase64String(cipherText);
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Convert.FromBase64String(myOptions.Value.CRT_KEY);
+                var validKey = DeriveAes256Key(myOptions.Value.CRT_KEY);
+                aes.Key = Convert.FromBase64String(validKey);
                 aes.IV = iv;
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
                 using (MemoryStream memoryStream = new MemoryStream(buffer))
