@@ -2,6 +2,7 @@
 using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
+using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Enum;
@@ -15,21 +16,22 @@ namespace SCP.Application.Core.Record
         private readonly AppDbContext dbContext;
         private readonly AsymmetricCryptoService asymmetricCryptoService;
         private readonly SymmetricCryptoService symmetricCrypto;
+        private readonly SafeCore safeCore;
 
         public RecordCore(AppDbContext dbContext,
                           AsymmetricCryptoService asymmetricCryptoService,
-                          SymmetricCryptoService symmetricCrypto)
+                          SymmetricCryptoService symmetricCrypto,
+                          SafeCore safeCore)
         {
             this.dbContext = dbContext;
             this.asymmetricCryptoService = asymmetricCryptoService;
             this.symmetricCrypto = symmetricCrypto;
+            this.safeCore = safeCore;
         }
 
         public async Task<CoreResponse<bool>> CreateRecord(CreateRecordCommand command)
         {
-            var rawData = command.Secret;
-            var prk = GetPrivateKeyFromSafe(command.SafeId);
-            var clearData = asymmetricCryptoService.DecryptData(rawData, prk);
+            var prk = safeCore.GetClearPrivateKeyFromSafe(command.SafeId);
 
             //var signatureIsValid = RSAUtils.VerifySignature(command.ClientPrivK, rawData, command.Signature);
             //if (signatureIsValid == false )
@@ -62,19 +64,6 @@ namespace SCP.Application.Core.Record
             return Good(true);
         }
 
-        private string GetPrivateKeyFromSafe(string safeId)
-        {
-            var ePrivateKey = dbContext.Safes
-                .Where(s => s.Id == Guid.Parse(safeId))
-                .Select(s => s.EPrivateKpem)
-                .FirstOrDefault();
-
-            var privateKey = this.symmetricCrypto.DecryptWithSecretKey(ePrivateKey);
-
-            return privateKey;
-            
-        }
-
 
         /// <summary>
         /// Отправляет данные зашифрованные с помощью полученного ключа от клиента
@@ -82,19 +71,34 @@ namespace SCP.Application.Core.Record
         /// <param name="command"></param>
         /// <returns></returns>
         public async Task<CoreResponse<ReadRecordResponse>> ReadRecord(ReadRecordCommand command)
+        {
+            var rec = await dbContext.Records
+                .Include(r => r.Safe)
+                .FirstAsync(r => r.Id == command.RecordId);
+
+            var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(rec.SafeId.ToString());
+
+            var clearLogin = asymmetricCryptoService.DecryptFromClientData(rec.ESecret, clearSafePrivateKey);
+            var clearPw = asymmetricCryptoService.DecryptFromClientData(rec.EPw, clearSafePrivateKey);
+            var clearSecret = asymmetricCryptoService.DecryptFromClientData(rec.ESecret, clearSafePrivateKey);
+
+            var eLoging = asymmetricCryptoService.EncryptDataForClient(clearLogin, command.PubKeyFromClient);
+            var ePw = asymmetricCryptoService.EncryptDataForClient(clearPw, command.PubKeyFromClient);
+            var eSecret = asymmetricCryptoService.EncryptDataForClient(clearSecret, command.PubKeyFromClient);
+
+
+            var data = new ReadRecordResponse
             {
-                var rec = await dbContext.Records
-                    .Include(r => r.Safe)
-                    .FirstAsync(r => r.Id == command.RecordId);
+                ELogin = eLoging,
+                EPw = ePw,
+                ESecret = eSecret,
+                Title = rec.Title,
+                ForResource = rec.ForResource,
+                IsDeleted = rec.IsDeleted,
+            };
 
-                // Decrypt the secret using the user's private key
-                //string dSecret = asymmetricCryptoService.DecryptWithRSA(rec.Safe.EPrivateKpem, rec.ESecret);
+            return new CoreResponse<ReadRecordResponse>(data);
 
-                //// Encrypt this plain text using client's public key
-                //string eSecret = asymmetricCryptoService.DecryptWithRSA(command.PubKeyFromClient, dSecret);
-
-                var data = new ReadRecordResponse { ESecret = "emty" };
-                return new CoreResponse<ReadRecordResponse>(data);
-            }
         }
+    }
 }

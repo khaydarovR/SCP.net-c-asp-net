@@ -15,10 +15,10 @@ namespace SCP.Api.Controllers
             this.recordCore = recordCore;
         }
 
-        [HttpGet("{recId}")]
-        public async Task<IActionResult> GetRecord(string recId, [FromHeader(Name = "Pub-Key")] string clientPublicKey)
+        [HttpPost]
+        public async Task<IActionResult> Read([FromBody] ReadRecordDTO dto)
         {
-            var comand = new ReadRecordCommand { PubKeyFromClient = clientPublicKey, RecordId = Guid.Parse(recId)};
+            var comand = new ReadRecordCommand { PubKeyFromClient = dto.PubKey, RecordId = Guid.Parse(dto.RecId)};
             var res = await recordCore.ReadRecord(comand);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

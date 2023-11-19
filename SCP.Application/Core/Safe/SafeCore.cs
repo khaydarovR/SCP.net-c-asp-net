@@ -17,12 +17,14 @@ namespace SCP.Application.Core.Safe
         private readonly SymmetricCryptoService cryptorService;
         private readonly AppDbContext dbContext;
         private readonly AsymmetricCryptoService asymmetricCrypto;
+        private readonly SymmetricCryptoService symmetricCrypto;
 
-        public SafeCore(SymmetricCryptoService cryptorService, AppDbContext dbContext, AsymmetricCryptoService asymmetricCrypto)
+        public SafeCore(SymmetricCryptoService cryptorService, AppDbContext dbContext, AsymmetricCryptoService asymmetricCrypto, SymmetricCryptoService symmetricCrypto)
         {
             this.cryptorService = cryptorService;
             this.dbContext = dbContext;
             this.asymmetricCrypto = asymmetricCrypto;
+            this.symmetricCrypto = symmetricCrypto;
         }
 
         public async Task<CoreResponse<bool>> CreateUserSafe(CreateSafeCommand command)
@@ -33,21 +35,21 @@ namespace SCP.Application.Core.Safe
             }
 
             var keys = asymmetricCrypto.GenerateKeys();
-            Console.WriteLine("Public Key: " + keys.publicKey);
-            Console.WriteLine("Private Key: " + keys.privateKey);
+            Console.WriteLine("Public Key: " + keys.publicKeyPem);
+            Console.WriteLine("Private Key: " + keys.privateKeyPem);
 
-            string PublickKeySPKIPem = keys.publicKey;
-            string PrivateKeyPkcs8Pem = keys.privateKey;
+            string PublickKeyPem = keys.publicKeyPem;
+            string PrivateKeyPem = keys.privateKeyPem;
 
 
             // Encrypt private key before saving
-            var EPrivateKeyPkcs8 = cryptorService.EncryptWithSecretKey(PrivateKeyPkcs8Pem);
+            var EPrivateKeyPkcs8 = cryptorService.EncryptWithSecretKey(PrivateKeyPem);
             var model = new Domain.Entity.Safe
             {
                 Id = Guid.NewGuid(),
                 Title = command.Title,
                 Description = command.Description ?? "",
-                PublicKpem = PublickKeySPKIPem,
+                PublicKpem = PublickKeyPem,
                 EPrivateKpem = EPrivateKeyPkcs8
             };
             await dbContext.Safes.AddAsync(model);
@@ -91,6 +93,19 @@ namespace SCP.Application.Core.Safe
             }
 
             return Good(safePubK);
+        }
+
+        public string GetClearPrivateKeyFromSafe(string safeId)
+        {
+            var ePrivateKey = dbContext.Safes
+                .Where(s => s.Id == Guid.Parse(safeId))
+                .Select(s => s.EPrivateKpem)
+                .FirstOrDefault();
+
+            var privateKey = symmetricCrypto.DecryptWithSecretKey(ePrivateKey);
+
+            return privateKey;
+
         }
     }
 

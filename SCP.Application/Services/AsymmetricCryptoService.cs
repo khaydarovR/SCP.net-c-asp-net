@@ -18,7 +18,13 @@ namespace SCP.Application.Services
             RSA = new RSACryptoServiceProvider(2048);
         }
 
-        public string DecryptData(string encryptedText, string privateKey)
+        /// <summary>
+        /// Расшифровывает данные из сейфа с помощью приватного ключа сейфа, зашифрованные клиентом публичным ключем сейфа
+        /// </summary>
+        /// <param name="encryptedText"></param>
+        /// <param name="privateKey"></param>
+        /// <returns></returns>
+        public string DecryptFromClientData(string encryptedText, string privateKey)
         {
             byte[] encryptedBytes = Convert.FromBase64String(encryptedText);  // Convert encrypted text into bytes
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048))
@@ -38,8 +44,12 @@ namespace SCP.Application.Services
             }
         }
 
-
-        public (string publicKey, string privateKey) GenerateKeys(int keySize = 2048)
+        /// <summary>
+        /// Создает RSA ключи и экспортирует в формате pem
+        /// </summary>
+        /// <param name="keySize"></param>
+        /// <returns></returns>
+        public (string publicKeyPem, string privateKeyPem) GenerateKeys(int keySize = 2048)
         {
             using (var rsa = new RSACryptoServiceProvider(keySize))
             {
@@ -58,7 +68,7 @@ namespace SCP.Application.Services
             }
         }
 
-        public string ExportPublicKeyToPemString(RSAParameters publParams)
+        private string ExportPublicKeyToPemString(RSAParameters publParams)
         {
             var stringWriter = new StringWriter();
             var pemWriter = new PemWriter(stringWriter);
@@ -68,7 +78,7 @@ namespace SCP.Application.Services
             return stringWriter.ToString();
         }
 
-        public string ExportPrivateKeyToPemString(RSAParameters privParams)
+        private string ExportPrivateKeyToPemString(RSAParameters privParams)
         {
             var stringWriter = new StringWriter();
             var pemWriter = new PemWriter(stringWriter);
@@ -79,5 +89,19 @@ namespace SCP.Application.Services
         }
 
 
+        /// <summary>
+        /// Шифрует данные с помощью публичного ключа клиента, выдает в b64
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="privateKeyPemFromClient"></param>
+        /// <returns></returns>
+        public string EncryptDataForClient(string data, string publicKeyPem)
+        {
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportFromPem(publicKeyPem); // might need to use a library for this, like BouncyCastle
+            var dataBytes = Encoding.UTF8.GetBytes(data);
+            var encryptedDataBytes = rsa.Encrypt(dataBytes, false);
+            return Convert.ToBase64String(encryptedDataBytes);
+        }
     }
 }
