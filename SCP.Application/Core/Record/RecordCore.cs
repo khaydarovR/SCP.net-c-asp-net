@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
@@ -62,6 +63,27 @@ namespace SCP.Application.Core.Record
             dbContext.SaveChanges();
 
             return Good(true);
+        }
+
+        public async Task<CoreResponse<List<GetRecordResponse>>> GetAllRecord(string safeId, Guid userId)
+        {
+            //защита до сейфа
+            var records = await dbContext.Records
+                .Where(r => r.SafeId == Guid.Parse(safeId))
+                .Where(r => r.IsDeleted == false)
+                .ProjectToType<GetRecordResponse>()
+                .ToListAsync();
+
+            //защита до записи
+            foreach (var record in records)
+            {
+                var rightInCurrentRec = await dbContext.RecordRights
+                    .FirstAsync(rr => rr.AppUserId == userId && rr.RecordId == record.Id);
+
+                record.RightToCurentUser = rightInCurrentRec.MapRightEnumToString();
+            }
+
+            return Good(records);
         }
 
 

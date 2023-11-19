@@ -39,11 +39,11 @@ namespace SCP.Api.Controllers
         /// Получение всех связанных сейфов с текущим пользователем
         /// </summary>
         /// <returns></returns>
-        [HttpGet(nameof(GetMy))]
-        public async Task<ActionResult> GetMy()
+        [HttpGet(nameof(GetLinked))]
+        public async Task<ActionResult> GetLinked()
         {
             var query = new GetLinkedSafesQuery(ContextUserId);
-            var res = await safeCore.GetMy(query);
+            var res = await safeCore.GetLinked(query);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 

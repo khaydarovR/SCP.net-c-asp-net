@@ -15,6 +15,14 @@ namespace SCP.Api.Controllers
             this.recordCore = recordCore;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] string safeId)
+        {
+            var res = await recordCore.GetAllRecord(safeId, ContextUserId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Read([FromBody] ReadRecordDTO dto)
         {

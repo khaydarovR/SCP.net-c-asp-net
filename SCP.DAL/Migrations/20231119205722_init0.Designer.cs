@@ -12,7 +12,7 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231118184927_init0")]
+    [Migration("20231119205722_init0")]
     partial class init0
     {
         /// <inheritdoc />
@@ -197,7 +197,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 11, 18, 18, 49, 27, 890, DateTimeKind.Utc).AddTicks(8574));
+                        .HasDefaultValue(new DateTime(2023, 11, 19, 20, 57, 22, 177, DateTimeKind.Utc).AddTicks(3476));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -389,7 +389,8 @@ namespace SCP.DAL.Migrations
 
                     b.HasKey("AppUserId", "RecordId");
 
-                    b.HasIndex("RecordId");
+                    b.HasIndex("RecordId")
+                        .IsUnique();
 
                     b.ToTable("RecordRights");
                 });
@@ -589,8 +590,8 @@ namespace SCP.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("SCP.Domain.Entity.Record", null)
-                        .WithMany("UserRights")
-                        .HasForeignKey("RecordId")
+                        .WithOne("UserRight")
+                        .HasForeignKey("SCP.Domain.Entity.RecordRight", "RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -643,7 +644,8 @@ namespace SCP.DAL.Migrations
                 {
                     b.Navigation("ActivityLogs");
 
-                    b.Navigation("UserRights");
+                    b.Navigation("UserRight")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.Safe", b =>

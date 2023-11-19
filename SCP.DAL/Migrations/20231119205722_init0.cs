@@ -31,7 +31,7 @@ namespace SCP.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 11, 18, 18, 49, 27, 890, DateTimeKind.Utc).AddTicks(8574)),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 11, 19, 20, 57, 22, 177, DateTimeKind.Utc).AddTicks(3476)),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -421,7 +421,8 @@ namespace SCP.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_RecordRights_RecordId",
                 table: "RecordRights",
-                column: "RecordId");
+                column: "RecordId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Records_Id",

@@ -67,12 +67,11 @@ namespace SCP.Application.Core.Safe
 
 
 
-        public async Task<CoreResponse<List<GetLinkedSafeResponse>>> GetMy(GetLinkedSafesQuery query)
+        public async Task<CoreResponse<List<GetLinkedSafeResponse>>> GetLinked(GetLinkedSafesQuery query)
         {
             var safes = await dbContext.Safes
                 .Include(s => s.SafeUsers)
                 .Where(s => s.SafeUsers.Any(su => su.AppUserId == query.UserId))
-                .Where(s => s.SafeUsers.Any(su => su.Permission == SystemSafePermisons.ItIsThisSafeCreator))
                 .ProjectToType<GetLinkedSafeResponse>()
                 .ToListAsync();
 
