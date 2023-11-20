@@ -7,8 +7,8 @@ namespace SCP.Domain.Entity
     {
         public Guid AppUserId { get; set; }
         public Guid SafeId { get; set; }
-        
-        public string Permission { get; set; }
-        public DateTime DeadDate{ get; set; }
+
+        public string Permission { get; set; } = null!;
+        public DateTime? DeadDate { get; set; }
     }
 }

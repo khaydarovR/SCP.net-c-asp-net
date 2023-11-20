@@ -179,8 +179,9 @@ namespace SCP.DAL
                                  .IsRequired()
                                  .HasMaxLength(200);
 
+            //if DeadDate is null -> permission for perpetual rights
             safeRightModelBuilder.Property(sr => sr.DeadDate)
-                                 .IsRequired();
+                                 .IsRequired(false);
         }
 
         private static void ConfigureBotRight(EntityTypeBuilder<BotRight> botRightModelBuilder)

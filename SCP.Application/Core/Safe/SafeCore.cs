@@ -44,20 +44,29 @@ namespace SCP.Application.Core.Safe
 
             // Encrypt private key before saving
             var EPrivateKeyPkcs8 = cryptorService.EncryptWithSecretKey(PrivateKeyPem);
+            var sharedId = Guid.NewGuid();
+
+            var permisions = SystemSafePermisons.AllClaims
+                .Select(c => new SafeRight
+                {
+                    AppUserId = command.UserId,
+                    Permission = c,
+                    DeadDate = null
+                })
+                .ToList();
+
             var model = new Domain.Entity.Safe
             {
-                Id = Guid.NewGuid(),
+                Id = sharedId,
                 Title = command.Title,
                 Description = command.Description ?? "",
                 PublicKpem = PublickKeyPem,
-                EPrivateKpem = EPrivateKeyPkcs8
+                EPrivateKpem = EPrivateKeyPkcs8,
+                SafeUsers = permisions
             };
+
+
             await dbContext.Safes.AddAsync(model);
-
-            var permisions = SystemSafePermisons.AllClaims
-                .Select(c => new SafeRight { AppUserId = command.UserId, SafeId = model.Id, Permission = c })
-                .ToList();
-
             await dbContext.SafeRights.AddRangeAsync(permisions);
 
             await dbContext.SaveChangesAsync();
