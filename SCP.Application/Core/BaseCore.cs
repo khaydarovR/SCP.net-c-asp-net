@@ -17,5 +17,10 @@ namespace SCP.Application.Core
         {
             return new CoreResponse<T>(errorMsg);
         }
+
+        public CoreResponse<T> Bad<T>(string[] errorMsgs)
+        {
+            return new CoreResponse<T>(errorMsgs);
+        }
     }
 }

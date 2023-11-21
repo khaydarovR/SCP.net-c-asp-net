@@ -1,14 +1,18 @@
-﻿using Mapster;
+﻿using FluentValidation.Results;
+using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
+using SCP.Application.Common.Validators;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Enum;
 using System.Security.Cryptography;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SCP.Application.Core.Record
 {
@@ -40,6 +44,14 @@ namespace SCP.Application.Core.Record
             //    return Bad<bool>("Цифровая подпись не прошла проверку");
             //}
 
+            CreateRecordV validator = new();
+            ValidationResult results = validator.Validate(command);
+            if (results.IsValid == false)
+            {
+                return Bad<bool>(results.Errors.Select(e => e.ErrorMessage).ToArray());
+            }
+
+
             var recordId = Guid.NewGuid();
             dbContext.Records.Add(new Domain.Entity.Record
             {
@@ -64,6 +76,7 @@ namespace SCP.Application.Core.Record
 
             return Good(true);
         }
+
 
         public async Task<CoreResponse<List<GetRecordResponse>>> GetAllRecord(string safeId, Guid userId)
         {
@@ -94,16 +107,20 @@ namespace SCP.Application.Core.Record
         /// <returns></returns>
         public async Task<CoreResponse<ReadRecordResponse>> ReadRecord(ReadRecordCommand command)
         {
+            //зашфирвонная запись
             var rec = await dbContext.Records
                 .Include(r => r.Safe)
                 .FirstAsync(r => r.Id == command.RecordId);
 
+            //получение ключа
             var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(rec.SafeId.ToString());
 
+            //расшифровка
             var clearLogin = asymmetricCryptoService.DecryptFromClientData(rec.ESecret, clearSafePrivateKey);
             var clearPw = asymmetricCryptoService.DecryptFromClientData(rec.EPw, clearSafePrivateKey);
             var clearSecret = asymmetricCryptoService.DecryptFromClientData(rec.ESecret, clearSafePrivateKey);
 
+            //шифрование с помощью публичного ключа клиента
             var eLoging = asymmetricCryptoService.EncryptDataForClient(clearLogin, command.PubKeyFromClient);
             var ePw = asymmetricCryptoService.EncryptDataForClient(clearPw, command.PubKeyFromClient);
             var eSecret = asymmetricCryptoService.EncryptDataForClient(clearSecret, command.PubKeyFromClient);
@@ -111,6 +128,7 @@ namespace SCP.Application.Core.Record
 
             var data = new ReadRecordResponse
             {
+                Id = rec.Id.ToString(),
                 ELogin = eLoging,
                 EPw = ePw,
                 ESecret = eSecret,

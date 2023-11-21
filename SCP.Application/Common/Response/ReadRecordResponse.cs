@@ -2,6 +2,7 @@
 {
     public class ReadRecordResponse
     {
+        public string Id { get; set; }
         public string Title { get; set; }
         public string ESecret { get; set; }
         public string ELogin { get; set; }
