@@ -101,6 +101,44 @@ namespace SCP.Application.Core.Record
 
 
         /// <summary>
+        /// Обновить секрет
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<CoreResponse<bool>> PatchRecord(PatchRecordCommand command)
+        {
+            PatchRecordV validator = new();
+            ValidationResult results = validator.Validate(command);
+            if (results.IsValid == false)
+            {
+                return Bad<bool>(results.Errors.Select(e => e.ErrorMessage).ToArray());
+            }
+
+
+            var dbRec = dbContext.Records
+                .FirstOrDefault(r => r.Id == Guid.Parse(command.Id));
+
+            if (dbRec == null)
+            {
+                return Bad<bool>("Не найден секрет");
+            }
+
+            dbRec.Title = command.Title;
+            dbRec.ELogin = command.Login;
+            dbRec.EPw = command.Pw;
+            dbRec.ESecret = command.Secret;
+            dbRec.IsDeleted = command.IsDeleted;
+            dbRec.ForResource = command.ForResource;
+
+            dbContext.Records.Update(dbRec);
+
+            dbContext.SaveChanges();
+
+            return Good(true);
+        }
+
+
+        /// <summary>
         /// Отправляет данные зашифрованные с помощью полученного ключа от клиента
         /// </summary>
         /// <param name="command"></param>
@@ -116,7 +154,7 @@ namespace SCP.Application.Core.Record
             var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(rec.SafeId.ToString());
 
             //расшифровка
-            var clearLogin = asymmetricCryptoService.DecryptFromClientData(rec.ESecret, clearSafePrivateKey);
+            var clearLogin = asymmetricCryptoService.DecryptFromClientData(rec.ELogin, clearSafePrivateKey);
             var clearPw = asymmetricCryptoService.DecryptFromClientData(rec.EPw, clearSafePrivateKey);
             var clearSecret = asymmetricCryptoService.DecryptFromClientData(rec.ESecret, clearSafePrivateKey);
 

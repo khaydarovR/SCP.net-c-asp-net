@@ -43,5 +43,13 @@ namespace SCP.Api.Controllers
         }
 
 
+        [HttpPatch]
+        public async Task<IActionResult> Patch([FromBody] PatchRecordDTO dto)
+        {
+            var comand = dto.Adapt<PatchRecordCommand>();
+            comand.UserId = ContextUserId.ToString();
+            var res = await recordCore.PatchRecord(comand);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
     }
 }
