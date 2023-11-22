@@ -13,18 +13,18 @@ namespace SCP.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class AccessController : CustomController
+    public class SafeAccessController : CustomController
     {
         private readonly AccessCore accessCore;
 
-        public AccessController(AccessCore accessCore)
+        public SafeAccessController(AccessCore accessCore)
         {
             this.accessCore = accessCore;
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> InviteUserToSafeAsync([FromBody] InviteRequestDTO dto) 
+        [HttpPost(nameof(InviteRequest))]
+        public async Task<IActionResult> InviteRequest([FromBody] InviteRequestDTO dto) 
         {
             var comand = dto.Adapt<AuthrizeUsersToSafeCommand>();
             var res = await accessCore.AuthorizeUsersToSafes(comand);
