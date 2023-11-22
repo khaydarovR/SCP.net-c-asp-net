@@ -116,11 +116,26 @@ namespace SCP.Application.Core.Record
 
 
             var dbRec = dbContext.Records
+                .Include(r => r.UserRight)
                 .FirstOrDefault(r => r.Id == Guid.Parse(command.Id));
 
             if (dbRec == null)
             {
                 return Bad<bool>("Не найден секрет");
+            }
+
+            if (dbRec.UserRight.EnumPermission < RecRightEnum.Edit)
+            {
+                return Bad<bool>("Не достаточно прав для редактирования");
+
+            }
+
+            if (command.IsDeleted)
+            {
+                if (dbRec.UserRight.EnumPermission < RecRightEnum.Delete)
+                {
+                    return Bad<bool>("Не достаточно прав для удаления");
+                }
             }
 
             dbRec.Title = command.Title;

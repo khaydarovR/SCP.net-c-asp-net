@@ -23,6 +23,10 @@ namespace SCP.Application.Core.UserAuth
 
         public async Task<CoreResponse<bool>> CreateAccount(CreateAccountCommand command)
         {
+            if (userManager.Users.Any(u => u.Email == command.Email))
+            {
+                return Bad<bool>("Пользователь с email " + command.Email + " уже зарегистрирован");
+            }
             var model = new AppUser
             {
                 UserName = command.UserName,
@@ -43,9 +47,9 @@ namespace SCP.Application.Core.UserAuth
                     return new CoreResponse<bool>(true);
                 }
 
-                new CoreResponse<bool>(claimRes.Errors.Select(e => e.Description));
+                return new CoreResponse<bool>(claimRes.Errors.Select(e => e.Description));
             }
-            return new CoreResponse<bool>(result.Errors.Select(e => e.Description));
+            return new CoreResponse<bool>(result.Errors.Select(e => e.Description + ". Использовать латинские буквы!"));
         }
 
 

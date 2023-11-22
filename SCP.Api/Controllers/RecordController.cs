@@ -32,7 +32,6 @@ namespace SCP.Api.Controllers
         }
 
 
-
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRecordDTO dto)
         {
@@ -53,3 +52,4 @@ namespace SCP.Api.Controllers
         }
     }
 }
+ 
