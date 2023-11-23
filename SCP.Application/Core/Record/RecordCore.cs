@@ -9,6 +9,7 @@ using SCP.Application.Common.Validators;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
+using SCP.Domain;
 using SCP.Domain.Enum;
 using System.Security.Cryptography;
 using System.Text;
@@ -43,6 +44,9 @@ namespace SCP.Application.Core.Record
             //{
             //    return Bad<bool>("Цифровая подпись не прошла проверку");
             //}
+
+            //TODO: SafeGuard
+            var neadPer = SystemSafePermisons.AddRecordToSafe;
 
             CreateRecordV validator = new();
             ValidationResult results = validator.Validate(command);
@@ -80,14 +84,18 @@ namespace SCP.Application.Core.Record
 
         public async Task<CoreResponse<List<GetRecordResponse>>> GetAllRecord(string safeId, Guid userId)
         {
+            //TODO: SafeGuard 
             //защита до сейфа
+            var needPer = SystemSafePermisons.GetRecordList;
+
+
             var records = await dbContext.Records
                 .Where(r => r.SafeId == Guid.Parse(safeId))
                 .Where(r => r.IsDeleted == false)
                 .ProjectToType<GetRecordResponse>()
                 .ToListAsync();
 
-            //защита до записи
+
             foreach (var record in records)
             {
                 var rightInCurrentRec = await dbContext.RecordRights
@@ -124,12 +132,13 @@ namespace SCP.Application.Core.Record
                 return Bad<bool>("Не найден секрет");
             }
 
+
+            //TODO SafeGuard
             if (dbRec.UserRight.EnumPermission < RecRightEnum.Edit)
             {
                 return Bad<bool>("Не достаточно прав для редактирования");
 
             }
-
             if (command.IsDeleted)
             {
                 if (dbRec.UserRight.EnumPermission < RecRightEnum.Delete)
@@ -160,10 +169,14 @@ namespace SCP.Application.Core.Record
         /// <returns></returns>
         public async Task<CoreResponse<ReadRecordResponse>> ReadRecord(ReadRecordCommand command)
         {
+
             //зашфирвонная запись
             var rec = await dbContext.Records
                 .Include(r => r.Safe)
                 .FirstAsync(r => r.Id == command.RecordId);
+
+            //TODO: SafeGuard
+            //var needRight = rec.UserRight.EnumPermission > RecRightEnum.Read;
 
             //получение ключа
             var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(rec.SafeId.ToString());

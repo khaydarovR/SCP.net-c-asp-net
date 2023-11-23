@@ -29,7 +29,7 @@ if (app.Environment.IsDevelopment())
         {
             c.Interceptors = new InterceptorFunctions
             {
-                RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI3Y2MwNjY3Ni00NmFhLTRmNzgtODNkNS0yZjJjYzBhYTBkZWUiLCJyb2xlIjoi0J_QvtC70YzQt9C-0LLQsNGC0LXQu9GMIiwibmJmIjoxNzAwMzMzNDUwLCJleHAiOjE3MDA0MTk4NTAsImlhdCI6MTcwMDMzMzQ1MCwiaXNzIjoiQk9TIn0.YKoTsBq4cjXeKxiRD5AI2wvCyV88U-_-X1Pij2hqpVI'; return req; }"
+                RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI3YTkyMWMxNy0zY2E1LTQxY2QtYjZjYS00YTg0ZDQ1ODNhYTciLCJyb2xlIjoi0J_QvtC70YzQt9C-0LLQsNGC0LXQu9GMIiwibmJmIjoxNzAwNzUxNTEyLCJleHAiOjE3MDA4Mzc5MTIsImlhdCI6MTcwMDc1MTUxMiwiaXNzIjoiQk9TIn0.f9m4oNdw3Z3HxnbTqz_iFbNXiREIye0OJWjkuMuznwU'; return req; }"
             };
         });
 }

@@ -23,6 +23,13 @@ namespace SCP.Api.Controllers
         }
 
 
+        [HttpGet("Permisions")]
+        public ActionResult Permisions()
+        {
+            var res = accessCore.GetSystemPermisions();
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
         [HttpPost(nameof(InviteRequest))]
         public async Task<IActionResult> InviteRequest([FromBody] InviteRequestDTO dto) 
         {
@@ -31,6 +38,17 @@ namespace SCP.Api.Controllers
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
+        /// <summary>
+        /// Поиск пользователей связанных с текущим пользователем
+        /// currentUserId - SafeUsers - Safes - SafeUsers - Users
+        /// </summary>
+        /// <returns></returns> 
+        [HttpGet(nameof(GetLinkedUsers))]
+        public async Task<IActionResult> GetLinkedUsers()
+        {
+            var res = await accessCore.GetLinkedUsersFromSafes(ContextUserId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
         
     }
 }

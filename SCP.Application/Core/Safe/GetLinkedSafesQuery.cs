@@ -8,10 +8,6 @@ namespace SCP.Application.Core.Safe
 {
     public class GetLinkedSafesQuery
     {
-        public GetLinkedSafesQuery(Guid id)
-        {
-            UserId = id;
-        }
-        public Guid UserId { get; private set; }
+        public Guid UserId { get; set; }
     }
 }

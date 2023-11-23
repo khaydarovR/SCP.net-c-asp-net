@@ -75,7 +75,11 @@ namespace SCP.Application.Core.Safe
         }
 
 
-
+        /// <summary>
+        /// Получение всех сейфов связанных с пользователем
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<CoreResponse<List<GetLinkedSafeResponse>>> GetLinked(GetLinkedSafesQuery query)
         {
             var safes = await dbContext.Safes

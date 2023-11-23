@@ -42,7 +42,7 @@ namespace SCP.Api.Controllers
         [HttpGet(nameof(GetLinked))]
         public async Task<ActionResult> GetLinked()
         {
-            var query = new GetLinkedSafesQuery(ContextUserId);
+            var query = new GetLinkedSafesQuery() { UserId = ContextUserId};
             var res = await safeCore.GetLinked(query);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

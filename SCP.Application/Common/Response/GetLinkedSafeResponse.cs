@@ -12,4 +12,5 @@ namespace SCP.Application.Common.Response
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
     }
+
 }
