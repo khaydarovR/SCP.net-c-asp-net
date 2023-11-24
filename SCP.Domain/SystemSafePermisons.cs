@@ -1,24 +1,33 @@
 ﻿namespace SCP.Domain
 {
+    public struct Permision
+    {
+        public string Slug {  get; init; }
+        public string Name { get; init; }
+    }
     public class SystemSafePermisons
     {
-        public const string GetBaseSafeInfo = "Получать информацию о сейфе";
-        public const string AddRecordToSafe = "Добавлять новые записи в сейф";
-        public const string GetRecordList = "Получать список записей в сейфе (без секретов)";
-        public const string InviteUser = "Приглашать пользователя в сейф";
-        public const string ShareWithUrl = "Делиться записью с помощью одноразовай ссылки";
-        public const string KickOutUser = "Выгонять пользователя из сейфа";
-        public const string EditUserRecordRight = "Менять права пользователей для конкретной записи";
-        public const string EditSafe = "Редактировать сейф";
-        public const string ConnectBot = "Подключать ботов";
-        public const string EditUserSafeRights = "Редактировать права пользователей для сейфа";
-        public const string ItIsThisSafeCreator = "Является создателем сейфа";
+        public static Permision GetBaseSafeInfo = new Permision {Slug = "Получать информацию о сейфе", Name = "Получать информацию о сейфе" };
+        public static Permision GetRecordList = new Permision { Slug = "Получать список секретов в сейфе (без секретов)", Name = "Получать список секретов в сейфе (без чтения)" };
+        public static Permision ReadSecrets = new Permision { Slug = "Читать секреты в сейфе!", Name = "Читать секреты в сейфе" };
+        public static Permision AddRecordToSafe = new Permision { Slug = "Добавлять новые секреты в сейф", Name = "Добавлять новые секреты в сейф" };
+        public static Permision ReadAndEditSecrets = new Permision { Slug = "Редактировать секреты!", Name = "Редактировать секреты" };
+        public static Permision InviteUser = new Permision { Slug = "Приглашать пользователя в сейф", Name = "Приглашать пользователя в сейф" };
+        public static Permision ShareWithUrl = new Permision { Slug = "Делиться записью с помощью одноразовай ссылки", Name = "Делиться записью с помощью одноразовай ссылки" };
+        public static Permision KickOutUser = new Permision { Slug = "Выгонять пользователя из сейфа", Name = "Выгонять пользователя из сейфа" };
+        public static Permision EditUserRecordRight = new Permision { Slug = "Менять права пользователей для конкретной записи", Name = "Менять права пользователей для конкретной записи" };
+        public static Permision EditSafe = new Permision { Slug = "Редактировать сейф", Name = "Редактировать сейф" };
+        public static Permision ConnectBot = new Permision { Slug = "Подключать ботов", Name = "Подключать ботов" };
+        public static Permision EditUserSafeRights = new Permision { Slug = "Редактировать права пользователей для сейфа", Name = "Редактировать права пользователей для сейфа" };
+        public static Permision ItIsThisSafeCreator = new Permision { Slug = "Является создателем сейфа", Name = "Является создателем сейфа" };
 
-        public static readonly List<string> AllClaims = new List<string>()
+        public static readonly IReadOnlyList<Permision> AllPermisions = new List<Permision>()
         {
             GetBaseSafeInfo,
-            AddRecordToSafe,
             GetRecordList,
+            ReadSecrets,
+            AddRecordToSafe,
+            ReadAndEditSecrets,
             InviteUser,
             ShareWithUrl,
             KickOutUser,
@@ -29,55 +38,5 @@
             ItIsThisSafeCreator,
         };
 
-        public static List<string> GetReadablePermissionList(List<string> permissions)
-        {
-            List<string> readablePermissions = new List<string>();
-
-            foreach (string permission in permissions)
-            {
-                switch (permission)
-                {
-                    case GetBaseSafeInfo:
-                        readablePermissions.Add($"Получать информацию о сейфе.");
-                        break;
-                    case AddRecordToSafe:
-                        readablePermissions.Add($"Добавлять новые записи в сейф.");
-                        break;
-                    case GetRecordList:
-                        readablePermissions.Add($"Получать список записей в сейфе (без секретов).");
-                        break;
-                    case InviteUser:
-                        readablePermissions.Add($"Приглашать пользователя в сейф.");
-                        break;
-                    case ShareWithUrl:
-                        readablePermissions.Add($"Делиться записью с помощью одноразовой ссылки.");
-                        break;
-                    case KickOutUser:
-                        readablePermissions.Add($"Выгонять пользователя из сейфа.");
-                        break;
-                    case EditUserRecordRight:
-                        readablePermissions.Add($"Менять права пользователей для конкретной записи.");
-                        break;
-                    case EditSafe:
-                        readablePermissions.Add($"Редактировать сейф.");
-                        break;
-                    case ConnectBot:
-                        readablePermissions.Add($"Подключать ботов.");
-                        break;
-                    case EditUserSafeRights:
-                        readablePermissions.Add($"Редактировать права пользователей для сейфа.");
-                        break;
-                    case ItIsThisSafeCreator:
-                        readablePermissions.Add($"Является создателем сейфа.");
-                        break;
-                    default:
-                        throw new Exception(permission + " - не найден вариант для чтения");
-                        readablePermissions.Add(permission); // Если разрешение не определено, оставляем его без изменений
-                        break;
-                }
-            }
-
-            return readablePermissions;
-        }
     }
 }

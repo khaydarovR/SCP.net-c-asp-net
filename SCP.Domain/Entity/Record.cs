@@ -13,6 +13,6 @@
         public Safe Safe { get; set; }
 
         public virtual IList<ActivityLog> ActivityLogs { get; set; }
-        public virtual RecordRight UserRight { get; set; }
+        public virtual IList<RecordRight> RightUsers { get; set; }
     }
 }

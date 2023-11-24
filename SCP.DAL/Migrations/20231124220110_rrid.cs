@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SCP.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class init0 : Migration
+    public partial class rrid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,7 @@ namespace SCP.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 11, 19, 20, 57, 22, 177, DateTimeKind.Utc).AddTicks(3476)),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2023, 11, 24, 22, 1, 10, 565, DateTimeKind.Utc).AddTicks(4184)),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -245,7 +245,7 @@ namespace SCP.DAL.Migrations
                     AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SafeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Permission = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    DeadDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DeadDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -327,13 +327,14 @@ namespace SCP.DAL.Migrations
                 name: "RecordRights",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RecordId = table.Column<Guid>(type: "uuid", nullable: false),
                     EnumPermission = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecordRights", x => new { x.AppUserId, x.RecordId });
+                    table.PrimaryKey("PK_RecordRights", x => x.Id);
                     table.ForeignKey(
                         name: "FK_RecordRights_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
@@ -415,6 +416,17 @@ namespace SCP.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_BotWhiteIPs_Id",
                 table: "BotWhiteIPs",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecordRights_AppUserId",
+                table: "RecordRights",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecordRights_Id",
+                table: "RecordRights",
                 column: "Id",
                 unique: true);
 

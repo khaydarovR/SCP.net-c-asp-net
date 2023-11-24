@@ -8,6 +8,8 @@ using SCP.Application.Core.Safe;
 using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Entity;
+using SCP.Domain.Enum;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SCP.Application.Core.Access
 {
@@ -41,19 +43,30 @@ namespace SCP.Application.Core.Access
             //TODO: SafeGuar
             foreach (var safeId in cmd.SafeIds)
             {
-                if(AuthorHasAccess(Guid.Parse(safeId), cmd.AuthorId, SystemSafePermisons.InviteUser) == false)
+                if(AuthorHasAccess(Guid.Parse(safeId), cmd.AuthorId, SystemSafePermisons.InviteUser.Slug) == false)
                 {
-                    return Bad<string>($"В сейфе {cmd.SafeIds} отсутсвует разрешение на: " + SystemSafePermisons.InviteUser) ;
+                    return Bad<string>($"В сейфе {safeId} отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name) ;
                 }
             }
 
             //добавление разрешений для каждого сейфа
             foreach (var safeId in cmd.SafeIds)
-            {
+            {   
+                //для каждого пользователя по id
                 _ = await AddPermisionsToUsersForSafe(cmd.Permisions.ToArray(),
                                                      Guid.Parse(safeId),
-                                                     cmd.UserIds.Select(i => Guid.Parse(i)).ToArray(),
+                                                     cmd.UserIds.ToHashSet(),
                                                      cmd.DayLife);
+
+                //для каждого пользователя по email
+                var userIds = dbContext.AppUsers
+                    .Where(u => cmd.UserEmails.Any(e => e == u.Email))
+                    .Select(u => u.Id.ToString()).ToHashSet();
+
+                _ = await AddPermisionsToUsersForSafe(cmd.Permisions.ToArray(),
+                                                      Guid.Parse(safeId),
+                                                      userIds,
+                                                      cmd.DayLife);
             }
 
 
@@ -61,19 +74,46 @@ namespace SCP.Application.Core.Access
 
         }
 
-        private async Task<bool> AddPermisionsToUsersForSafe(string[] permisions, Guid safeId, Guid[] userIds, int lifeOfTime)
+        private async Task<bool> AddPermisionsToUsersForSafe(string[] permisionSlugs, Guid safeId, HashSet<string> userIds, int lifeOfTime)
         {
-            foreach (var per in permisions)
+
+            foreach(var uId in userIds)
             {
-                foreach(var uId in userIds)
+                if (string.IsNullOrEmpty(uId))
+                {
+                    continue;
+                }
+                foreach (var per in permisionSlugs)
                 {
                     dbContext.SafeRights.Add(new SafeRight
                     {
                         SafeId = safeId,
-                        AppUserId = uId,
+                        AppUserId = Guid.Parse(uId),
                         Permission = per,
                         DeadDate = DateTime.UtcNow.AddDays(lifeOfTime)
                     });
+                }
+
+                var recordsInSafe = dbContext.Records
+                    .Where(r => r.SafeId == safeId)
+                    .Select(r => r.Id).ToList();
+
+                foreach (var recordID in recordsInSafe)
+                {
+                    //TODO пофиксить права дублирующиеся права ..удалитьб все права в сейфе 
+                    var existingRight = dbContext.RecordRights
+                        .FirstOrDefault(rr => rr.AppUserId == Guid.Parse(uId) && rr.RecordId == recordID);
+
+                    if (existingRight == null)
+                    {
+                        dbContext.RecordRights.Add(new RecordRight
+                        {
+                            AppUserId = Guid.Parse(uId),
+                            RecordId = recordID,
+                            EnumPermission = Domain.Enum.RecRightEnum.Delete
+                        });
+                    }
+                    //else update
                 }
             }
 
@@ -81,21 +121,22 @@ namespace SCP.Application.Core.Access
             return true;
         }
 
-        private bool AuthorHasAccess(Guid safeId, Guid userId, string permision)
+        private bool AuthorHasAccess(Guid safeId, Guid userId, string permisionSlug)
         {
             var validPermisionIsExists = dbContext.SafeRights
                 .Where(sr => sr.AppUserId == userId)
                 .Where(sr => sr.SafeId == safeId)
-                .Any(sr => sr.Permission == permision && sr.DeadDate < DateTime.UtcNow);
+                .Any(sr => sr.Permission == permisionSlug && 
+                (sr.DeadDate > DateTime.UtcNow || sr.DeadDate == null));
 
             return validPermisionIsExists;
         }
 
 
-        public CoreResponse<string[]> GetSystemPermisions()
+        public CoreResponse<Permision[]> GetSystemPermisions()
         {
-            var readPermisions = SystemSafePermisons.GetReadablePermissionList(SystemSafePermisons.AllClaims).ToArray();
-            return Good<string[]>(readPermisions);
+            var readPermisions = SystemSafePermisons.AllPermisions.ToArray();
+            return Good<Permision[]>(readPermisions);
         }
 
         public Task AuthorizeUsersToSafes()

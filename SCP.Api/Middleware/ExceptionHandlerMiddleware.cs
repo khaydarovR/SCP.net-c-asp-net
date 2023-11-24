@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using SCP.Application.Common.Exceptions;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Text.Json;
+
 
 namespace SCP.Application.Common.PipeLine
 {
@@ -39,7 +40,7 @@ namespace SCP.Application.Common.PipeLine
         {
             ctx.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             ctx.Response.ContentType = "application/json";
-            var result = JsonSerializer.Serialize(new { error ="Ошибка валидации: " + exception.Message });
+            var result = JsonConvert.SerializeObject(new CoreResponse<List<string>>("Ошибка валидации: " + exception.Message));
 
             return ctx.Response.WriteAsync(result);
         }
@@ -48,7 +49,7 @@ namespace SCP.Application.Common.PipeLine
         {
             ctx.Response.StatusCode = (int)exception.Status;
             ctx.Response.ContentType = "application/json";
-            var result = JsonSerializer.Serialize(new { error = "Ошибка запроса: " + exception.Message });
+            var result = JsonConvert.SerializeObject(new CoreResponse<List<string>>("Ошибка запроса: " + exception.Message));
 
             return ctx.Response.WriteAsync(result);
         }
@@ -61,7 +62,7 @@ namespace SCP.Application.Common.PipeLine
             ctx.Response.StatusCode = (int)code;
             ctx.Response.ContentType = "application/json";
 
-            var result = JsonSerializer.Serialize(new { error = "Ошибка сервера: " + exception.Message });
+            var result = JsonConvert.SerializeObject(new CoreResponse<List<string>>("Ошибка сервера: " + exception.Message));
    
             return ctx.Response.WriteAsync(result);
         }

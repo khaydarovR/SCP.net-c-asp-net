@@ -46,11 +46,11 @@ namespace SCP.Application.Core.Safe
             var EPrivateKeyPkcs8 = cryptorService.EncryptWithSecretKey(PrivateKeyPem);
             var sharedId = Guid.NewGuid();
 
-            var permisions = SystemSafePermisons.AllClaims
+            var permisions = SystemSafePermisons.AllPermisions
                 .Select(c => new SafeRight
                 {
                     AppUserId = command.UserId,
-                    Permission = c,
+                    Permission = c.Slug,
                     DeadDate = null
                 })
                 .ToList();

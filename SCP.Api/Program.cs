@@ -50,4 +50,14 @@ app.MapControllers();
 
 app.MapGet("ping", () => "pong");
 
+if (true)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var seedingService = scope.ServiceProvider.GetRequiredService<SystemEntitySeeding>();
+        await seedingService.InitTUsersWithSafe(5);
+    }
+}
+
+
 app.Run();

@@ -12,8 +12,8 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231120200243_DeadDateNullable")]
-    partial class DeadDateNullable
+    [Migration("20231124222257_reclist")]
+    partial class reclist
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,7 +197,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 11, 20, 20, 2, 43, 473, DateTimeKind.Utc).AddTicks(1385));
+                        .HasDefaultValue(new DateTime(2023, 11, 24, 22, 22, 57, 56, DateTimeKind.Utc).AddTicks(1018));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -378,19 +378,27 @@ namespace SCP.DAL.Migrations
 
             modelBuilder.Entity("SCP.Domain.Entity.RecordRight", b =>
                 {
-                    b.Property<Guid>("AppUserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RecordId")
+                    b.Property<Guid>("AppUserId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("EnumPermission")
                         .HasColumnType("integer");
 
-                    b.HasKey("AppUserId", "RecordId");
+                    b.Property<Guid>("RecordId")
+                        .HasColumnType("uuid");
 
-                    b.HasIndex("RecordId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("RecordId");
 
                     b.ToTable("RecordRights");
                 });
@@ -590,8 +598,8 @@ namespace SCP.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("SCP.Domain.Entity.Record", null)
-                        .WithOne("UserRight")
-                        .HasForeignKey("SCP.Domain.Entity.RecordRight", "RecordId")
+                        .WithMany("RightUsers")
+                        .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -644,8 +652,7 @@ namespace SCP.DAL.Migrations
                 {
                     b.Navigation("ActivityLogs");
 
-                    b.Navigation("UserRight")
-                        .IsRequired();
+                    b.Navigation("RightUsers");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.Safe", b =>

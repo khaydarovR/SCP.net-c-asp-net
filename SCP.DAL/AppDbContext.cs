@@ -106,10 +106,11 @@ namespace SCP.DAL
 
         private static void ConfigureRecordRight(EntityTypeBuilder<RecordRight> recordRightBuilder)
         {
-            // Key configurations
-            // In this case, a composite primary key would be appropriate given 
-            // a unique record should be maintained per user per record.
-            recordRightBuilder.HasKey(rr => new { rr.AppUserId, rr.RecordId });
+            // Setting primary key
+            recordRightBuilder.HasKey(r => r.Id);
+
+            // Setting uniqueness of Id
+            recordRightBuilder.HasIndex(r => r.Id).IsUnique();
 
         }
 

@@ -34,6 +34,7 @@ namespace SCP.Api.Controllers
         public async Task<IActionResult> InviteRequest([FromBody] InviteRequestDTO dto) 
         {
             var comand = dto.Adapt<AuthrizeUsersToSafeCommand>();
+            comand.AuthorId = ContextUserId;
             var res = await accessCore.AuthorizeUsersToSafes(comand);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

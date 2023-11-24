@@ -36,6 +36,7 @@ namespace SCP.Api.ConfigureWebApi
                 o.AddSecurityRequirement(securityReq);
             });
 
+            services.AddTransient<SystemEntitySeeding>();
 
             return services;
         }

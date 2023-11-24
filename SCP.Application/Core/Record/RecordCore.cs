@@ -124,7 +124,7 @@ namespace SCP.Application.Core.Record
 
 
             var dbRec = dbContext.Records
-                .Include(r => r.UserRight)
+                .Include(r => r.RightUsers)
                 .FirstOrDefault(r => r.Id == Guid.Parse(command.Id));
 
             if (dbRec == null)
@@ -134,14 +134,14 @@ namespace SCP.Application.Core.Record
 
 
             //TODO SafeGuard
-            if (dbRec.UserRight.EnumPermission < RecRightEnum.Edit)
+            if (IsHaveRight(Guid.Parse(command.UserId), dbRec.Id, RecRightEnum.Edit))
             {
                 return Bad<bool>("Не достаточно прав для редактирования");
 
             }
             if (command.IsDeleted)
             {
-                if (dbRec.UserRight.EnumPermission < RecRightEnum.Delete)
+                if (IsHaveRight(Guid.Parse(command.UserId), dbRec.Id, RecRightEnum.Delete))
                 {
                     return Bad<bool>("Не достаточно прав для удаления");
                 }
@@ -161,6 +161,15 @@ namespace SCP.Application.Core.Record
             return Good(true);
         }
 
+        private bool IsHaveRight(Guid usesId, Guid recId, RecRightEnum recRight)
+        {
+            var res = dbContext.RecordRights
+                .Where(rr => rr.AppUserId == usesId)
+                .Where(rr => rr.RecordId == recId)
+                .Any(rr => rr.EnumPermission == recRight);
+
+            return res;
+        }
 
         /// <summary>
         /// Отправляет данные зашифрованные с помощью полученного ключа от клиента

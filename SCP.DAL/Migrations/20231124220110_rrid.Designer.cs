@@ -12,8 +12,8 @@ using SCP.DAL;
 namespace SCP.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231119205722_init0")]
-    partial class init0
+    [Migration("20231124220110_rrid")]
+    partial class rrid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,7 +197,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 11, 19, 20, 57, 22, 177, DateTimeKind.Utc).AddTicks(3476));
+                        .HasDefaultValue(new DateTime(2023, 11, 24, 22, 1, 10, 565, DateTimeKind.Utc).AddTicks(4184));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -378,16 +378,25 @@ namespace SCP.DAL.Migrations
 
             modelBuilder.Entity("SCP.Domain.Entity.RecordRight", b =>
                 {
-                    b.Property<Guid>("AppUserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RecordId")
+                    b.Property<Guid>("AppUserId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("EnumPermission")
                         .HasColumnType("integer");
 
-                    b.HasKey("AppUserId", "RecordId");
+                    b.Property<Guid>("RecordId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("RecordId")
                         .IsUnique();
@@ -431,7 +440,7 @@ namespace SCP.DAL.Migrations
                     b.Property<Guid>("AppUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("DeadDate")
+                    b.Property<DateTime?>("DeadDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Permission")
