@@ -9,7 +9,6 @@ namespace SCP.Application.Common.Validators
         {
             RuleFor(x => x.SafeIds).NotEmpty().WithMessage("Укажите для каких сейфов");
             RuleFor(x => x.UserIds).NotEmpty().WithMessage("Укажите для каких пользователей");
-            RuleFor(x => x.Permisions).NotEmpty().WithMessage("Укажите разрешения");
             RuleFor(x => x.DayLife).NotEmpty().WithMessage("Укажите срок годности выдаваемых разрешений");
         }
 

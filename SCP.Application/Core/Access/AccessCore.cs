@@ -83,8 +83,18 @@ namespace SCP.Application.Core.Access
                 {
                     continue;
                 }
+
+                //очистить разрешения для сейфа
+                dbContext.SafeRights.RemoveRange(
+                    dbContext.SafeRights
+                    .Where(s => s.SafeId == safeId)
+                    .Where(s => s.AppUserId == Guid.Parse(uId))
+                    .ToArray());
+                dbContext.SaveChanges();
+
                 foreach (var per in permisionSlugs)
                 {
+                    //добавить разрешения
                     dbContext.SafeRights.Add(new SafeRight
                     {
                         SafeId = safeId,
@@ -100,7 +110,6 @@ namespace SCP.Application.Core.Access
 
                 foreach (var recordID in recordsInSafe)
                 {
-                    //TODO пофиксить права дублирующиеся права ..удалитьб все права в сейфе 
                     var existingRight = dbContext.RecordRights
                         .FirstOrDefault(rr => rr.AppUserId == Guid.Parse(uId) && rr.RecordId == recordID);
 
