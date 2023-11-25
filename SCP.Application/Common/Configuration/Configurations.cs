@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SCP.Application.Core.Access;
 using SCP.Application.Core.Record;
 using SCP.Application.Core.Safe;
+using SCP.Application.Core.SafeGuard;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
@@ -46,6 +47,7 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<SafeCore>();
             services.AddScoped<RecordCore>();
             services.AddScoped<AccessCore>();
+            services.AddScoped<SafeGuardCore>();
 
             return services;
         }

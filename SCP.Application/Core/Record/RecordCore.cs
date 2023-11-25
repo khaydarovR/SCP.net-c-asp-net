@@ -7,6 +7,7 @@ using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
 using SCP.Application.Core.Safe;
+using SCP.Application.Core.SafeGuard;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
@@ -23,16 +24,19 @@ namespace SCP.Application.Core.Record
         private readonly AsymmetricCryptoService asymmetricCryptoService;
         private readonly SymmetricCryptoService symmetricCrypto;
         private readonly SafeCore safeCore;
+        private readonly SafeGuardCore safeGuard;
 
         public RecordCore(AppDbContext dbContext,
                           AsymmetricCryptoService asymmetricCryptoService,
                           SymmetricCryptoService symmetricCrypto,
-                          SafeCore safeCore)
+                          SafeCore safeCore,
+                          SafeGuardCore safeGuard)
         {
             this.dbContext = dbContext;
             this.asymmetricCryptoService = asymmetricCryptoService;
             this.symmetricCrypto = symmetricCrypto;
             this.safeCore = safeCore;
+            this.safeGuard = safeGuard;
         }
 
         public async Task<CoreResponse<bool>> CreateRecord(CreateRecordCommand command)
@@ -45,8 +49,12 @@ namespace SCP.Application.Core.Record
             //    return Bad<bool>("Цифровая подпись не прошла проверку");
             //}
 
-            //TODO: SafeGuard
             var neadPer = SystemSafePermisons.AddRecordToSafe;
+            var isAccess = safeGuard.AuthorHasAccessToSafe(command.SafeId, Guid.Parse(command.UserId), neadPer.Slug);
+            if (isAccess == false)
+            {
+                return Bad<bool>("Отстутсвует разрешение на: " + neadPer.Name);
+            }
 
             CreateRecordV validator = new();
             ValidationResult results = validator.Validate(command);
@@ -76,6 +84,19 @@ namespace SCP.Application.Core.Record
                 EnumPermission = RecRightEnum.Delete
             });
 
+            //дать права всем пользователям сейфа для новой записи
+            var safeUsers = await safeCore.GetAllUsersFromSafe(Guid.Parse(command.SafeId));
+            foreach ( var user in safeUsers.Data! )
+            {
+                dbContext.RecordRights.Add(new Domain.Entity.RecordRight
+                {
+                    AppUserId = user.Id,
+                    RecordId = recordId,
+                    EnumPermission = RecRightEnum.Delete
+                });
+            }
+
+
             dbContext.SaveChanges();
 
             return Good(true);
@@ -84,11 +105,11 @@ namespace SCP.Application.Core.Record
 
         public async Task<CoreResponse<List<GetRecordResponse>>> GetAllRecord(string safeId, Guid userId)
         {
-            //TODO: SafeGuard 
-            //защита до сейфа
-            var needPer = SystemSafePermisons.GetRecordList;
-
-
+            var isAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), userId, SystemSafePermisons.GetRecordList.Slug);
+            if (isAccess == false)
+            {
+                return Bad<List<GetRecordResponse>>("Отстутсвует разрешение на: " + SystemSafePermisons.GetRecordList.Name);
+            }
             var records = await dbContext.Records
                 .Where(r => r.SafeId == Guid.Parse(safeId))
                 .Where(r => r.IsDeleted == false)
@@ -122,7 +143,6 @@ namespace SCP.Application.Core.Record
                 return Bad<bool>(results.Errors.Select(e => e.ErrorMessage).ToArray());
             }
 
-
             var dbRec = dbContext.Records
                 .Include(r => r.RightUsers)
                 .FirstOrDefault(r => r.Id == Guid.Parse(command.Id));
@@ -133,17 +153,26 @@ namespace SCP.Application.Core.Record
             }
 
 
-            //TODO SafeGuard
-            if (IsHaveRight(Guid.Parse(command.UserId), dbRec.Id, RecRightEnum.Edit))
+            if (safeGuard.AuthorHasAccessToSafe(dbRec.SafeId, Guid.Parse(command.UserId), SystemSafePermisons.ReadAndEditSecrets.Slug) == false)
             {
-                return Bad<bool>("Не достаточно прав для редактирования");
-
+                return Bad<bool>("Отстутсвует разрешение на: " + SystemSafePermisons.ReadAndEditSecrets.Name);
             }
+
+            if (safeGuard.IsHaveRight(Guid.Parse(command.UserId), dbRec.Id, RecRightEnum.Edit) == false)
+            {
+                return Bad<bool>("Отстутсвует разрешение на: " + EnumUtil.MapRightEnumToString(RecRightEnum.Edit));
+            }
+
             if (command.IsDeleted)
             {
-                if (IsHaveRight(Guid.Parse(command.UserId), dbRec.Id, RecRightEnum.Delete))
+
+                if (safeGuard.AuthorHasAccessToSafe(dbRec.SafeId, Guid.Parse(command.UserId), SystemSafePermisons.SoftDelete.Slug) == false)
                 {
-                    return Bad<bool>("Не достаточно прав для удаления");
+                    return Bad<bool>("Отстутсвует разрешение на: " + SystemSafePermisons.SoftDelete.Name);
+                }
+                if (safeGuard.IsHaveRight(Guid.Parse(command.UserId), dbRec.Id, RecRightEnum.Delete) == false)
+                {
+                    return Bad<bool>("Отстутсвует разрешение на: " + EnumUtil.MapRightEnumToString(RecRightEnum.Delete));
                 }
             }
 
@@ -161,15 +190,6 @@ namespace SCP.Application.Core.Record
             return Good(true);
         }
 
-        private bool IsHaveRight(Guid usesId, Guid recId, RecRightEnum recRight)
-        {
-            var res = dbContext.RecordRights
-                .Where(rr => rr.AppUserId == usesId)
-                .Where(rr => rr.RecordId == recId)
-                .Any(rr => rr.EnumPermission == recRight);
-
-            return res;
-        }
 
         /// <summary>
         /// Отправляет данные зашифрованные с помощью полученного ключа от клиента
@@ -184,8 +204,18 @@ namespace SCP.Application.Core.Record
                 .Include(r => r.Safe)
                 .FirstAsync(r => r.Id == command.RecordId);
 
-            //TODO: SafeGuard
-            //var needRight = rec.UserRight.EnumPermission > RecRightEnum.Read;
+            var isAccessSafe = safeGuard.AuthorHasAccessToSafe(rec.SafeId, command.AuthorId, SystemSafePermisons.ReadSecrets.Slug);
+            if (isAccessSafe == false)
+            {
+                return Bad<ReadRecordResponse>("Отстутсвует разрешение на: " + SystemSafePermisons.ReadSecrets.Name);
+            }
+
+            var isAccessRec = safeGuard.IsHaveRight(command.AuthorId, command.RecordId, RecRightEnum.Read);
+            if (isAccessRec == false)
+            {
+                return Bad<ReadRecordResponse>("Отстутсвует разрешение на: " + EnumUtil.MapRightEnumToString(RecRightEnum.Read));
+            }
+
 
             //получение ключа
             var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(rec.SafeId.ToString());

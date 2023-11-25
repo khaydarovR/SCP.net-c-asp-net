@@ -5,6 +5,7 @@ using SCP.Application.Common;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
 using SCP.Application.Core.Safe;
+using SCP.Application.Core.SafeGuard;
 using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Entity;
@@ -16,21 +17,20 @@ namespace SCP.Application.Core.Access
     public class AccessCore: BaseCore
     {
         private readonly SafeCore safeCore;
-
+        private readonly SafeGuardCore safeGuard;
         private readonly AppDbContext dbContext;
 
-        public AccessCore(AppDbContext dbContext, SafeCore safeCore)
+        public AccessCore(AppDbContext dbContext, SafeCore safeCore, SafeGuardCore safeGuard)
         {
             this.dbContext = dbContext;
             this.safeCore = safeCore;
+            this.safeGuard = safeGuard;
         }
 
 
 
         public async Task<CoreResponse<string>> AuthorizeUsersToSafes(AuthrizeUsersToSafeCommand cmd)
         {
-            //обработать если только емаил -> найти и пригласить
-
 
             InviteUsersToSafesV validator = new();
             ValidationResult results = validator.Validate(cmd);
@@ -39,13 +39,12 @@ namespace SCP.Application.Core.Access
                 return Bad<string>(results.Errors.Select(e => e.ErrorMessage).ToArray());
             }
 
-            //проверить разрешения автора на сейфах
-            //TODO: SafeGuar
             foreach (var safeId in cmd.SafeIds)
             {
-                if(AuthorHasAccess(Guid.Parse(safeId), cmd.AuthorId, SystemSafePermisons.InviteUser.Slug) == false)
+                var hasAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), cmd.AuthorId, SystemSafePermisons.InviteUser.Slug);
+                if (hasAccess == false)
                 {
-                    return Bad<string>($"В сейфе {safeId} отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name) ;
+                    return Bad<string>($"В сейфе отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name) ;
                 }
             }
 
@@ -84,17 +83,11 @@ namespace SCP.Application.Core.Access
                     continue;
                 }
 
-                //очистить разрешения для сейфа
-                dbContext.SafeRights.RemoveRange(
-                    dbContext.SafeRights
-                    .Where(s => s.SafeId == safeId)
-                    .Where(s => s.AppUserId == Guid.Parse(uId))
-                    .ToArray());
-                dbContext.SaveChanges();
+                ClearPermisionsInSafe(safeId, uId);
 
+                //добавить разрешения в сейфе для пользователя
                 foreach (var per in permisionSlugs)
                 {
-                    //добавить разрешения
                     dbContext.SafeRights.Add(new SafeRight
                     {
                         SafeId = safeId,
@@ -104,6 +97,7 @@ namespace SCP.Application.Core.Access
                     });
                 }
 
+                //дать права пользователю для всех записей в сейфе
                 var recordsInSafe = dbContext.Records
                     .Where(r => r.SafeId == safeId)
                     .Select(r => r.Id).ToList();
@@ -122,7 +116,6 @@ namespace SCP.Application.Core.Access
                             EnumPermission = Domain.Enum.RecRightEnum.Delete
                         });
                     }
-                    //else update
                 }
             }
 
@@ -130,27 +123,32 @@ namespace SCP.Application.Core.Access
             return true;
         }
 
-        private bool AuthorHasAccess(Guid safeId, Guid userId, string permisionSlug)
+        private void ClearPermisionsInSafe(Guid safeId, string uId)
         {
-            var validPermisionIsExists = dbContext.SafeRights
-                .Where(sr => sr.AppUserId == userId)
-                .Where(sr => sr.SafeId == safeId)
-                .Any(sr => sr.Permission == permisionSlug && 
-                (sr.DeadDate > DateTime.UtcNow || sr.DeadDate == null));
+            var safesPermisons = dbContext.SafeRights
+                .Where(s => s.SafeId == safeId)
+                .Where(s => s.AppUserId == Guid.Parse(uId))
+                .ToArray();
 
-            return validPermisionIsExists;
+            var recIdsFromSafe = dbContext.Records
+                .Where(r => r.SafeId == safeId)
+                .Select(r => r.Id)
+                .ToArray();
+            var recRightsForUserInSafe = dbContext.RecordRights
+                .Where(sr => sr.AppUserId == Guid.Parse(uId))
+                .Where(sr => recIdsFromSafe.Any(id => sr.Id == id))
+                .ToArray();
+
+            dbContext.RecordRights.RemoveRange(recRightsForUserInSafe);
+            dbContext.SafeRights.RemoveRange(safesPermisons);
+
+            dbContext.SaveChanges();
         }
-
 
         public CoreResponse<Permision[]> GetSystemPermisions()
         {
             var readPermisions = SystemSafePermisons.AllPermisions.ToArray();
             return Good<Permision[]>(readPermisions);
-        }
-
-        public Task AuthorizeUsersToSafes()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>

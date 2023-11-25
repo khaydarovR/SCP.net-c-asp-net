@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using SCP.Application.Common.Response;
 using Mapster;
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 
 namespace SCP.Application.Core.Safe
 {
@@ -90,6 +92,21 @@ namespace SCP.Application.Core.Safe
 
 
             return Good(safes);
+        }
+
+
+        /// <summary>
+        /// Получить всех пользователей с правами для сейфа 
+        /// </summary>
+        /// <param name="safeId"></param>
+        /// <returns></returns>
+        public async Task<CoreResponse<List<AppUser>>> GetAllUsersFromSafe(Guid safeId)
+        {
+            var users = dbContext.AppUsers
+                .Include(u => u.SafeRights)
+                .Where(u => u.SafeRights.Any(u => u.SafeId == safeId))
+                .ToList();
+            return Good<List<AppUser>>(users);
         }
 
         public CoreResponse<string> GetPubKForSafe(string safeId)

@@ -12,6 +12,7 @@
         public static Permision ReadSecrets = new Permision { Slug = "Читать секреты в сейфе!", Name = "Читать секреты в сейфе" };
         public static Permision AddRecordToSafe = new Permision { Slug = "Добавлять новые секреты в сейф", Name = "Добавлять новые секреты в сейф" };
         public static Permision ReadAndEditSecrets = new Permision { Slug = "Редактировать секреты!", Name = "Редактировать секреты" };
+        public static Permision SoftDelete = new Permision { Slug = "Удалять секреты!", Name = "Удалять секреты" };
         public static Permision InviteUser = new Permision { Slug = "Приглашать пользователя в сейф", Name = "Приглашать пользователя в сейф" };
         public static Permision ShareWithUrl = new Permision { Slug = "Делиться записью с помощью одноразовай ссылки", Name = "Делиться записью с помощью одноразовай ссылки" };
         public static Permision KickOutUser = new Permision { Slug = "Выгонять пользователя из сейфа", Name = "Выгонять пользователя из сейфа" };
@@ -28,6 +29,7 @@
             ReadSecrets,
             AddRecordToSafe,
             ReadAndEditSecrets,
+            SoftDelete,
             InviteUser,
             ShareWithUrl,
             KickOutUser,

@@ -26,7 +26,11 @@ namespace SCP.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Read([FromBody] ReadRecordDTO dto)
         {
-            var comand = new ReadRecordCommand { PubKeyFromClient = dto.PubKey, RecordId = Guid.Parse(dto.RecId)};
+            var comand = new ReadRecordCommand { 
+                PubKeyFromClient = dto.PubKey, 
+                RecordId = Guid.Parse(dto.RecId),
+                AuthorId = ContextUserId
+            };
             var res = await recordCore.ReadRecord(comand);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

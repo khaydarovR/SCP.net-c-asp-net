@@ -22,5 +22,11 @@ namespace SCP.Application.Core
         {
             return new CoreResponse<T>(errorMsgs);
         }
+
+
+        public CoreResponse<bool> Bad(string errorMsg)
+        {
+            return new CoreResponse<bool>(errorMsg);
+        }
     }
 }
