@@ -192,5 +192,20 @@ namespace SCP.Application.Core.Access
             return Good<List<GetUserResponse>>(linkedUsers);
             
         }
+
+        public CoreResponse<Permision[]> GetPermissions(GetPerQuery cmd)
+        {
+            var perSlugs = dbContext.SafeRights
+                .Where(sr => sr.SafeId == cmd.SafeId)
+                .Where(sr => sr.AppUserId == cmd.UserId)
+                .Select(sr => sr.Permission)
+                .ToArray();
+
+            var res = SystemSafePermisons.AllPermisions
+                .Where(p => perSlugs.Any(ps => ps == p.Slug))
+                .ToArray();
+
+            return Good<Permision[]>(res);
+        }
     }
 }

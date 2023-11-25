@@ -7,6 +7,7 @@ using SCP.Api.Controllers.Base;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Core.Record;
 using SCP.Application.Core.Access;
+using Org.BouncyCastle.Bcpg;
 
 namespace SCP.Api.Controllers
 {
@@ -50,6 +51,19 @@ namespace SCP.Api.Controllers
             var res = await accessCore.GetLinkedUsersFromSafes(ContextUserId);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
-        
+
+
+        [HttpGet(nameof(GetPer))]
+        public async Task<IActionResult> GetPer([FromQuery] string uId,[FromQuery] string sId)
+        {
+            var cmd = new GetPerQuery 
+            { 
+                AuthorId = ContextUserId,
+                SafeId = Guid.Parse(sId),
+                UserId = Guid.Parse(uId)
+            };
+            var res = accessCore.GetPermissions(cmd);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
     }
 }
