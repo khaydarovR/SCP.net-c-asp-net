@@ -19,7 +19,7 @@ namespace SCP.Application.Services
         }
 
         /// <summary>
-        /// Расшифровывает данные из сейфа с помощью приватного ключа сейфа, зашифрованные клиентом публичным ключем сейфа
+        /// Расшифровывает данные из сейфа с помощью приватного ключа сейфа
         /// </summary>
         /// <param name="encryptedText"></param>
         /// <param name="privateKey"></param>

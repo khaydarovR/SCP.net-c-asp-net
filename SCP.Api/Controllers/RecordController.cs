@@ -36,6 +36,20 @@ namespace SCP.Api.Controllers
         }
 
 
+
+        /// <summary>
+        /// Получение самого подходящей записи по ресурсу или @UserName
+        /// </summary>
+        /// <param name="forRes"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> ReadMatch([FromHeader(Name = "For-Res")] string forRes)
+        {
+            var res = await recordCore.ReadBestMatch(forRes, ContextUserId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRecordDTO dto)
         {

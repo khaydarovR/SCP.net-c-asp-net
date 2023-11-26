@@ -2,6 +2,7 @@
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Ocsp;
 using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
@@ -188,6 +189,67 @@ namespace SCP.Application.Core.Record
             dbContext.SaveChanges();
 
             return Good(true);
+        }
+
+
+        public async Task<CoreResponse<ReadMatchRecordResponse>> ReadBestMatch(string forRes, Guid contextUserId)
+        {
+            var linkedSafesRes = await safeCore.GetLinked(new GetLinkedSafesQuery { UserId = contextUserId });
+
+            if (linkedSafesRes.IsSuccess == false)
+            {
+                return Bad<ReadMatchRecordResponse>(linkedSafesRes.ErrorList.ToArray());
+            }
+
+            var linkedSafes = linkedSafesRes.Data.ToList();
+
+            var filtredSafesIds = new List<Guid>();
+            foreach (var s in linkedSafes)
+            {
+                var canReed = safeGuard.AuthorHasAccessToSafe(s.Id, contextUserId, SystemSafePermisons.ReadSecrets.Slug);
+                if (canReed)
+                {
+                    filtredSafesIds.Add(Guid.Parse(s.Id));
+                }
+            }
+
+            var authorName = dbContext.AppUsers.Where(u => u.Id == contextUserId).Select(u => u.UserName).FirstOrDefault();
+            var resourseName = GetDomainName(forRes);
+            var bestMatchRec = dbContext.Records
+                .Where(r => filtredSafesIds.Any(id => r.SafeId ==id))
+                .FirstOrDefault(r => r.ForResource.Contains(resourseName) || r.ForResource.Contains($"@{authorName}"));
+
+            if (bestMatchRec == null)
+            {
+                return Bad<ReadMatchRecordResponse>("Нет подходящей записей для ресурса " + forRes);
+            }
+
+
+            var res = new ReadMatchRecordResponse();
+            var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(bestMatchRec.SafeId.ToString());
+
+            res.Login = asymmetricCryptoService.DecryptFromClientData(bestMatchRec.ELogin, clearSafePrivateKey);
+            res.Pw = asymmetricCryptoService.DecryptFromClientData(bestMatchRec.EPw, clearSafePrivateKey);
+            res.Secret = asymmetricCryptoService.DecryptFromClientData(bestMatchRec.ESecret, clearSafePrivateKey);
+            res.Title = bestMatchRec.Title;
+            res.Id = bestMatchRec.Id.ToString();
+            return Good(res);
+
+        }
+
+        private string GetDomainName(string url)
+        {
+            // Удаление протокола и слэшей из URL
+            string cleanedUrl = url.Replace("https://", "").Replace("http://", "").Trim('/');
+
+            // Парсинг значения между "://" и первым встреченным слэшем (/)
+            int startIndex = cleanedUrl.IndexOf("://") + 3;
+            int endIndex = cleanedUrl.IndexOf('/');
+
+            // Получение подстроки с именем домена
+            string domainName = cleanedUrl.Substring(startIndex, endIndex - startIndex);
+
+            return domainName;
         }
 
 
