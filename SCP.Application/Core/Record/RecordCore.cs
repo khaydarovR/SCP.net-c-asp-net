@@ -103,9 +103,9 @@ namespace SCP.Application.Core.Record
         }
 
 
-        public async Task<CoreResponse<List<GetRecordResponse>>> GetAllRecord(string safeId, Guid userId)
+        public async Task<CoreResponse<List<GetRecordResponse>>> GetAllRecord(string safeId, Guid authorId)
         {
-            var isAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), userId, SystemSafePermisons.GetRecordList.Slug);
+            var isAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), authorId, SystemSafePermisons.GetRecordList.Slug);
             if (isAccess == false)
             {
                 return Bad<List<GetRecordResponse>>("Отстутсвует разрешение на: " + SystemSafePermisons.GetRecordList.Name);
@@ -120,7 +120,7 @@ namespace SCP.Application.Core.Record
             foreach (var record in records)
             {
                 var rightInCurrentRec = await dbContext.RecordRights
-                    .FirstAsync(rr => rr.AppUserId == userId && rr.RecordId == record.Id);
+                    .FirstAsync(rr => rr.AppUserId == authorId && rr.RecordId == record.Id);
 
                 record.RightToCurentUser = rightInCurrentRec.MapRightEnumToString();
             }

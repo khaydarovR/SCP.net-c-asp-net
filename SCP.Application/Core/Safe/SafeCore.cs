@@ -11,6 +11,7 @@ using SCP.Application.Common.Response;
 using Mapster;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
+using SCP.Application.Core.SafeGuard;
 
 namespace SCP.Application.Core.Safe
 {
@@ -20,13 +21,19 @@ namespace SCP.Application.Core.Safe
         private readonly AppDbContext dbContext;
         private readonly AsymmetricCryptoService asymmetricCrypto;
         private readonly SymmetricCryptoService symmetricCrypto;
+        private readonly SafeGuardCore safeGuard;
 
-        public SafeCore(SymmetricCryptoService cryptorService, AppDbContext dbContext, AsymmetricCryptoService asymmetricCrypto, SymmetricCryptoService symmetricCrypto)
+        public SafeCore(SymmetricCryptoService cryptorService,
+                        AppDbContext dbContext,
+                        AsymmetricCryptoService asymmetricCrypto,
+                        SymmetricCryptoService symmetricCrypto,
+                        SafeGuardCore safeGuard)
         {
             this.cryptorService = cryptorService;
             this.dbContext = dbContext;
             this.asymmetricCrypto = asymmetricCrypto;
             this.symmetricCrypto = symmetricCrypto;
+            this.safeGuard = safeGuard;
         }
 
         public async Task<CoreResponse<bool>> CreateUserSafe(CreateSafeCommand command)
@@ -124,6 +131,7 @@ namespace SCP.Application.Core.Safe
             return Good(safePubK);
         }
 
+
         public string GetClearPrivateKeyFromSafe(string safeId)
         {
             var ePrivateKey = dbContext.Safes
@@ -136,7 +144,41 @@ namespace SCP.Application.Core.Safe
             return privateKey;
 
         }
-    }
 
+
+        public async Task<CoreResponse<SafeStatResponse>> GetStat(Guid safeId)
+        {
+            var usersFromSafe = await GetAllUsersFromSafe(safeId);
+            
+            var canReadCounter = 0;
+            var canEditPerCounter = 0;
+            foreach (var user in usersFromSafe.Data)
+            {
+                if (safeGuard.AuthorHasAccessToSafe(safeId, user.Id, SystemSafePermisons.ReadSecrets.Slug))
+                {
+                    canReadCounter++;
+                }
+                if (safeGuard.AuthorHasAccessToSafe(safeId, user.Id, SystemSafePermisons.EditUserSafeRights.Slug))
+                {
+                    canEditPerCounter++;
+                }
+                if (safeGuard.AuthorHasAccessToSafe(safeId, user.Id, SystemSafePermisons.EditUserSafeRights.Slug))
+                {
+                    canEditPerCounter++;
+                }
+            }
+
+
+            var result = new SafeStatResponse()
+            {
+                UsersCanEditPer = canEditPerCounter,
+                UsersCanReadSec = canReadCounter,
+                SafeUsersAmount = usersFromSafe.Data.Count,
+                SecretsAmount = dbContext.Records.Where(r => r.SafeId == safeId).Count(),
+            };
+
+            return Good(result);
+        }
+    }
 
 }

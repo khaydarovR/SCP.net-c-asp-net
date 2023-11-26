@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace SCP.Api.ConfigureWebApi
 {
@@ -34,6 +35,7 @@ namespace SCP.Api.ConfigureWebApi
             {
                 o.AddSecurityDefinition("Bearer", securityScheme);
                 o.AddSecurityRequirement(securityReq);
+                o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
             });
 
             services.AddTransient<SystemEntitySeeding>();

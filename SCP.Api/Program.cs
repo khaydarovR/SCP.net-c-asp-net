@@ -50,6 +50,7 @@ app.MapControllers();
 
 app.MapGet("ping", () => "pong");
 
+//Seeding test users
 if (true)
 {
     using (var scope = app.Services.CreateScope())

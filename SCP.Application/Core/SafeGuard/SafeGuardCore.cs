@@ -17,14 +17,12 @@ namespace SCP.Application.Core.SafeGuard
 {
     public class SafeGuardCore : BaseCore
     {
-        private readonly SafeCore safeCore;
 
         private readonly AppDbContext dbContext;
 
-        public SafeGuardCore(AppDbContext dbContext, SafeCore safeCore)
+        public SafeGuardCore(AppDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.safeCore = safeCore;
         }
 
 

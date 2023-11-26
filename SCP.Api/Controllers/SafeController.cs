@@ -60,5 +60,18 @@ namespace SCP.Api.Controllers
             var res = safeCore.GetPubKForSafe(safeId);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
+
+
+        /// <summary>
+        /// Получение статистики для сейфа
+        /// </summary>
+        /// <param name="sId"></param>
+        /// <returns></returns>
+        [HttpGet(nameof(GetStat))]
+        public async Task<ActionResult> GetStat(string sId)
+        {
+            var res = await safeCore.GetStat(Guid.Parse(sId));
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
     }
 }

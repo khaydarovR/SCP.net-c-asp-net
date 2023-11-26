@@ -39,12 +39,23 @@ namespace SCP.Application.Core.Access
                 return Bad<string>(results.Errors.Select(e => e.ErrorMessage).ToArray());
             }
 
+            //проверка всех разрешений
             foreach (var safeId in cmd.SafeIds)
             {
                 var hasAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), cmd.AuthorId, SystemSafePermisons.InviteUser.Slug);
                 if (hasAccess == false)
                 {
                     return Bad<string>($"В сейфе отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name) ;
+                }
+
+                var hasEditPer = safeGuard.AuthorHasAccessToSafe(safeId, cmd.AuthorId, SystemSafePermisons.EditUserSafeRights.Slug);
+                if (hasEditPer == false)
+                {
+                    if (cmd.Permisions.Count != 1 || !cmd.Permisions.Contains(SystemSafePermisons.GetBaseSafeInfo.Slug))
+                    {
+                        return Bad<string>("Вам разрешено только приглашать пользователей в сейф с помощью: "
+                                + SystemSafePermisons.GetBaseSafeInfo.Name);
+                    }
                 }
             }
 
@@ -75,8 +86,7 @@ namespace SCP.Application.Core.Access
 
         private async Task<bool> AddPermisionsToUsersForSafe(string[] permisionSlugs, Guid safeId, HashSet<string> userIds, int lifeOfTime)
         {
-
-            foreach(var uId in userIds)
+            foreach (var uId in userIds)
             {
                 if (string.IsNullOrEmpty(uId))
                 {
@@ -193,6 +203,12 @@ namespace SCP.Application.Core.Access
             
         }
 
+
+        /// <summary>
+        /// Список разрешений для пользователя в сейфе
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
         public CoreResponse<Permision[]> GetPermissions(GetPerQuery cmd)
         {
             var perSlugs = dbContext.SafeRights
@@ -206,6 +222,35 @@ namespace SCP.Application.Core.Access
                 .ToArray();
 
             return Good<Permision[]>(res);
+        }
+
+
+        /// <summary>
+        /// Обновить разрешения для пользвателя в сейфе
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        public async Task<CoreResponse<bool>> UpdatePermissions(PatchPerCommand cmd)
+        {
+            PatchPerV validator = new();
+            ValidationResult results = validator.Validate(cmd);
+            if (results.IsValid == false)
+            {
+                return Bad<bool>(results.Errors.Select(e => e.ErrorMessage).ToArray());
+            }
+
+            var hasEditPer = safeGuard.AuthorHasAccessToSafe(cmd.SafeId, cmd.AuthorId, SystemSafePermisons.EditUserSafeRights.Slug);
+            if (hasEditPer == false)
+            {
+                return Bad<bool>("Вам разрешено только приглашать пользователей в сейф с помощью: "
+                    + SystemSafePermisons.GetBaseSafeInfo.Name);
+            }
+
+            ClearPermisionsInSafe(Guid.Parse(cmd.SafeId), cmd.UserId);
+
+            var users = new HashSet<string> { cmd.UserId };
+            await AddPermisionsToUsersForSafe(cmd.PermissionSlags.ToArray(), Guid.Parse(cmd.SafeId), users, cmd.DayLife);
+            return Good<bool>(true);
         }
     }
 }

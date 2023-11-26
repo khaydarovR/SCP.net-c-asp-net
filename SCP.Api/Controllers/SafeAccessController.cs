@@ -11,6 +11,9 @@ using Org.BouncyCastle.Bcpg;
 
 namespace SCP.Api.Controllers
 {
+    /// <summary>
+    /// Работа с разрешениями для сейфов
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -24,6 +27,10 @@ namespace SCP.Api.Controllers
         }
 
 
+        /// <summary>
+        /// Получение списка системных разрешений со slug ом
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Permisions")]
         public ActionResult Permisions()
         {
@@ -31,6 +38,12 @@ namespace SCP.Api.Controllers
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
+
+        /// <summary>
+        /// Приглашение пользователя в сейф посредством выдачи ему разрешений
+        /// </summary>
+        /// <param name="dto">Данные для регистрации пользвателя в сейфе</param>
+        /// <returns></returns>
         [HttpPost(nameof(InviteRequest))]
         public async Task<IActionResult> InviteRequest([FromBody] InviteRequestDTO dto) 
         {
@@ -53,6 +66,12 @@ namespace SCP.Api.Controllers
         }
 
 
+        /// <summary>
+        /// Получить список разрешений для пользователя в сейфе
+        /// </summary>
+        /// <param name="uId"></param>
+        /// <param name="sId"></param>
+        /// <returns></returns>
         [HttpGet(nameof(GetPer))]
         public async Task<IActionResult> GetPer([FromQuery] string uId,[FromQuery] string sId)
         {
@@ -63,6 +82,21 @@ namespace SCP.Api.Controllers
                 UserId = Guid.Parse(uId)
             };
             var res = accessCore.GetPermissions(cmd);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
+
+        /// <summary>
+        /// Обновить разрешения в сейфе для пользователя
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost(nameof(PatchPer))]
+        public async Task<IActionResult> PatchPer([FromBody] PatchPerDTO dto)
+        {
+            var cmd = dto.Adapt<PatchPerCommand>();
+            cmd.AuthorId = ContextUserId;
+            var res = await accessCore.UpdatePermissions(cmd);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
     }
