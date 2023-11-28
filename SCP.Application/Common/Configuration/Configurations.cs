@@ -48,6 +48,7 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<RecordCore>();
             services.AddScoped<AccessCore>();
             services.AddScoped<SafeGuardCore>();
+            services.AddScoped<ApiKeyCore>();
 
             return services;
         }

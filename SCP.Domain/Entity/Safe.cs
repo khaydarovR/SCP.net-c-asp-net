@@ -10,5 +10,6 @@ namespace SCP.Domain.Entity
         public string PublicKpem { get; set; } = null!;
         public virtual IList<Record> Records { get; set; }
         public virtual IList<SafeRight> SafeUsers { get; set; }
+        public virtual IList<ApiKey> ApiKeys { get; set; }
     }
 }

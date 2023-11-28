@@ -178,6 +178,66 @@ namespace SCP.DAL.Migrations
                     b.ToTable("ActivityLogs");
                 });
 
+            modelBuilder.Entity("SCP.Domain.Entity.ApiKey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DeadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SafeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("SafeId");
+
+                    b.ToTable("ApiKeys");
+                });
+
+            modelBuilder.Entity("SCP.Domain.Entity.ApiKeyWhiteIP", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AllowFrom")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("ApiKeyId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApiKeyId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("ApiKeyWhiteIPs");
+                });
+
             modelBuilder.Entity("SCP.Domain.Entity.AppUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -194,7 +254,7 @@ namespace SCP.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 11, 24, 22, 22, 57, 56, DateTimeKind.Utc).AddTicks(1018));
+                        .HasDefaultValue(new DateTime(2023, 11, 28, 7, 16, 8, 196, DateTimeKind.Utc).AddTicks(3682));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -246,85 +306,6 @@ namespace SCP.DAL.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.Bot", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("EApiKey")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("Bots");
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.BotRight", b =>
-                {
-                    b.Property<Guid>("BotId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SafeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("DeadDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Permission")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("BotId", "SafeId");
-
-                    b.ToTable("BotRights");
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.BotWhiteIP", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AllowFrom")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("BotId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BotId");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.ToTable("BotWhiteIPs");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.Record", b =>
@@ -544,35 +525,34 @@ namespace SCP.DAL.Migrations
                     b.Navigation("Record");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.Bot", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.ApiKey", b =>
                 {
                     b.HasOne("SCP.Domain.Entity.AppUser", "Owner")
-                        .WithMany("Bots")
+                        .WithMany("ApiKeys")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SCP.Domain.Entity.Safe", "Safe")
+                        .WithMany("ApiKeys")
+                        .HasForeignKey("SafeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Owner");
+
+                    b.Navigation("Safe");
                 });
 
-            modelBuilder.Entity("SCP.Domain.Entity.BotRight", b =>
+            modelBuilder.Entity("SCP.Domain.Entity.ApiKeyWhiteIP", b =>
                 {
-                    b.HasOne("SCP.Domain.Entity.Bot", null)
-                        .WithMany("Rights")
-                        .HasForeignKey("BotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.BotWhiteIP", b =>
-                {
-                    b.HasOne("SCP.Domain.Entity.Bot", "Bot")
+                    b.HasOne("SCP.Domain.Entity.ApiKey", "ApiKey")
                         .WithMany("WhiteIPs")
-                        .HasForeignKey("BotId")
+                        .HasForeignKey("ApiKeyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Bot");
+                    b.Navigation("ApiKey");
                 });
 
             modelBuilder.Entity("SCP.Domain.Entity.Record", b =>
@@ -627,20 +607,18 @@ namespace SCP.DAL.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("SCP.Domain.Entity.ApiKey", b =>
+                {
+                    b.Navigation("WhiteIPs");
+                });
+
             modelBuilder.Entity("SCP.Domain.Entity.AppUser", b =>
                 {
-                    b.Navigation("Bots");
+                    b.Navigation("ApiKeys");
 
                     b.Navigation("RecordRights");
 
                     b.Navigation("SafeRights");
-
-                    b.Navigation("WhiteIPs");
-                });
-
-            modelBuilder.Entity("SCP.Domain.Entity.Bot", b =>
-                {
-                    b.Navigation("Rights");
 
                     b.Navigation("WhiteIPs");
                 });
@@ -654,6 +632,8 @@ namespace SCP.DAL.Migrations
 
             modelBuilder.Entity("SCP.Domain.Entity.Safe", b =>
                 {
+                    b.Navigation("ApiKeys");
+
                     b.Navigation("Records");
 
                     b.Navigation("SafeUsers");

@@ -7,7 +7,7 @@
     }
     public class SystemSafePermisons
     {
-        public static Permision GetBaseSafeInfo = new Permision {Slug = "Получать информацию о сейфе", Name = "Получать информацию о сейфе" };
+        public static Permision GetBaseSafeInfo = new Permision { Slug = "Получать информацию о сейфе", Name = "Получать информацию о сейфе" };
         public static Permision GetRecordList = new Permision { Slug = "Получать список секретов в сейфе (без секретов)", Name = "Получать список секретов в сейфе (без чтения)" };
         public static Permision ReadSecrets = new Permision { Slug = "Читать секреты в сейфе!", Name = "Читать секреты в сейфе" };
         public static Permision AddRecordToSafe = new Permision { Slug = "Добавлять новые секреты в сейф", Name = "Добавлять новые секреты в сейф" };
@@ -39,6 +39,5 @@
             EditUserSafeRights,
             ItIsThisSafeCreator,
         };
-
     }
 }

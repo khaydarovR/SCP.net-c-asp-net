@@ -1,4 +1,6 @@
-﻿namespace SCP.Application.Common.Response
+﻿using SCP.Domain.Entity;
+
+namespace SCP.Application.Common.Response
 {
     public class AuthResponse
     {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SCP.Domain.Entity;
+using System.Reflection.Emit;
 
 namespace SCP.DAL
 {
@@ -21,9 +22,8 @@ namespace SCP.DAL
         public DbSet<RecordRight> RecordRights { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<UserWhiteIP> UserWhiteIPs { get; set; }
-        public DbSet<BotWhiteIP> BotWhiteIPs { get; set; }
-        public DbSet<Bot> Bots { get; set;  }
-        public DbSet<BotRight> BotRights { get; set;  }
+        public DbSet<ApiKeyWhiteIP> ApiKeyWhiteIPs { get; set; }
+        public DbSet<ApiKey> ApiKeys { get; set;  }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -38,10 +38,10 @@ namespace SCP.DAL
             ConfigureAppUser(appUserModelBuilder);
 
 
-            var botModelBuilder = modelBuilder.Entity<Bot>();
-            ConfigureBot(botModelBuilder);
+            var botModelBuilder = modelBuilder.Entity<ApiKey>();
+            ConfigureApiKey(botModelBuilder);
 
-            var botRightModelBuilder = modelBuilder.Entity<BotRight>();
+            var botRightModelBuilder = modelBuilder.Entity<ApiKeyWhiteIP>();
             ConfigureBotRight(botRightModelBuilder);
 
 
@@ -66,8 +66,8 @@ namespace SCP.DAL
             var userWhiteIPBuilder = modelBuilder.Entity<UserWhiteIP>();
             ConfigureUserWhiteIps(userWhiteIPBuilder);
 
-            var botWhiteIpModelBuilder = modelBuilder.Entity<BotWhiteIP>();
-            ConfigureBotIP(botWhiteIpModelBuilder);
+            var botWhiteIpModelBuilder = modelBuilder.Entity<ApiKeyWhiteIP>();
+            ConfigureApiIP(botWhiteIpModelBuilder);
 
         }
 
@@ -161,7 +161,7 @@ namespace SCP.DAL
                                .HasForeignKey(wip => wip.AppUserId)
                                .OnDelete(DeleteBehavior.Cascade);
 
-            appUserModelBuilder.HasMany(au => au.Bots)
+            appUserModelBuilder.HasMany(au => au.ApiKeys)
                                .WithOne()
                                .HasForeignKey(b => b.Id)
                                .OnDelete(DeleteBehavior.Cascade);
@@ -185,18 +185,14 @@ namespace SCP.DAL
                                  .IsRequired(false);
         }
 
-        private static void ConfigureBotRight(EntityTypeBuilder<BotRight> botRightModelBuilder)
+        private static void ConfigureBotRight(EntityTypeBuilder<ApiKeyWhiteIP> botRightModelBuilder)
         {
-            // Composite Key Configuration
-            botRightModelBuilder.HasKey(br => new { br.BotId, br.SafeId });
+            // Setting primary key
+            botRightModelBuilder.HasKey(r => r.Id);
 
-            // Properties settings
-            botRightModelBuilder.Property(br => br.Permission)
-                                .IsRequired()
-                                .HasMaxLength(200);
+            // Setting uniqueness of Id
+            botRightModelBuilder.HasIndex(r => r.Id).IsUnique();
 
-            botRightModelBuilder.Property(br => br.DeadDate)
-                                .IsRequired();
 
         }
 
@@ -237,7 +233,7 @@ namespace SCP.DAL
 
         }
 
-        private static void ConfigureBotIP(EntityTypeBuilder<BotWhiteIP> botWhiteIpModelBuilder)
+        private static void ConfigureApiIP(EntityTypeBuilder<ApiKeyWhiteIP> botWhiteIpModelBuilder)
         {
             // Setting primary key
             botWhiteIpModelBuilder.HasKey(b => b.Id);
@@ -250,14 +246,19 @@ namespace SCP.DAL
                                   .IsRequired()
                                   .HasMaxLength(100);
 
+            botWhiteIpModelBuilder.Property(b => b.AllowFrom)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
             // Relationships settings
-            botWhiteIpModelBuilder.HasOne(b => b.Bot)
+            botWhiteIpModelBuilder.HasOne(b => b.ApiKey)
                                   .WithMany(b => b.WhiteIPs)
-                                  .HasForeignKey(b => b.BotId)
+                                  .HasForeignKey(b => b.ApiKeyId)
                                   .OnDelete(DeleteBehavior.Cascade);
+
         }
 
-        private static void ConfigureBot(EntityTypeBuilder<Bot> botModelBuilder)
+        private static void ConfigureApiKey(EntityTypeBuilder<ApiKey> botModelBuilder)
         {
             // Setting primary key
             botModelBuilder.HasKey(b => b.Id);
@@ -269,18 +270,22 @@ namespace SCP.DAL
             botModelBuilder.Property(b => b.Name)
                            .IsRequired()
                            .HasMaxLength(100);
-            botModelBuilder.Property(b => b.Description)
-                           .IsRequired()
-                           .HasMaxLength(500);
-            botModelBuilder.Property(b => b.EApiKey)
-                           .IsRequired()
-                           .HasMaxLength(100);
+
+            botModelBuilder.Property(b => b.DeadDate)
+                           .IsRequired();
 
             // Relationships settings
             botModelBuilder.HasOne(b => b.Owner)
-                           .WithMany(u => u.Bots)
+                           .WithMany(u => u.ApiKeys)
                            .HasForeignKey(b => b.OwnerId)
                            .OnDelete(DeleteBehavior.Cascade);
+
+
+            botModelBuilder
+                .HasOne(a => a.Safe)
+                .WithMany(s => s.ApiKeys)
+                .HasForeignKey(a => a.SafeId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }
