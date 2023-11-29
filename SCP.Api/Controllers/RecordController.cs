@@ -85,6 +85,13 @@ namespace SCP.Api.Controllers
             var res = await recordCore.PatchRecord(comand);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Logs(string rId)
+        {
+            var res = await recordCore.GetLogs(Guid.Parse(rId), ContextUserId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
     }
 }
  

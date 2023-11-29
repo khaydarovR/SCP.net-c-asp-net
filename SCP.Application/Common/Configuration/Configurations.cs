@@ -49,6 +49,7 @@ namespace SCP.Application.Common.Configuration
             services.AddSingleton<AsymmetricCryptoService>();
             services.AddTransient<EmailService>();
             services.AddTransient<TwoFactorAuthService>();
+            services.AddTransient<RLogService>();
             services.Configure<EmailServiceOptions>(config.GetSection("EmailService"));
 
             services.AddScoped<UserAuthCore>();

@@ -12,6 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SCP.Domain.Enum;
+using SCP.Application.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using SCP.Application.Common.Helpers;
 
 namespace SCP.Application.Core.ApiKey
 {
@@ -19,10 +22,12 @@ namespace SCP.Application.Core.ApiKey
     {
 
         private readonly AppDbContext dbContext;
+        private readonly RLogService rLog;
 
-        public SafeGuardCore(AppDbContext dbContext)
+        public SafeGuardCore(AppDbContext dbContext, RLogService rLog)
         {
             this.dbContext = dbContext;
+            this.rLog = rLog;
         }
 
 
@@ -75,6 +80,11 @@ namespace SCP.Application.Core.ApiKey
                 .Where(rr => rr.AppUserId == usesId)
                 .Where(rr => rr.RecordId == recId)
                 .Any(rr => (int)rr.EnumPermission >= (int)recRight);
+
+            if (res == false)
+            {
+                rLog.Push("Не успешная попытка чтения записи на основании прав: " + EnumUtil.MapRightEnumToString(recRight), recId).GetAwaiter();
+            }
 
             return res;
         }

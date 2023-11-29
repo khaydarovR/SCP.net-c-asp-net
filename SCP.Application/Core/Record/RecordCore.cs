@@ -16,6 +16,8 @@ using SCP.Domain.Enum;
 using System.Security.Cryptography;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using MimeKit;
+using SCP.Domain.Entity;
 
 namespace SCP.Application.Core.Record
 {
@@ -26,18 +28,21 @@ namespace SCP.Application.Core.Record
         private readonly SymmetricCryptoService symmetricCrypto;
         private readonly SafeCore safeCore;
         private readonly SafeGuardCore safeGuard;
+        private readonly RLogService rLog;
 
         public RecordCore(AppDbContext dbContext,
                           AsymmetricCryptoService asymmetricCryptoService,
                           SymmetricCryptoService symmetricCrypto,
                           SafeCore safeCore,
-                          SafeGuardCore safeGuard)
+                          SafeGuardCore safeGuard,
+                          RLogService rLog)
         {
             this.dbContext = dbContext;
             this.asymmetricCryptoService = asymmetricCryptoService;
             this.symmetricCrypto = symmetricCrypto;
             this.safeCore = safeCore;
             this.safeGuard = safeGuard;
+            this.rLog = rLog;
         }
 
         public async Task<CoreResponse<bool>> CreateRecord(CreateRecordCommand command)
@@ -97,8 +102,7 @@ namespace SCP.Application.Core.Record
                 });
             }
 
-
-            dbContext.SaveChanges();
+            await rLog.Push("Создание на основаннии разрешения: " + neadPer.Name, recordId);
 
             return Good(true);
         }
@@ -125,6 +129,7 @@ namespace SCP.Application.Core.Record
 
                 record.RightToCurentUser = rightInCurrentRec.MapRightEnumToString();
             }
+
 
             return Good(records);
         }
@@ -185,9 +190,8 @@ namespace SCP.Application.Core.Record
             dbRec.ForResource = command.ForResource;
 
             dbContext.Records.Update(dbRec);
-
             dbContext.SaveChanges();
-
+            await rLog.Push("Редактирование на основаннии разрешения: " + SystemSafePermisons.ReadAndEditSecrets.Name, command.Id);
             return Good(true);
         }
 
@@ -233,6 +237,9 @@ namespace SCP.Application.Core.Record
             res.Secret = asymmetricCryptoService.DecryptFromClientData(bestMatchRec.ESecret, clearSafePrivateKey);
             res.Title = bestMatchRec.Title;
             res.Id = bestMatchRec.Id.ToString();
+
+            await rLog.Push("Чтение для расширения на основаннии разрешения пользователя по личному токену: " + SystemSafePermisons.ReadSecrets.Name, res.Id);
+
             return Good(res);
 
         }
@@ -303,6 +310,8 @@ namespace SCP.Application.Core.Record
                 ForResource = rec.ForResource,
                 IsDeleted = rec.IsDeleted,
             };
+            var author = dbContext.AppUsers.FirstOrDefault(x => x.Id == command.AuthorId);
+            await rLog.Push(author?.Email + " | Чтение в зашифрованном виде на основаннии разрешения: " + SystemSafePermisons.ReadSecrets.Name, data.Id);
 
             return new CoreResponse<ReadRecordResponse>(data);
 
@@ -345,9 +354,24 @@ namespace SCP.Application.Core.Record
                 ForResource = dbRec.ForResource,
                 IsDeleted = dbRec.IsDeleted,
             };
+            await rLog.Push("Чтение секрета на основаннии API KEY: " + SystemSafePermisons.ReadSecrets.Name, data.Id);
 
             return new CoreResponse<ReadRecordResponse>(data);
 
+        }
+
+        public async Task<CoreResponse<List<RLogsResponse>>> GetLogs(Guid rId, Guid contextUserId)
+        {
+            var logs = await dbContext.ActivityLogs
+                .Where(l => l.RecordId == rId)
+                .ToListAsync();
+
+            var res = new List<RLogsResponse>();
+            foreach (var l in logs)
+            {
+                res.Add(l.Adapt<RLogsResponse>());
+            }
+            return Good<List<RLogsResponse>>(res);
         }
     }
 }

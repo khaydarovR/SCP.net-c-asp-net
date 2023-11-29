@@ -43,6 +43,7 @@ namespace SCP.Api.ConfigureWebApi
                 if (user != null)
                 {
                     dbContext.AppUsers.Remove(user);
+                    Console.WriteLine("================Deleted " + user.Email);
                 }
             }
             dbContext.SaveChanges();    
@@ -71,7 +72,7 @@ namespace SCP.Api.ConfigureWebApi
 
                 await GenSafeForUsers(u);
             }
-            Console.WriteLine("Users inited " + ammount);
+            Console.WriteLine("==============Users inited " + ammount);
 
             return this;
         }
@@ -91,7 +92,7 @@ namespace SCP.Api.ConfigureWebApi
                 throw new Exception("Seeding safe error " + user.Email);
             }
 
-            Console.WriteLine("Users safe inited " + users.Count);
+            Console.WriteLine("=======================Users safe inited " + users.Count);
         }
     }
 }

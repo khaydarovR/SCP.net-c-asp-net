@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using SCP.Application.Services;
 using SCP.Application.Common.Response;
+using SCP.Application.Core.Safe;
 
 namespace SCP.Application.Core.UserAuth
 {
@@ -15,19 +16,21 @@ namespace SCP.Application.Core.UserAuth
         private readonly UserManager<AppUser> userManager;
         private readonly JwtService jwtService;
         private readonly TwoFactorAuthService twoFactorAuthService;
+        private readonly SafeCore safeCore;
 
-        public UserAuthCore(UserManager<AppUser> userManager, JwtService jwtService, TwoFactorAuthService twoFactorAuthService)
+        public UserAuthCore(UserManager<AppUser> userManager, JwtService jwtService, TwoFactorAuthService twoFactorAuthService, SafeCore safeCore)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
             this.twoFactorAuthService = twoFactorAuthService;
+            this.safeCore = safeCore;
         }
 
         public async Task<CoreResponse<bool>> Activate2FA(string uId, bool isOn)
         {
             var u =  await userManager.FindByIdAsync(uId);
             await userManager.SetTwoFactorEnabledAsync(u, isOn);
-            return Good<bool>(isOn);
+            return Good<bool>(true);
         }
 
         public async Task<CoreResponse<bool>> CreateAccount(CreateAccountCommand command)
@@ -54,7 +57,13 @@ namespace SCP.Application.Core.UserAuth
                 var claimRes = await userManager.AddClaimsAsync(dbUser, claims);
                 if (claimRes.Succeeded)
                 {
-                    return new CoreResponse<bool>(true);
+                    _ = await safeCore.CreateUserSafe(new CreateSafeCommand
+                    {
+                        Title = dbUser.NormalizedUserName!,
+                        Description = "Сейф по умолчанию",
+                        UserId = dbUser.Id,
+                    });
+;                   return new CoreResponse<bool>(true);
                 }
 
                 return new CoreResponse<bool>(claimRes.Errors.Select(e => e.Description));
