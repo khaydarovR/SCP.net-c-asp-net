@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
 using SCP.Api.DTO;
@@ -22,7 +23,11 @@ namespace SCP.Api.Controllers
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
-
+        /// <summary>
+        /// Чтение секрета на основании прав учетной записи
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Read([FromBody] ReadRecordDTO dto)
         {
@@ -35,7 +40,19 @@ namespace SCP.Api.Controllers
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
-
+        /// <summary>
+        /// Чтение записи на оснвании Api ключа
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <param name="recId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReadWithKey([FromHeader(Name = "Api-Key")] string apiKey, [FromQuery] string recId)
+        {
+            var res = await recordCore.ReadWithKey(apiKey, recId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
 
         /// <summary>
         /// Получение самого подходящей записи по ресурсу или @UserName

@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.OpenApi.Models;
+using SCP.Application.Services;
 using System.Reflection;
 
 namespace SCP.Api.ConfigureWebApi
@@ -39,6 +41,7 @@ namespace SCP.Api.ConfigureWebApi
             });
 
             services.AddTransient<SystemEntitySeeding>();
+
 
             return services;
         }

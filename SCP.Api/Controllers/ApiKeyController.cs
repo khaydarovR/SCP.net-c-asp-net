@@ -5,7 +5,7 @@ using SCP.Api.Controllers.Base;
 using SCP.Api.DTO;
 using Mapster;
 using SCP.Application.Core.UserAuth;
-using SCP.Application.Core.SafeGuard;
+using SCP.Application.Core.ApiKeyC;
 
 namespace SCP.Api.Controllers
 {
@@ -42,6 +42,13 @@ namespace SCP.Api.Controllers
         public async Task<IActionResult> Delete(string keyId)
         {
             var res = await keyCore.Delete(keyId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
+        [HttpPost("Block")]
+        public async Task<IActionResult> Block(string keyId, bool isBlock)
+        {
+            var res = await keyCore.Block(keyId, isBlock);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
     }

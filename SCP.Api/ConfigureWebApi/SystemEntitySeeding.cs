@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Validations;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
@@ -32,6 +33,20 @@ namespace SCP.Api.ConfigureWebApi
             this.symmetricCrypto = symmetricCrypto;
             this.safeCore = safeCore;
 
+        }
+
+        public async Task<SystemEntitySeeding> ClearUser(params string[] names)
+        {
+            foreach (var n in names)
+            {
+                var user = await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == n);
+                if (user != null)
+                {
+                    dbContext.AppUsers.Remove(user);
+                }
+            }
+            dbContext.SaveChanges();    
+            return this;
         }
 
         public async Task<SystemEntitySeeding> InitTUsersWithSafe(int ammount)

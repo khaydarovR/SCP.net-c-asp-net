@@ -11,7 +11,7 @@ using SCP.Application.Common.Response;
 using Mapster;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
-using SCP.Application.Core.SafeGuard;
+using SCP.Application.Core.ApiKey;
 
 namespace SCP.Application.Core.Safe
 {

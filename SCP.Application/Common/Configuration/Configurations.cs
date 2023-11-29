@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SCP.Application.Core.Access;
+using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Record;
 using SCP.Application.Core.Safe;
-using SCP.Application.Core.SafeGuard;
+using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
@@ -26,6 +27,7 @@ namespace SCP.Application.Common.Configuration
 
             services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
             {
+                options.Tokens.EmailConfirmationTokenProvider = "email";
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
                 options.SignIn.RequireConfirmedEmail = false;
@@ -35,13 +37,19 @@ namespace SCP.Application.Common.Configuration
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
             })
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddUserManager<UserManager<AppUser>>()
-            .AddErrorDescriber<IdentityMessageRu>();
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<Microsoft.AspNetCore.Identity.EmailTokenProvider<AppUser>>("email")
+                .AddUserManager<UserManager<AppUser>>()
+                .AddErrorDescriber<IdentityMessageRu>();
+
 
             services.AddScoped<JwtService>();
             services.AddSingleton<SymmetricCryptoService>();
             services.AddSingleton<AsymmetricCryptoService>();
+            services.AddTransient<EmailService>();
+            services.AddTransient<TwoFactorAuthService>();
+            services.Configure<EmailServiceOptions>(config.GetSection("EmailService"));
 
             services.AddScoped<UserAuthCore>();
             services.AddScoped<SafeCore>();
@@ -49,6 +57,8 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<AccessCore>();
             services.AddScoped<SafeGuardCore>();
             services.AddScoped<ApiKeyCore>();
+
+
 
             return services;
         }

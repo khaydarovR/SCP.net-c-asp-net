@@ -18,7 +18,7 @@
         public static Permision KickOutUser = new Permision { Slug = "Выгонять пользователя из сейфа", Name = "Выгонять пользователя из сейфа" };
         public static Permision EditUserRecordRight = new Permision { Slug = "Менять права пользователей для конкретной записи", Name = "Менять права пользователей для конкретной записи" };
         public static Permision EditSafe = new Permision { Slug = "Редактировать сейф", Name = "Редактировать сейф" };
-        public static Permision ConnectBot = new Permision { Slug = "Подключать ботов", Name = "Подключать ботов" };
+        public static Permision ApiKeyGen = new Permision { Slug = "Подключать ботов. Создовать токены доступа", Name = "Создовать API ключи для сейфа" };
         public static Permision EditUserSafeRights = new Permision { Slug = "Редактировать права пользователей для сейфа", Name = "Редактировать права пользователей для сейфа" };
         public static Permision ItIsThisSafeCreator = new Permision { Slug = "Является создателем сейфа", Name = "Является создателем сейфа" };
 
@@ -35,7 +35,7 @@
             KickOutUser,
             EditUserRecordRight,
             EditSafe,
-            ConnectBot,
+            ApiKeyGen,
             EditUserSafeRights,
             ItIsThisSafeCreator,
         };

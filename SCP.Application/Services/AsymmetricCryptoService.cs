@@ -1,11 +1,9 @@
-﻿using Org.BouncyCastle.OpenSsl;
+﻿
+
+using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SCP.Application.Services
 {
@@ -71,8 +69,8 @@ namespace SCP.Application.Services
         private string ExportPublicKeyToPemString(RSAParameters publParams)
         {
             var stringWriter = new StringWriter();
-            var pemWriter = new PemWriter(stringWriter);
-            var publicKey = DotNetUtilities.GetRsaPublicKey(publParams);
+            var pemWriter = new Org.BouncyCastle.OpenSsl.PemWriter(stringWriter);
+            var publicKey = Org.BouncyCastle.Security.DotNetUtilities.GetRsaPublicKey(publParams);
             pemWriter.WriteObject(publicKey);
             pemWriter.Writer.Flush();
             return stringWriter.ToString();

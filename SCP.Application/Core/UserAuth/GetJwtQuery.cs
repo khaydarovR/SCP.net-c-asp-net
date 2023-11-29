@@ -12,5 +12,7 @@ namespace SCP.Application.Core.UserAuth
 
         public string Password { get; set; }
 
+        public string Fac { get; set; }
+
     }
 }

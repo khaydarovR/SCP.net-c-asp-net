@@ -8,7 +8,7 @@ using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
 using SCP.Application.Core.Safe;
-using SCP.Application.Core.SafeGuard;
+using SCP.Application.Core.ApiKey;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
@@ -302,6 +302,48 @@ namespace SCP.Application.Core.Record
                 Title = rec.Title,
                 ForResource = rec.ForResource,
                 IsDeleted = rec.IsDeleted,
+            };
+
+            return new CoreResponse<ReadRecordResponse>(data);
+
+        }
+
+        public async Task<CoreResponse<ReadRecordResponse>> ReadWithKey(string apiKey, string recId)
+        {
+            if (Guid.TryParse(recId, out var res) == false)
+            {
+                return Bad<ReadRecordResponse>("Не правильный формат ID: " + recId);
+            }
+            var dbRec = dbContext.Records.FirstOrDefault(r => r.Id == Guid.Parse(recId) && r.IsDeleted == false);
+            if (dbRec == null)
+            {
+                return Bad<ReadRecordResponse>("Секрет с идентификатором " + recId + " не найден");
+            }
+
+            var msg = "";
+            var keyIsValid = safeGuard.ApiKeyIsValid(apiKey, dbRec.SafeId, out msg);
+            if (keyIsValid == false)
+            {
+                return Bad<ReadRecordResponse>(msg);
+            }
+
+            //получение ключа
+            var clearSafePrivateKey = safeCore.GetClearPrivateKeyFromSafe(dbRec.SafeId.ToString());
+
+            //расшифровка
+            var clearLogin = asymmetricCryptoService.DecryptFromClientData(dbRec.ELogin, clearSafePrivateKey);
+            var clearPw = asymmetricCryptoService.DecryptFromClientData(dbRec.EPw, clearSafePrivateKey);
+            var clearSecret = asymmetricCryptoService.DecryptFromClientData(dbRec.ESecret, clearSafePrivateKey);
+
+            var data = new ReadRecordResponse
+            {
+                Id = dbRec.Id.ToString(),
+                ELogin = clearLogin,
+                EPw = clearPw,
+                ESecret = clearSecret,
+                Title = dbRec.Title,
+                ForResource = dbRec.ForResource,
+                IsDeleted = dbRec.IsDeleted,
             };
 
             return new CoreResponse<ReadRecordResponse>(data);

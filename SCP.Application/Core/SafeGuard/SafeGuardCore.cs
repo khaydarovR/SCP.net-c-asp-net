@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SCP.Domain.Enum;
 
-namespace SCP.Application.Core.SafeGuard
+namespace SCP.Application.Core.ApiKey
 {
     public class SafeGuardCore : BaseCore
     {
@@ -75,6 +75,45 @@ namespace SCP.Application.Core.SafeGuard
                 .Where(rr => rr.AppUserId == usesId)
                 .Where(rr => rr.RecordId == recId)
                 .Any(rr => (int)rr.EnumPermission >= (int)recRight);
+
+            return res;
+        }
+
+        /// <summary>
+        /// Проверка валидности api ключа
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <param name="safeId"></param>
+        /// <returns></returns>
+        public bool ApiKeyIsValid(string apiKey, Guid safeId, out string msg)
+        {
+            msg = "";
+            var res = true;
+
+            var k = dbContext.ApiKeys
+                .Where(k => k.SafeId == safeId)
+                .Where(k => k.Key == apiKey)
+                .FirstOrDefault();
+
+            if (k == null)
+            {
+                msg = "Ключ не найден";
+                res = false;
+                return res;
+            }
+           
+            if (k.DeadDate < DateTime.UtcNow)
+            {
+                msg = "Время жизни ключа истек";
+                res = false;
+                return res;
+            }
+            if (k.IsBlocked)
+            {
+                msg = "Ключ временно заблокирован";
+                res = false;
+                return res;
+            }
 
             return res;
         }

@@ -3,29 +3,39 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
+using SCP.Application.Core.ApiKey;
 using SCP.DAL;
+using SCP.Domain;
 using SCP.Domain.Entity;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
 
-namespace SCP.Application.Core.SafeGuard
+namespace SCP.Application.Core.ApiKeyC
 {
     public class ApiKeyCore : BaseCore
     {
 
         private readonly AppDbContext dbContext;
+        private readonly SafeGuardCore safeGuard;
 
-        public ApiKeyCore(AppDbContext dbContext)
+        public ApiKeyCore(AppDbContext dbContext, SafeGuardCore safeGuard)
         {
             this.dbContext = dbContext;
+            this.safeGuard = safeGuard;
         }
 
 
 
         public async Task<CoreResponse<bool>> CreateApiKey(CreateKeyCommand cmd)
         {
-            var model = new ApiKey
+
+            var canGenKey = safeGuard.AuthorHasAccessToSafe(cmd.SafeId, cmd.UserId, SystemSafePermisons.ApiKeyGen.Slug);
+            if (canGenKey == false)
+            {
+                return Bad<bool>("Отсутсвует права на создание ключа доступа к сейфу: " + SystemSafePermisons.ApiKeyGen.Name);
+            }
+            var model = new Domain.Entity.ApiKey
             {
                 DeadDate = DateTime.UtcNow.AddDays(cmd.DayLife),
                 Key = GenerateApiKey(),
@@ -36,7 +46,7 @@ namespace SCP.Application.Core.SafeGuard
 
             dbContext.ApiKeys.Add(model);
             dbContext.SaveChanges();
-            return Good<bool>(true);
+            return Good(true);
 
         }
 
@@ -55,7 +65,7 @@ namespace SCP.Application.Core.SafeGuard
                 vm.Add(item);
             }
 
-            return Good<List<ApiKeyResponse>>(vm);
+            return Good(vm);
 
         }
 
@@ -74,11 +84,21 @@ namespace SCP.Application.Core.SafeGuard
             var m = await dbContext.ApiKeys.FirstOrDefaultAsync(k => k.Id == Guid.Parse(keyId)) ?? null;
             if (m == null)
             {
-                return Good<bool>(false);
+                return Good(false);
             }
             dbContext.ApiKeys.Remove(m);
             dbContext.SaveChanges();
 
+            return Good(true);
+        }
+
+
+        public async Task<CoreResponse<bool>> Block(string keyId, bool isBlock)
+        {
+            var k = await dbContext.ApiKeys.FirstOrDefaultAsync(k => k.Id == Guid.Parse(keyId));
+            k.IsBlocked = isBlock;
+            dbContext.ApiKeys.Update(k);
+            dbContext.SaveChanges();
             return Good<bool>(true);
         }
     }

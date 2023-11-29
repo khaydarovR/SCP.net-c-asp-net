@@ -5,7 +5,7 @@ using SCP.Application.Common;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
 using SCP.Application.Core.Safe;
-using SCP.Application.Core.SafeGuard;
+using SCP.Application.Core.ApiKey;
 using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Entity;

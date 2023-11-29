@@ -1,4 +1,4 @@
-﻿namespace SCP.Application.Core.SafeGuard
+﻿namespace SCP.Application.Core.ApiKeyC
 {
     public class CreateKeyCommand
     {

@@ -14,11 +14,20 @@ namespace SCP.Application.Core.UserAuth
     {
         private readonly UserManager<AppUser> userManager;
         private readonly JwtService jwtService;
+        private readonly TwoFactorAuthService twoFactorAuthService;
 
-        public UserAuthCore(UserManager<AppUser> userManager, JwtService jwtService)
+        public UserAuthCore(UserManager<AppUser> userManager, JwtService jwtService, TwoFactorAuthService twoFactorAuthService)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
+            this.twoFactorAuthService = twoFactorAuthService;
+        }
+
+        public async Task<CoreResponse<bool>> Activate2FA(string uId, bool isOn)
+        {
+            var u =  await userManager.FindByIdAsync(uId);
+            await userManager.SetTwoFactorEnabledAsync(u, isOn);
+            return Good<bool>(isOn);
         }
 
         public async Task<CoreResponse<bool>> CreateAccount(CreateAccountCommand command)
@@ -31,6 +40,7 @@ namespace SCP.Application.Core.UserAuth
             {
                 UserName = command.UserName,
                 Email = command.Email,
+                TwoFactorEnabled = true,
             };
 
             var result = await userManager.CreateAsync(model, command.Password);
@@ -62,19 +72,45 @@ namespace SCP.Application.Core.UserAuth
                 return Bad<AuthResponse>("Логин или пароль не верный");
             }
 
-            var pwIsVerifyed = await userManager.CheckPasswordAsync(user, query.Password);
-            if (pwIsVerifyed == false)
+            var pwIsVerified = await userManager.CheckPasswordAsync(user, query.Password);
+            if (!pwIsVerified)
             {
                 return Bad<AuthResponse>("Логин или пароль не верный");
             }
 
+            // Check if Two-Factor Authentication is enabled for the user
+            if (await userManager.GetTwoFactorEnabledAsync(user))
+            {
+
+                // Add logic to prompt the user for the 2FA code, then verify it
+                if (string.IsNullOrEmpty(query.Fac))
+                {
+                    return Bad<AuthResponse>("Требуется код двухфакторной аутентификации");
+                }
+
+                var isTwoFactorTokenValid = await twoFactorAuthService.VerifyTwoFactorCodeAsync(user, query.Fac);
+                if (!isTwoFactorTokenValid)
+                {
+                    return Bad<AuthResponse>("Неверный код двухфакторной аутентификации");
+                }
+            }
+
+            // At this point, user credentials and 2FA (if enabled) are verified, generate JWT token
             var token = await jwtService.GenerateJwtToken(user);
 
-            return Good(new AuthResponse { 
+            return Good(new AuthResponse
+            {
                 UserId = user.Id.ToString(),
                 Jwt = token,
                 UserName = user.UserName!
             });
+        }
+
+        public async Task<CoreResponse<bool>> Send2FA(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            await twoFactorAuthService.SendTwoFactorCodeByEmailAsync(user);
+            return Good(true);
         }
     }
 }
