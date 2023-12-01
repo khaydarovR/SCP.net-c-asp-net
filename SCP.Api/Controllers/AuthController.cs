@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SCP.Api.Controllers.Base;
 using SCP.Api.DTO;
 using SCP.Application.Core.UserAuth;
@@ -8,6 +9,7 @@ using SCP.Application.Services;
 namespace SCP.Api.Controllers
 {
     [Route("api/[controller]")]
+    [EnableRateLimiting("fixed")]
     [ApiController]
     public class AuthController : CustomController
     {

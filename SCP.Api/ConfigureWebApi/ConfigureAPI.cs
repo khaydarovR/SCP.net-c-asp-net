@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using SCP.Application.Services;
 using System.Reflection;
+using System.Threading.RateLimiting;
 
 namespace SCP.Api.ConfigureWebApi
 {
@@ -39,6 +41,16 @@ namespace SCP.Api.ConfigureWebApi
                 o.AddSecurityRequirement(securityReq);
                 o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
             });
+
+            services.AddRateLimiter(_ => _
+                .AddFixedWindowLimiter(policyName: "fixed", options =>
+                {
+                    options.PermitLimit = 4;
+                    options.Window = TimeSpan.FromSeconds(12);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 2;
+                }));
+
 
             services.AddTransient<SystemEntitySeeding>();
 

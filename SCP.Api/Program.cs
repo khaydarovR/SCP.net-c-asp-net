@@ -46,9 +46,13 @@ app.UseCors(x => x
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
 
+app.UseRateLimiter();
+
 app.MapControllers();
 
 app.MapGet("ping", () => "pong");
+
+
 
 //Seeding test users
 if (true)
