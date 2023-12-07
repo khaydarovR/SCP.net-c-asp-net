@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Identity;
 using SCP.Application.Services;
 using SCP.Application.Common.Response;
 using SCP.Application.Core.Safe;
+using SCP.Application.Common.Configuration;
+using SCP.Application.Core.Access;
 
 namespace SCP.Application.Core.UserAuth
 {
@@ -17,13 +19,22 @@ namespace SCP.Application.Core.UserAuth
         private readonly JwtService jwtService;
         private readonly TwoFactorAuthService twoFactorAuthService;
         private readonly SafeCore safeCore;
+        private readonly AccessCore accessCore;
+        private readonly CacheService cache;
 
-        public UserAuthCore(UserManager<AppUser> userManager, JwtService jwtService, TwoFactorAuthService twoFactorAuthService, SafeCore safeCore)
+        public UserAuthCore(UserManager<AppUser> userManager,
+                            JwtService jwtService,
+                            TwoFactorAuthService twoFactorAuthService,
+                            SafeCore safeCore,
+                            CacheService cache,
+                            AccessCore accessCore)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
             this.twoFactorAuthService = twoFactorAuthService;
             this.safeCore = safeCore;
+            this.cache = cache;
+            this.accessCore = accessCore;
         }
 
         public async Task<CoreResponse<bool>> Activate2FA(string uId, bool isOn)
@@ -63,6 +74,9 @@ namespace SCP.Application.Core.UserAuth
                         Description = "Сейф по умолчанию",
                         UserId = dbUser.Id,
                     });
+
+                    TryDeferredInvite(dbUser);
+
 ;                   return new CoreResponse<bool>(true);
                 }
 
@@ -71,7 +85,19 @@ namespace SCP.Application.Core.UserAuth
             return new CoreResponse<bool>(result.Errors.Select(e => e.Description + ". Использовать латинские буквы!"));
         }
 
-
+        private async Task TryDeferredInvite(AppUser dbUser)
+        {
+            if (cache.Exists(CachePrefix.DeferredInvite_ + dbUser.Email))
+            {
+                var safeId = cache.Get<string>(CachePrefix.DeferredInvite_ + dbUser.Email)!;
+                var res = await accessCore.AddPermisionsToUsersForSafe(new string[] { SystemSafePermisons.GetBaseSafeInfo.Slug },
+                                                       Guid.Parse(safeId),
+                                                       new HashSet<string> { dbUser.Id.ToString() },
+                                                       30);
+                Console.WriteLine(res + " Добавлен в сейеф ");
+            }
+            cache.Delete(CachePrefix.DeferredInvite_ + dbUser.Email);
+        }
 
         public async Task<CoreResponse<AuthResponse>> GetJwtAndClaims(GetJwtQuery query)
         {
@@ -118,7 +144,13 @@ namespace SCP.Application.Core.UserAuth
         public async Task<CoreResponse<bool>> Send2FA(string email)
         {
             var user = await userManager.FindByEmailAsync(email);
-            await twoFactorAuthService.SendTwoFactorCodeByEmailAsync(user);
+            if (user != null)
+            {
+                if (user.TwoFactorEnabled)
+                {
+                    await twoFactorAuthService.SendTwoFactorCodeByEmailAsync(user);
+                }
+            }
             return Good(true);
         }
     }

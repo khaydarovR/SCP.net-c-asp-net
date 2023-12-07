@@ -50,12 +50,26 @@ namespace SCP.Api.ConfigureWebApi
             return this;
         }
 
+
+        public async Task<SystemEntitySeeding> ClearUser(string email)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+            if (user != null)
+            {
+                dbContext.AppUsers.Remove(user);
+                Console.WriteLine("================Deleted " + user.Email);
+            }
+
+            dbContext.SaveChanges();
+            return this;
+        }
+
         public async Task<SystemEntitySeeding> InitTUsersWithSafe(int ammount)
         {
 
             for (int i = 0; i < ammount; i++)
             {
-                var u = new AppUser { Email = $"tu{i}@m.r", UserName = $"tu{i}_name" };
+                var u = new AppUser { Email = $"tu{i}@m.r", UserName = $"tu{i}_name", TwoFactorEnabled = false };
 
                 if (dbContext.AppUsers.Any(db => db.Email == u.Email))
                 {

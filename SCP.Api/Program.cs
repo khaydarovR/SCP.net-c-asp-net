@@ -60,7 +60,9 @@ if (true)
     using (var scope = app.Services.CreateScope())
     {
         var seedingService = scope.ServiceProvider.GetRequiredService<SystemEntitySeeding>();
-        await seedingService.InitTUsersWithSafe(6);
+        await seedingService.InitTUsersWithSafe(7);
+        //await seedingService.ClearUser("razil_khayka@mail.ru");
+        //await seedingService.ClearUser("razil.khayka@gmail.com");
     }
 }
 

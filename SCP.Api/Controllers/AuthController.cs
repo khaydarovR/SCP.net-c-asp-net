@@ -49,7 +49,11 @@ namespace SCP.Api.Controllers
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
-
+        /// <summary>
+        /// Отправить по указанному email письмо с кодом подтрверждения
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         [HttpPost(nameof(Code2FA))]
         public async Task<ActionResult<string>> Code2FA(string email)
         {

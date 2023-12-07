@@ -99,5 +99,20 @@ namespace SCP.Api.Controllers
             var res = await accessCore.UpdatePermissions(cmd);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
+
+
+        /// <summary>
+        /// Прикрепление к сейфу с помощью разрешения
+        /// поддерживает отложенное приглашение
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="safeId"></param>
+        /// <returns></returns>
+        [HttpPost(nameof(JustInvite))]
+        public async Task<IActionResult> JustInvite(string safeId, string email)
+        {
+            var res = await accessCore.JustInvite(safeId, email, ContextUserId);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
     }
 }

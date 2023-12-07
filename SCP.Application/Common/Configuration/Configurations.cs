@@ -23,7 +23,11 @@ namespace SCP.Application.Common.Configuration
             //конфигурация приложения
             services.InjectDB(config);
             services.Configure<MyOptions>(config.GetSection(nameof(MyOptions)));
-            services.AddHttpContextAccessor();
+
+            services.AddStackExchangeRedisCache(options => {
+                options.Configuration = "localhost";
+                options.InstanceName = "local";
+            });
 
             services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
             {
@@ -51,6 +55,7 @@ namespace SCP.Application.Common.Configuration
             services.AddTransient<TwoFactorAuthService>();
             services.AddTransient<RLogService>();
             services.Configure<EmailServiceOptions>(config.GetSection("EmailService"));
+            services.AddScoped<CacheService>();
 
             services.AddScoped<UserAuthCore>();
             services.AddScoped<SafeCore>();

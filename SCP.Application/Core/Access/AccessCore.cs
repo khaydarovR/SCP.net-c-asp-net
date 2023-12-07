@@ -11,6 +11,9 @@ using SCP.Domain;
 using SCP.Domain.Entity;
 using SCP.Domain.Enum;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using SCP.Application.Services;
+using Microsoft.AspNetCore.Identity;
+using SCP.Application.Common.Configuration;
 
 namespace SCP.Application.Core.Access
 {
@@ -18,13 +21,21 @@ namespace SCP.Application.Core.Access
     {
         private readonly SafeCore safeCore;
         private readonly SafeGuardCore safeGuard;
+        private readonly CacheService cache;
         private readonly AppDbContext dbContext;
+        private readonly UserManager<AppUser> userMan;
 
-        public AccessCore(AppDbContext dbContext, SafeCore safeCore, SafeGuardCore safeGuard)
+        public AccessCore(AppDbContext dbContext,
+                          SafeCore safeCore,
+                          SafeGuardCore safeGuard,
+                          CacheService cache,
+                          UserManager<AppUser> userMan)
         {
             this.dbContext = dbContext;
             this.safeCore = safeCore;
             this.safeGuard = safeGuard;
+            this.cache = cache;
+            this.userMan = userMan;
         }
 
 
@@ -84,7 +95,7 @@ namespace SCP.Application.Core.Access
 
         }
 
-        private async Task<bool> AddPermisionsToUsersForSafe(string[] permisionSlugs, Guid safeId, HashSet<string> userIds, int lifeOfTime)
+        public async Task<bool> AddPermisionsToUsersForSafe(string[] permisionSlugs, Guid safeId, HashSet<string> userIds, int lifeOfTime)
         {
             foreach (var uId in userIds)
             {
@@ -162,7 +173,7 @@ namespace SCP.Application.Core.Access
         }
 
         /// <summary>
-        /// Поиск связанных пользователей с текущим пользователем
+        /// Поиск связанных пользователей с текущим пользователем (общие сейфы)
         /// currentUserId - SafeUsers - Users
         /// </summary>
         /// <param name="rootUserId"></param>
@@ -242,15 +253,50 @@ namespace SCP.Application.Core.Access
             var hasEditPer = safeGuard.AuthorHasAccessToSafe(cmd.SafeId, cmd.AuthorId, SystemSafePermisons.EditUserSafeRights.Slug);
             if (hasEditPer == false)
             {
-                return Bad<bool>("Вам разрешено только приглашать пользователей в сейф с помощью: "
-                    + SystemSafePermisons.GetBaseSafeInfo.Name);
+                return Bad<bool>("Отсутствует разрешение: "
+                    + SystemSafePermisons.EditUserSafeRights.Name);
             }
 
             ClearPermisionsInSafe(Guid.Parse(cmd.SafeId), cmd.UserId);
 
             var users = new HashSet<string> { cmd.UserId };
-            await AddPermisionsToUsersForSafe(cmd.PermissionSlags.ToArray(), Guid.Parse(cmd.SafeId), users, cmd.DayLife);
-            return Good<bool>(true);
+            var res = await AddPermisionsToUsersForSafe(cmd.PermissionSlags.ToArray(), Guid.Parse(cmd.SafeId), users, cmd.DayLife);
+            return Good<bool>(res);
+        }
+
+
+        public async Task<CoreResponse<string>> JustInvite(string safeId, string email, Guid authorId)
+        {
+            var hasAccess = safeGuard.AuthorHasAccessToSafe(safeId, authorId, SystemSafePermisons.InviteUser.Slug);
+            if (hasAccess == false)
+            {
+                return Bad<string>($"В сейфе отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name);
+            }
+
+            var user = await userMan.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                await cache.Save(CachePrefix.DeferredInvite_ + email, safeId, 48 * 60);
+                return Good(email + " должен зарегистрироваться в системе в течении 2 суток для получения досутпа к сейфу");
+            }
+
+            if (user.Id == authorId)
+            {
+                return Bad<string>($"Запрещено редактировать свои права");
+            }
+
+            var inviteResult = await AddPermisionsToUsersForSafe(new string[] { SystemSafePermisons.GetBaseSafeInfo.Slug },
+                                                                 Guid.Parse(safeId),
+                                                                 new HashSet<string> { user!.Id.ToString() },
+                                                                 30);
+
+            if (inviteResult == false)
+            {
+                return Bad<string>("Ошибка при добавлении разрешения");
+            }
+
+            return Good(email + " успешно добавлен в сейф согласно базовой политике");
         }
     }
 }

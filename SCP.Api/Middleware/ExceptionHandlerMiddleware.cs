@@ -62,7 +62,8 @@ namespace SCP.Application.Common.PipeLine
             ctx.Response.StatusCode = (int)code;
             ctx.Response.ContentType = "application/json";
 
-            var result = JsonConvert.SerializeObject(new CoreResponse<List<string>>("Ошибка сервера: " + exception.Message));
+            var msg = new CoreResponse<List<string>>("Ошибка сервера: " + exception.Message);
+            var result = JsonConvert.SerializeObject(msg.ErrorList);
    
             return ctx.Response.WriteAsync(result);
         }
