@@ -48,9 +48,14 @@ namespace SCP.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ReadWithKey([FromHeader(Name = "Api-Key")] string apiKey, [FromQuery] string recId)
+        public async Task<IActionResult> ReadWithKey([FromHeader(Name = "Api-Key")] string apiKey, [FromQuery] ReadRecordDTO dto)
         {
-            var res = await recordCore.ReadWithKey(apiKey, recId);
+            var command = new ReadRecordWithKeyCommand();
+            command.AuthorId = ContextUserId;
+            command.RecordId = dto.RecId;
+            command.PubKeyFromClient = dto.PubKey;
+
+            var res = await recordCore.ReadWithKey(apiKey, command);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 

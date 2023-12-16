@@ -317,16 +317,16 @@ namespace SCP.Application.Core.Record
 
         }
 
-        public async Task<CoreResponse<ReadRecordResponse>> ReadWithKey(string apiKey, string recId)
+        public async Task<CoreResponse<ReadRecordResponse>> ReadWithKey(string apiKey, ReadRecordWithKeyCommand cmd)
         {
-            if (Guid.TryParse(recId, out var res) == false)
+            if (Guid.TryParse(cmd.RecordId.ToString(), out var res) == false)
             {
-                return Bad<ReadRecordResponse>("Не правильный формат ID: " + recId);
+                return Bad<ReadRecordResponse>("Не правильный формат ID: " + cmd.RecordId);
             }
-            var dbRec = dbContext.Records.FirstOrDefault(r => r.Id == Guid.Parse(recId) && r.IsDeleted == false);
+            var dbRec = dbContext.Records.FirstOrDefault(r => r.Id == Guid.Parse(cmd.RecordId) && r.IsDeleted == false);
             if (dbRec == null)
             {
-                return Bad<ReadRecordResponse>("Секрет с идентификатором " + recId + " не найден");
+                return Bad<ReadRecordResponse>("Секрет с идентификатором " + cmd.RecordId + " не найден");
             }
 
             var msg = "";
@@ -344,12 +344,17 @@ namespace SCP.Application.Core.Record
             var clearPw = asymmetricCryptoService.DecryptFromClientData(dbRec.EPw, clearSafePrivateKey);
             var clearSecret = asymmetricCryptoService.DecryptFromClientData(dbRec.ESecret, clearSafePrivateKey);
 
+            //шифровка
+            var eLogin = asymmetricCryptoService.EncryptDataForClient(clearLogin, cmd.PubKeyFromClient);
+            var ePw = asymmetricCryptoService.EncryptDataForClient(clearPw, cmd.PubKeyFromClient);
+            var eSecret = asymmetricCryptoService.EncryptDataForClient(clearSecret, cmd.PubKeyFromClient);
+
             var data = new ReadRecordResponse
             {
                 Id = dbRec.Id.ToString(),
-                ELogin = clearLogin,
-                EPw = clearPw,
-                ESecret = clearSecret,
+                ELogin = eLogin,
+                EPw = ePw,
+                ESecret = eSecret,
                 Title = dbRec.Title,
                 ForResource = dbRec.ForResource,
                 IsDeleted = dbRec.IsDeleted,
