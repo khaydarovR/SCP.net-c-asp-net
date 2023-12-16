@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using SCP.Application.Services;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
@@ -11,6 +11,7 @@ namespace SCP.Api.ConfigureWebApi
     {
         public static IServiceCollection ConfigureWebApi(this IServiceCollection services, IConfiguration config)
         {
+
             //конфигурация swagger auth
             var securityScheme = new OpenApiSecurityScheme()
             {

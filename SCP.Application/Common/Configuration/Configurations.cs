@@ -13,6 +13,12 @@ using SCP.DAL;
 using SCP.Domain.Entity;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using System.Text;
+using Microsoft.Extensions.Primitives;
+using System.Security.Claims;
 
 namespace SCP.Application.Common.Configuration
 {
@@ -46,6 +52,38 @@ namespace SCP.Application.Common.Configuration
                 .AddTokenProvider<Microsoft.AspNetCore.Identity.EmailTokenProvider<AppUser>>("email")
                 .AddUserManager<UserManager<AppUser>>()
                 .AddErrorDescriber<IdentityMessageRu>();
+
+            //OAuth 2.0 google
+            _ = services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                options.DefaultScheme = GoogleDefaults.AuthenticationScheme;
+
+            })
+            .AddJwtBearer(jwtBearerOptions =>
+            {
+                var issuer = config.GetValue<string>("MyOptions:JWT_ISSUER");
+                var key = config.GetValue<string>("MyOptions:JWT_KEY");
+                var keyStr = Encoding.ASCII.GetBytes(key);
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(keyStr),
+                    ValidateIssuer = true,
+                    ValidIssuer = issuer,
+                    ValidateAudience = false,
+                    RequireExpirationTime = true,
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                };
+            })
+            .AddGoogle(googleOptions =>
+            {
+                
+                googleOptions.ClientId = config["GoogleOAuth:ClientId"]!;
+                googleOptions.ClientSecret = config["GoogleOAuth:ClientSecret"]!;
+                googleOptions.CallbackPath = "/signin-google";
+            });
 
 
             services.AddScoped<JwtService>();

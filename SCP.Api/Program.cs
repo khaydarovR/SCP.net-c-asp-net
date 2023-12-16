@@ -1,11 +1,7 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using SCP.Api.ConfigureWebApi;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.PipeLine;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using System.Reflection;
 using System.Text;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -45,14 +41,15 @@ app.UseCors(x => x
 
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.UseRateLimiter();
 
 app.MapControllers();
 
 app.MapGet("ping", () => "pong");
-
-
 
 //Seeding test users
 if (true)
