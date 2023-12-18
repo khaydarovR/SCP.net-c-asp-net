@@ -10,6 +10,8 @@ using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using System.Web;
+using System;
 
 namespace SCP.Api.Controllers
 {
@@ -35,11 +37,10 @@ namespace SCP.Api.Controllers
         }
 
 
-        [Authorize]
         [HttpGet("Google")]
-        public ActionResult<string> Google()
+        public ActionResult<string> Fog(string code, string scope)
         {
-            return this.User.Identity.Name;
+            return Ok();
         }
 
         [Authorize]
