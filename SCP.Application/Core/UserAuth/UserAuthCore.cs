@@ -57,7 +57,17 @@ namespace SCP.Application.Core.UserAuth
                 TwoFactorEnabled = true,
             };
 
-            var result = await userManager.CreateAsync(model, command.Password);
+            IdentityResult result = null;
+
+            if (command.Password != null)
+            {
+                result = await userManager.CreateAsync(model, command.Password);
+            }
+            else
+            {
+                result = await userManager.CreateAsync(model);
+            }
+
             if (result.Succeeded)
             {
                 var dbUser = await userManager.FindByEmailAsync(command.Email);
@@ -77,7 +87,7 @@ namespace SCP.Application.Core.UserAuth
 
                     TryDeferredInvite(dbUser);
 
-;                   return new CoreResponse<bool>(true);
+                    return new CoreResponse<bool>(true);
                 }
 
                 return new CoreResponse<bool>(claimRes.Errors.Select(e => e.Description));

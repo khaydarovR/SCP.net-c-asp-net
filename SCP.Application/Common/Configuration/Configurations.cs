@@ -29,6 +29,7 @@ namespace SCP.Application.Common.Configuration
             //конфигурация приложения
             services.InjectDB(config);
             services.Configure<MyOptions>(config.GetSection(nameof(MyOptions)));
+            services.AddHttpClient();
 
             services.AddStackExchangeRedisCache(options => {
                 options.Configuration = "localhost";
@@ -101,6 +102,8 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<AccessCore>();
             services.AddScoped<SafeGuardCore>();
             services.AddScoped<ApiKeyCore>();
+            services.AddScoped<GoogleOAuthService>();
+            services.AddScoped<GoogleOAuthCore>();
 
 
 

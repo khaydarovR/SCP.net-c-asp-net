@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using System.Web;
 using System;
+using System.Security.Cryptography;
+using SCP.Application.Core.ApiKey;
+using SCP.Application.Common.Response;
 
 namespace SCP.Api.Controllers
 {
@@ -19,29 +22,37 @@ namespace SCP.Api.Controllers
     [ApiController]
     public class OAuthController : CustomController
     {
-        private readonly UserAuthCore userAuthCore;
+        private readonly GoogleOAuthCore oauthCore;
         private readonly TwoFactorAuthService twoFactorAuthService;
         private readonly EmailService email;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="userAuthCore"></param>
+        /// <param name="oauthCore"></param>
         /// <param name="twoFactorAuthService"></param>
         /// <param name="email"></param>
-        public OAuthController(UserAuthCore userAuthCore, TwoFactorAuthService twoFactorAuthService, EmailService email)
+        public OAuthController(GoogleOAuthCore oauthCore, TwoFactorAuthService twoFactorAuthService, EmailService email)
         {
-            this.userAuthCore = userAuthCore;
+            this.oauthCore = oauthCore;
             this.twoFactorAuthService = twoFactorAuthService;
             this.email = email;
         }
 
-
+        /// <summary>
+        /// Получает код из ответа гугла (запрос в гугл отправлял клиент) и отправляет запрос что бы поменять его на токены
+        /// </summary>
         [HttpGet("Google")]
-        public ActionResult<string> Fog(string code, string scope)
+        public async Task<ActionResult<AuthResponse>> GoogleGetCode([FromQuery] string code, [FromQuery] string scope)
         {
-            return Ok();
+            if (string.IsNullOrEmpty(code))
+            {
+                return BadRequest("Missing code");
+            }
+            var res = await oauthCore.GetTokens(code, scope);
+            return res.IsSuccess ? Redirect($"http://localhost:4200/register?jwt={res.Data.UserName}") : BadRequest(res.ErrorList);
         }
+
 
         [Authorize]
         [HttpGet("logout")]

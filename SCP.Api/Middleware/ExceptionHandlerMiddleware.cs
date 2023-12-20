@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SCP.Application.Common.Exceptions;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
