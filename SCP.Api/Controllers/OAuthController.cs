@@ -43,14 +43,32 @@ namespace SCP.Api.Controllers
         /// Получает код из ответа гугла (запрос в гугл отправлял клиент) и отправляет запрос что бы поменять его на токены
         /// </summary>
         [HttpGet("Google")]
-        public async Task<ActionResult<AuthResponse>> GoogleGetCode([FromQuery] string code, [FromQuery] string scope)
+        public async Task<ActionResult<AuthResponse>> GoogleGetCode([FromQuery] string code, string scope, string? state)
         {
             if (string.IsNullOrEmpty(code))
             {
                 return BadRequest("Missing code");
             }
             var res = await oauthCore.GetTokens(code, scope);
-            return res.IsSuccess ? Redirect($"http://localhost:4200/register?jwt={res.Data.UserName}") : BadRequest(res.ErrorList);
+
+            //редирект на страницу клиента который принимет jwt
+            state = state == null ? "http://localhost:4200/register?jwt=" : state;
+            return res.IsSuccess ? Redirect($"{state}{res.Data.UserName}") : BadRequest(res.ErrorList);
+        }
+
+
+        [HttpGet("Github")]
+        public async Task<ActionResult<AuthResponse>> GitHubGetCode([FromQuery] string code, string scope, string? state)
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                return BadRequest("Missing code");
+            }
+            var res = await oauthCore.GetTokens(code, scope);
+
+            //редирект на страницу клиента который принимет jwt
+            state = state == null ? "http://localhost:4200/register?jwt=" : state;
+            return res.IsSuccess ? Redirect($"{state}{res.Data.UserName}") : BadRequest(res.ErrorList);
         }
 
 
