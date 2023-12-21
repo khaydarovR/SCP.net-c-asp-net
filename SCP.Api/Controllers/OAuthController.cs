@@ -60,6 +60,11 @@ namespace SCP.Api.Controllers
         [HttpGet("Github")]
         public async Task<ActionResult<AuthResponse>> GitHubGetCode([FromQuery] string code, string scope, string? state)
         {
+            var clientSecret = "fccaa925e96a2a77d3ddbdf8d814c23ee5bde6a9";
+            var clientId = "ec53b6470c0c43cf1320";
+
+            
+
             if (string.IsNullOrEmpty(code))
             {
                 return BadRequest("Missing code");
