@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Validations;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
-using SCP.Domain;
 using SCP.Domain.Entity;
 using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SCP.Api.ConfigureWebApi
 {
@@ -21,7 +18,7 @@ namespace SCP.Api.ConfigureWebApi
         private readonly SymmetricCryptoService symmetricCrypto;
         private readonly SafeCore safeCore;
 
-        public SystemEntitySeeding(AppDbContext dbContext, 
+        public SystemEntitySeeding(AppDbContext dbContext,
             UserManager<AppUser> userManager,
             AsymmetricCryptoService asymmetricCrypto,
             SymmetricCryptoService symmetricCrypto,
@@ -46,7 +43,7 @@ namespace SCP.Api.ConfigureWebApi
                     Console.WriteLine("================Deleted " + user.Email);
                 }
             }
-            dbContext.SaveChanges();    
+            dbContext.SaveChanges();
             return this;
         }
 

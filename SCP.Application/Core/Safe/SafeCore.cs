@@ -1,21 +1,16 @@
-﻿using SCP.Application.Common;
-using SCP.Application.Services;
-using SCP.Domain.Entity;
-using SCP.Domain;
-using SCP.DAL;
-using Microsoft.AspNetCore.Identity;
-using SCP.Application.Core.UserAuth;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
+using SCP.Application.Common;
 using SCP.Application.Common.Response;
-using Mapster;
-using System.Diagnostics;
-using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Services;
+using SCP.DAL;
+using SCP.Domain;
+using SCP.Domain.Entity;
 
 namespace SCP.Application.Core.Safe
 {
-    public class SafeCore: BaseCore
+    public class SafeCore : BaseCore
     {
         private readonly SymmetricCryptoService cryptorService;
         private readonly AppDbContext dbContext;
@@ -149,7 +144,7 @@ namespace SCP.Application.Core.Safe
         public async Task<CoreResponse<SafeStatResponse>> GetStat(Guid safeId)
         {
             var usersFromSafe = await GetAllUsersFromSafe(safeId);
-            
+
             var canReadCounter = 0;
             var canEditPerCounter = 0;
             foreach (var user in usersFromSafe.Data)

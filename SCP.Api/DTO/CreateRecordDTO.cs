@@ -1,6 +1,4 @@
-﻿using SCP.Domain.Entity;
-
-namespace SCP.Api.DTO
+﻿namespace SCP.Api.DTO
 {
     public class CreateRecordDTO
     {

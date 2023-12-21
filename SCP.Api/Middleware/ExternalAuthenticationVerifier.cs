@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace SCP.Application.Common.PipeLine
+﻿namespace SCP.Application.Common.PipeLine
 {
     //public class ExternalAuthenticationVerifier : IExternalAuthenticationVerifier
     //{

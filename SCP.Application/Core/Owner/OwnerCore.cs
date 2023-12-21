@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SCP.Application.Core.Owner
+﻿namespace SCP.Application.Core.Owner
 {
     public class OwnerCore
     {
         public OwnerCore()
         {
-            
+
         }
 
         //генерация 3 ключей при первом запуске

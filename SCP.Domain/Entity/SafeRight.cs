@@ -1,7 +1,4 @@
-﻿using SCP.Domain.Enum;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SCP.Domain.Entity
+﻿namespace SCP.Domain.Entity
 {
     public class SafeRight : BaseEntity
     {

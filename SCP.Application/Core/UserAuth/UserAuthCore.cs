@@ -1,15 +1,13 @@
-﻿using SCP.Application.Common;
-using SCP.Application.Common.Exceptions;
-using SCP.Domain.Entity;
-using SCP.Domain;
-using System.Net;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using SCP.Application.Services;
-using SCP.Application.Common.Response;
-using SCP.Application.Core.Safe;
+﻿using Microsoft.AspNetCore.Identity;
+using SCP.Application.Common;
 using SCP.Application.Common.Configuration;
+using SCP.Application.Common.Response;
 using SCP.Application.Core.Access;
+using SCP.Application.Core.Safe;
+using SCP.Application.Services;
+using SCP.Domain;
+using SCP.Domain.Entity;
+using System.Security.Claims;
 
 namespace SCP.Application.Core.UserAuth
 {
@@ -39,7 +37,7 @@ namespace SCP.Application.Core.UserAuth
 
         public async Task<CoreResponse<bool>> Activate2FA(string uId, bool isOn)
         {
-            var u =  await userManager.FindByIdAsync(uId);
+            var u = await userManager.FindByIdAsync(uId);
             await userManager.SetTwoFactorEnabledAsync(u, isOn);
             return Good<bool>(true);
         }

@@ -1,27 +1,22 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SCP.Application.Common.Configuration;
 using SCP.Domain.Entity;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SCP.Application.Services
 {
     public class JwtService
     {
-        private readonly UserManager<AppUser> userManager;
         private readonly IOptions<MyOptions> options;
+        private readonly UserService userService;
 
-        public JwtService(UserManager<AppUser> userManager, IOptions<MyOptions> options)
+        public JwtService(IOptions<MyOptions> options, UserService userService)
         {
-            this.userManager = userManager;
             this.options = options;
+            this.userService = userService;
         }
 
 
@@ -33,7 +28,7 @@ namespace SCP.Application.Services
             {
                 Subject = new ClaimsIdentity(new[] {
                     new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, await GetRoleFromClaims(user)),
+                    new Claim(ClaimTypes.Role, await userService.GetRoleFromClaims(user)),
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 Issuer = options.Value.JWT_ISSUER,
@@ -43,11 +38,5 @@ namespace SCP.Application.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public async Task<string> GetRoleFromClaims(AppUser user)
-        {
-            var claims = await userManager.GetClaimsAsync(user);
-            var role = claims.First(c => c.Type == ClaimTypes.Role).Value;
-            return role;
-        }
     }
 }

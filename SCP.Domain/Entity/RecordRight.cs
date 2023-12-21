@@ -1,9 +1,8 @@
 ﻿using SCP.Domain.Enum;
-using SCP.Domain.Entity;
 
 namespace SCP.Domain.Entity
 {
-    public class RecordRight: BaseEntity
+    public class RecordRight : BaseEntity
     {
         public Guid AppUserId { get; set; }
         public Guid RecordId { get; set; }

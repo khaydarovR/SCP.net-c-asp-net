@@ -2,8 +2,8 @@
 {
     public class ReadRecordCommand
     {
-        public string PubKeyFromClient {  get; set; }
-        public Guid RecordId {  get; set; }
-        public Guid AuthorId {  get; set; }
+        public string PubKeyFromClient { get; set; }
+        public Guid RecordId { get; set; }
+        public Guid AuthorId { get; set; }
     }
 }

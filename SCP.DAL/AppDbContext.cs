@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SCP.Domain.Entity;
-using System.Reflection.Emit;
 
 namespace SCP.DAL
 {
@@ -23,7 +22,7 @@ namespace SCP.DAL
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<UserWhiteIP> UserWhiteIPs { get; set; }
         public DbSet<ApiKeyWhiteIP> ApiKeyWhiteIPs { get; set; }
-        public DbSet<ApiKey> ApiKeys { get; set;  }
+        public DbSet<ApiKey> ApiKeys { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -99,7 +98,7 @@ namespace SCP.DAL
 
             // Relationship configurations
             activityLogBuilder.HasOne(a => a.Record)
-                              .WithMany(r => r.ActivityLogs) 
+                              .WithMany(r => r.ActivityLogs)
                               .HasForeignKey(a => a.RecordId)
                               .OnDelete(DeleteBehavior.Cascade);
         }

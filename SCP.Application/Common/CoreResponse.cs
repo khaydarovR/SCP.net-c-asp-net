@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SCP.Application.Common
+﻿namespace SCP.Application.Common
 {
     public class CoreResponse<T>
     {
         public bool IsSuccess { get; init; } = false;
         public T? Data { get; set; }
         public List<string> ErrorList { get; set; }
-        
-        public CoreResponse(T data, bool isSuccess = true) 
+
+        public CoreResponse(T data, bool isSuccess = true)
         {
             this.Data = data;
             IsSuccess = isSuccess;

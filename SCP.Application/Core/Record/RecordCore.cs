@@ -1,23 +1,16 @@
 ﻿using FluentValidation.Results;
 using Mapster;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Ocsp;
 using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
-using SCP.Application.Core.Safe;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Enum;
-using System.Security.Cryptography;
-using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using MimeKit;
-using SCP.Domain.Entity;
 
 namespace SCP.Application.Core.Record
 {
@@ -92,7 +85,7 @@ namespace SCP.Application.Core.Record
 
             //дать права всем пользователям сейфа для новой записи
             var safeUsers = await safeCore.GetAllUsersFromSafe(Guid.Parse(command.SafeId));
-            foreach ( var user in safeUsers.Data! )
+            foreach (var user in safeUsers.Data!)
             {
                 dbContext.RecordRights.Add(new Domain.Entity.RecordRight
                 {
@@ -220,7 +213,7 @@ namespace SCP.Application.Core.Record
             var authorName = dbContext.AppUsers.Where(u => u.Id == contextUserId).Select(u => u.UserName).FirstOrDefault();
             var resourseName = GetDomainName(forRes);
             var bestMatchRec = dbContext.Records
-                .Where(r => filtredSafesIds.Any(id => r.SafeId ==id))
+                .Where(r => filtredSafesIds.Any(id => r.SafeId == id))
                 .FirstOrDefault(r => r.ForResource.Contains(resourseName) || r.ForResource.Contains($"@{authorName}"));
 
             if (bestMatchRec == null)

@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
+using SCP.Api.Controllers.Base;
 using SCP.Api.DTO;
 using SCP.Api.Middleware;
-using Mapster;
-using SCP.Application.Core.Safe;
-using SCP.Api.Controllers.Base;
-using SCP.Application.Core.UserAuth;
-using SCP.Application.Core.Record;
 using SCP.Application.Core.Access;
-using Org.BouncyCastle.Bcpg;
 
 namespace SCP.Api.Controllers
 {
@@ -45,7 +41,7 @@ namespace SCP.Api.Controllers
         /// <param name="dto">Данные для регистрации пользвателя в сейфе</param>
         /// <returns></returns>
         [HttpPost(nameof(InviteRequest))]
-        public async Task<IActionResult> InviteRequest([FromBody] InviteRequestDTO dto) 
+        public async Task<IActionResult> InviteRequest([FromBody] InviteRequestDTO dto)
         {
             var comand = dto.Adapt<AuthrizeUsersToSafeCommand>();
             comand.AuthorId = ContextUserId;
@@ -73,10 +69,10 @@ namespace SCP.Api.Controllers
         /// <param name="sId"></param>
         /// <returns></returns>
         [HttpGet(nameof(GetPer))]
-        public async Task<IActionResult> GetPer([FromQuery] string uId,[FromQuery] string sId)
+        public async Task<IActionResult> GetPer([FromQuery] string uId, [FromQuery] string sId)
         {
-            var cmd = new GetPerQuery 
-            { 
+            var cmd = new GetPerQuery
+            {
                 AuthorId = ContextUserId,
                 SafeId = Guid.Parse(sId),
                 UserId = Guid.Parse(uId)

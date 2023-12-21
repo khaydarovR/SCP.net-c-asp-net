@@ -2,7 +2,7 @@
 {
     public struct Permision
     {
-        public string Slug {  get; init; }
+        public string Slug { get; init; }
         public string Name { get; init; }
     }
     public class SystemSafePermisons

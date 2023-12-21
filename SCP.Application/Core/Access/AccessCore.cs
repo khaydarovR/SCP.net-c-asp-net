@@ -1,23 +1,21 @@
 ﻿using FluentValidation.Results;
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SCP.Application.Common;
+using SCP.Application.Common.Configuration;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
-using SCP.Application.Core.Safe;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.Safe;
+using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
 using SCP.Domain.Entity;
-using SCP.Domain.Enum;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using SCP.Application.Services;
-using Microsoft.AspNetCore.Identity;
-using SCP.Application.Common.Configuration;
 
 namespace SCP.Application.Core.Access
 {
-    public class AccessCore: BaseCore
+    public class AccessCore : BaseCore
     {
         private readonly SafeCore safeCore;
         private readonly SafeGuardCore safeGuard;
@@ -56,7 +54,7 @@ namespace SCP.Application.Core.Access
                 var hasAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), cmd.AuthorId, SystemSafePermisons.InviteUser.Slug);
                 if (hasAccess == false)
                 {
-                    return Bad<string>($"В сейфе отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name) ;
+                    return Bad<string>($"В сейфе отсутсвует разрешение на: " + SystemSafePermisons.InviteUser.Name);
                 }
 
                 var hasEditPer = safeGuard.AuthorHasAccessToSafe(safeId, cmd.AuthorId, SystemSafePermisons.EditUserSafeRights.Slug);
@@ -72,7 +70,7 @@ namespace SCP.Application.Core.Access
 
             //добавление разрешений для каждого сейфа
             foreach (var safeId in cmd.SafeIds)
-            {   
+            {
                 //для каждого пользователя по id
                 _ = await AddPermisionsToUsersForSafe(cmd.Permisions.ToArray(),
                                                      Guid.Parse(safeId),
@@ -205,13 +203,13 @@ namespace SCP.Application.Core.Access
             }
 
             var linkedUsers = await dbContext.AppUsers
-                .Where(u => u.Id !=  currentUserId)
+                .Where(u => u.Id != currentUserId)
                 .Where(u => linkedUserIds.Contains(u.Id))
                 .ProjectToType<GetUserResponse>()
                 .ToListAsync();
 
             return Good<List<GetUserResponse>>(linkedUsers);
-            
+
         }
 
 

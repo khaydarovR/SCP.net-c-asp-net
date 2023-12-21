@@ -1,20 +1,11 @@
-﻿using Mapster;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using SCP.Api.Controllers.Base;
-using SCP.Api.DTO;
-using SCP.Application.Core.UserAuth;
-using SCP.Application.Services;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
-using System.Web;
-using System;
-using System.Security.Cryptography;
-using SCP.Application.Core.ApiKey;
+using Microsoft.AspNetCore.Mvc;
+using SCP.Api.Controllers.Base;
 using SCP.Application.Common.Response;
+using SCP.Application.Core.ApiKey;
+using SCP.Application.Services;
 
 namespace SCP.Api.Controllers
 {
@@ -52,8 +43,8 @@ namespace SCP.Api.Controllers
             var res = await oauthCore.GetTokens(code, scope);
 
             //редирект на страницу клиента который принимет jwt
-            state = state == null ? "http://localhost:4200/register?jwt=" : state;
-            return res.IsSuccess ? Redirect($"{state}{res.Data.UserName}") : BadRequest(res.ErrorList);
+            //state = state == null ? "http://localhost:4200/register?jwt=" : state;
+            return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }
 
 
@@ -63,7 +54,7 @@ namespace SCP.Api.Controllers
             var clientSecret = "fccaa925e96a2a77d3ddbdf8d814c23ee5bde6a9";
             var clientId = "ec53b6470c0c43cf1320";
 
-            
+
 
             if (string.IsNullOrEmpty(code))
             {

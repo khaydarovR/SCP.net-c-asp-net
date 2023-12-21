@@ -63,7 +63,7 @@ namespace SCP.Application.Common.PipeLine
 
             var msg = new CoreResponse<List<string>>("Ошибка сервера: " + exception.Message);
             var result = JsonConvert.SerializeObject(msg.ErrorList);
-   
+
             return ctx.Response.WriteAsync(result);
         }
 

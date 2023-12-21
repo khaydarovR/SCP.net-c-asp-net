@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
+using SCP.Api.Controllers.Base;
 using SCP.Api.DTO;
 using SCP.Api.Middleware;
-using Mapster;
 using SCP.Application.Core.Safe;
-using SCP.Api.Controllers.Base;
-using SCP.Application.Core.UserAuth;
-using SCP.Application.Core.Record;
 
 namespace SCP.Api.Controllers
 {
@@ -42,7 +40,7 @@ namespace SCP.Api.Controllers
         [HttpGet(nameof(GetLinked))]
         public async Task<ActionResult> GetLinked()
         {
-            var query = new GetLinkedSafesQuery() { UserId = ContextUserId};
+            var query = new GetLinkedSafesQuery() { UserId = ContextUserId };
             var res = await safeCore.GetLinked(query);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

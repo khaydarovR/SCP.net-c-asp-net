@@ -1,6 +1,4 @@
-﻿using SCP.Domain;
-
-namespace SCP.Domain.Entity
+﻿namespace SCP.Domain.Entity
 {
     public class Safe : BaseEntity
     {

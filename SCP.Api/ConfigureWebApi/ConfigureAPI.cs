@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Threading.RateLimiting;

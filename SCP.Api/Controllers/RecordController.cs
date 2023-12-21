@@ -31,8 +31,9 @@ namespace SCP.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Read([FromBody] ReadRecordDTO dto)
         {
-            var comand = new ReadRecordCommand { 
-                PubKeyFromClient = dto.PubKey, 
+            var comand = new ReadRecordCommand
+            {
+                PubKeyFromClient = dto.PubKey,
                 RecordId = Guid.Parse(dto.RecId),
                 AuthorId = ContextUserId
             };
@@ -99,4 +100,3 @@ namespace SCP.Api.Controllers
         }
     }
 }
- 

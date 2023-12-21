@@ -1,24 +1,19 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using SCP.Application.Core.Access;
+using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Record;
 using SCP.Application.Core.Safe;
-using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
-using System.Net.NetworkInformation;
-using System.Reflection;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Options;
 using System.Text;
-using Microsoft.Extensions.Primitives;
-using System.Security.Claims;
 
 namespace SCP.Application.Common.Configuration
 {
@@ -31,7 +26,8 @@ namespace SCP.Application.Common.Configuration
             services.Configure<MyOptions>(config.GetSection(nameof(MyOptions)));
             services.AddHttpClient();
 
-            services.AddStackExchangeRedisCache(options => {
+            services.AddStackExchangeRedisCache(options =>
+            {
                 options.Configuration = "localhost";
                 options.InstanceName = "local";
             });
@@ -80,7 +76,7 @@ namespace SCP.Application.Common.Configuration
             })
             .AddGoogle(googleOptions =>
             {
-                
+
                 googleOptions.ClientId = config["GoogleOAuth:ClientId"]!;
                 googleOptions.ClientSecret = config["GoogleOAuth:ClientSecret"]!;
                 googleOptions.CallbackPath = "/signin-google";
@@ -95,6 +91,7 @@ namespace SCP.Application.Common.Configuration
             services.AddTransient<RLogService>();
             services.Configure<EmailServiceOptions>(config.GetSection("EmailService"));
             services.AddScoped<CacheService>();
+            services.AddScoped<UserService>();
 
             services.AddScoped<UserAuthCore>();
             services.AddScoped<SafeCore>();
@@ -104,6 +101,7 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<ApiKeyCore>();
             services.AddScoped<GoogleOAuthService>();
             services.AddScoped<GoogleOAuthCore>();
+            services.AddScoped<UserCore>();
 
 
 

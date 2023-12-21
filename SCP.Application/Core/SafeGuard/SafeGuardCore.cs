@@ -1,20 +1,7 @@
-﻿using SCP.Application.Common.Response;
-using SCP.Application.Common.Validators;
-using SCP.Application.Common;
-using SCP.Application.Core.Access;
-using SCP.Application.Core.Safe;
-using SCP.DAL;
-using SCP.Domain.Entity;
-using SCP.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SCP.Domain.Enum;
+﻿using SCP.Application.Common.Helpers;
 using SCP.Application.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using SCP.Application.Common.Helpers;
+using SCP.DAL;
+using SCP.Domain.Enum;
 
 namespace SCP.Application.Core.ApiKey
 {
@@ -111,7 +98,7 @@ namespace SCP.Application.Core.ApiKey
                 res = false;
                 return res;
             }
-           
+
             if (k.DeadDate < DateTime.UtcNow)
             {
                 msg = "Время жизни ключа истек";

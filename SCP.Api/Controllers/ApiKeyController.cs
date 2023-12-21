@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SCP.Api.Middleware;
-using SCP.Application.Core.Safe;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
 using SCP.Api.DTO;
-using Mapster;
-using SCP.Application.Core.UserAuth;
+using SCP.Api.Middleware;
 using SCP.Application.Core.ApiKeyC;
 
 namespace SCP.Api.Controllers
