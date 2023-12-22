@@ -1,6 +1,6 @@
 ﻿namespace SCP.Api.DTO
 {
-    public class UserInfoResponse
+    public class GoogleUserInfoResponse
     {
         public string UserId { get; set; }
         public string UserEmail { get; set; }

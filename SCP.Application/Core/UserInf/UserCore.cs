@@ -35,16 +35,16 @@ namespace SCP.Application.Core.UserAuth
             this.jwt = jwt;
         }
 
-        public async Task<CoreResponse<UserInfoResponse>> GetUserInfo(string userId)
+        public async Task<CoreResponse<GoogleUserInfoResponse>> GetUserInfo(string userId)
         {
             var u = await userManager.FindByIdAsync(userId);
 
             if (u == null)
             {
-                return Bad<UserInfoResponse>("UserId is not available");
+                return Bad<GoogleUserInfoResponse>("UserId is not available");
             }
 
-            var result = new UserInfoResponse();
+            var result = new GoogleUserInfoResponse();
 
             result.UserId = userId;
             result.UserName = u.UserName;

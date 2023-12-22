@@ -70,7 +70,7 @@ namespace SCP.Application.Core.ApiKey
             }
 
             var resultString = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<TokenResponseDTO>(resultString);
+            var result = JsonConvert.DeserializeObject<GoogleTokenResponseDTO>(resultString);
 
             var userInfo = await GetUserInfo(result!.AccessToken);
 

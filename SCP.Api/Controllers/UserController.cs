@@ -18,7 +18,7 @@ namespace SCP.Api.Controllers
 
 
         [HttpGet("Info")]
-        public async Task<ActionResult<UserInfoResponse>> Info([FromQuery] string uId)
+        public async Task<ActionResult<GoogleUserInfoResponse>> Info([FromQuery] string uId)
         {
             var res = await userCore.GetUserInfo(uId);
 

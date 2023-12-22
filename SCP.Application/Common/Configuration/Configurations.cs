@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SCP.Application.Core.Access;
 using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.ApiKeyC;
+using SCP.Application.Core.OAuth;
 using SCP.Application.Core.Record;
 using SCP.Application.Core.Safe;
 using SCP.Application.Core.UserAuth;
@@ -99,9 +100,9 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<AccessCore>();
             services.AddScoped<SafeGuardCore>();
             services.AddScoped<ApiKeyCore>();
-            services.AddScoped<GoogleOAuthService>();
             services.AddScoped<GoogleOAuthCore>();
             services.AddScoped<UserCore>();
+            services.AddScoped<GitHubOAuthCore>();
 
 
 

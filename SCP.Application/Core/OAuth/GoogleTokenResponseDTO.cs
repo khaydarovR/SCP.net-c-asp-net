@@ -2,7 +2,7 @@
 
 namespace SCP.Application.Core.ApiKey
 {
-    public class TokenResponseDTO
+    public class GoogleTokenResponseDTO
     {
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
@@ -22,6 +22,5 @@ namespace SCP.Application.Core.ApiKey
         [JsonProperty("refresh_token")]
         public string RefreshToken { get; set; }
     }
-
 
 }

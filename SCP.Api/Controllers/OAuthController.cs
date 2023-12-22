@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
 using SCP.Application.Common.Response;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.OAuth;
 using SCP.Application.Services;
 
 namespace SCP.Api.Controllers
@@ -13,7 +14,9 @@ namespace SCP.Api.Controllers
     [ApiController]
     public class OAuthController : CustomController
     {
-        private readonly GoogleOAuthCore oauthCore;
+        private readonly GoogleOAuthCore googleOauthCore;
+        private readonly GitHubOAuthCore gitHubOAuthCore;
+        private readonly GitHubOAuthCore gitHubOauthCore;
         private readonly TwoFactorAuthService twoFactorAuthService;
         private readonly EmailService email;
 
@@ -21,11 +24,13 @@ namespace SCP.Api.Controllers
         /// 
         /// </summary>
         /// <param name="oauthCore"></param>
+        /// <param name="gitHubOAuthCore"></param>
         /// <param name="twoFactorAuthService"></param>
         /// <param name="email"></param>
-        public OAuthController(GoogleOAuthCore oauthCore, TwoFactorAuthService twoFactorAuthService, EmailService email)
+        public OAuthController(GoogleOAuthCore oauthCore, GitHubOAuthCore gitHubOAuthCore, TwoFactorAuthService twoFactorAuthService, EmailService email)
         {
-            this.oauthCore = oauthCore;
+            this.googleOauthCore = oauthCore;
+            this.gitHubOAuthCore = gitHubOAuthCore;
             this.twoFactorAuthService = twoFactorAuthService;
             this.email = email;
         }
@@ -40,31 +45,17 @@ namespace SCP.Api.Controllers
             {
                 return BadRequest("Missing code");
             }
-            var res = await oauthCore.GetTokens(code, scope);
+            var res = await googleOauthCore.GetTokens(code, scope);
 
-            //редирект на страницу клиента который принимет jwt
-            //state = state == null ? "http://localhost:4200/register?jwt=" : state;
             return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }
 
 
         [HttpGet("Github")]
-        public async Task<ActionResult<AuthResponse>> GitHubGetCode([FromQuery] string code, string scope, string? state)
+        public async Task<ActionResult<AuthResponse>> GitHubGetCode([FromQuery] string code, string state)
         {
-            var clientSecret = "fccaa925e96a2a77d3ddbdf8d814c23ee5bde6a9";
-            var clientId = "ec53b6470c0c43cf1320";
-
-
-
-            if (string.IsNullOrEmpty(code))
-            {
-                return BadRequest("Missing code");
-            }
-            var res = await oauthCore.GetTokens(code, scope);
-
-            //редирект на страницу клиента который принимет jwt
-            state = state == null ? "http://localhost:4200/register?jwt=" : state;
-            return res.IsSuccess ? Redirect($"{state}{res.Data.UserName}") : BadRequest(res.ErrorList);
+            var res = await gitHubOAuthCore.GetTokens(code, state);
+            return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }
 
 
