@@ -49,7 +49,9 @@ app.UseRateLimiter();
 
 app.MapControllers();
 
-app.MapGet("ping", () => "pong");
+app.MapGet("ping", () => "pong 3");
+
+Console.WriteLine("=============== " + Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT"));
 
 //Seeding test users
 if (true)
@@ -63,5 +65,5 @@ if (true)
     }
 }
 
-
+Console.WriteLine("--------------------------TEST 3----------------------------------");
 app.Run();

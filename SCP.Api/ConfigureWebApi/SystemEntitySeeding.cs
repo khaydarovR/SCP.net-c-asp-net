@@ -63,6 +63,7 @@ namespace SCP.Api.ConfigureWebApi
 
         public async Task<SystemEntitySeeding> InitTUsersWithSafe(int ammount)
         {
+            dbContext.Database.Migrate();
 
             for (int i = 0; i < ammount; i++)
             {

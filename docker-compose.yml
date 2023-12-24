@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  scp.api:
+    image: ${DOCKER_REGISTRY-}scpapi
+    ports:
+      - 7192:443
+    build:
+      context: .
+      dockerfile: SCP.Api/Dockerfile
+  postgres:
+    image: postgres:15
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=pgroot
+      - POSTGRES_USER=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
