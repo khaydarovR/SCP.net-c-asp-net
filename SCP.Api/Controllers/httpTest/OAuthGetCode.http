@@ -1,0 +1,3 @@
+@hostname=localhost
+@port=7192
+GET https://git.kamaz.tatar/login/oauth/authorize?client_id=9c58d41e-1ed5-41ff-875b-4c0595cbd448&redirect_uri=https://localhost:7192/api/OAuth/Gitea& response_type=code&state=https://localhost:7192/client/jwt=

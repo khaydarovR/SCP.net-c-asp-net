@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 namespace SCP.Application.Core.OAuth
 {
 
-    public class GitHubOAuthCore : BaseCore
+    public class GiteaOAuthCore : BaseCore
     {
         private readonly HttpClient http;
         private readonly ILogger<GitHubOAuthCore> logger;
@@ -24,8 +24,10 @@ namespace SCP.Application.Core.OAuth
         private readonly UserManager<AppUser> userManager;
         private readonly string _clientId;
         private readonly string _clientSecret;
+        private readonly string _host;
+        private string _accessToken;
 
-        public GitHubOAuthCore(AppDbContext dbContext,
+        public GiteaOAuthCore(AppDbContext dbContext,
                                HttpClient http,
                                ILogger<GitHubOAuthCore> logger,
                                UserAuthCore userAuthCore,
@@ -38,15 +40,15 @@ namespace SCP.Application.Core.OAuth
             this.userAuthCore = userAuthCore;
             this.jwtService = jwtService;
             this.userManager = userManager;
-            _clientId = configuration.GetValue<string>("OAuth:GitHub:clientId")!;
-            _clientSecret = configuration.GetValue<string>("OAuth:GitHub:clientSecret")!;
+            _clientId = configuration.GetValue<string>("OAuth:Gitea:ClientId")!;
+            _clientSecret = configuration.GetValue<string>("OAuth:Gitea:ClientSecret")!;
+            _host = "https://git.kamaz.tatar/";
         }
 
         /// <summary>
-        /// Обмен полученного кода на АПИ ключ, получение от GH userinfo, генерация jwt
+        /// Обмен полученного кода на АПИ ключ, получение от Gitea, генерация jwt
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="scope"></param>
         /// <returns></returns>
         public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string state)
         {
@@ -55,7 +57,8 @@ namespace SCP.Application.Core.OAuth
                 { "client_id", _clientId },
                 { "client_secret", _clientSecret },
                 { "code", code },
-                { "redirect_uri", "https://localhost:7192/api/OAuth/Github" }
+                { "grant_type", "authorization_code"},
+                { "redirect_uri", "https://localhost:7192/api/OAuth/Gitea" }
             };
 
             var response = await SendOAuthTokenRequest(requestContent);
@@ -69,8 +72,8 @@ namespace SCP.Application.Core.OAuth
 
             var result = await ParseOAuthTokenResponse(response);
 
-            Console.WriteLine(result.scope);
-            var userInfo = await GetUserInfo(result.access_token);
+            _accessToken = result.access_token;
+            var userInfo = await GetUserInfo();
 
             if (!userInfo.IsSuccess)
             {
@@ -91,17 +94,17 @@ namespace SCP.Application.Core.OAuth
 
         private async Task<HttpResponseMessage> SendOAuthTokenRequest(Dictionary<string, string> requestContent)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _host+"login/oauth/access_token");
             requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             requestMessage.Content = new FormUrlEncodedContent(requestContent);
 
             return await http.SendAsync(requestMessage);
         }
 
-        private async Task<GitHubTokenResponseDTO> ParseOAuthTokenResponse(HttpResponseMessage response)
+        private async Task<GiteaOAuthResponseDTO> ParseOAuthTokenResponse(HttpResponseMessage response)
         {
             var resultString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<GitHubTokenResponseDTO>(resultString);
+            return JsonConvert.DeserializeObject<GiteaOAuthResponseDTO>(resultString);
         }
 
 
@@ -115,7 +118,7 @@ namespace SCP.Application.Core.OAuth
                 {
                     Email = userInfo.email,
                     UserName = userInfo.name,
-                    FA2Enabled = userInfo.two_factor_authentication,
+                    FA2Enabled = true,
                     Password = null
                 });
 
@@ -130,15 +133,12 @@ namespace SCP.Application.Core.OAuth
         }
 
 
-        public async Task<CoreResponse<GitHubUserInfo>> GetUserInfo(string accessToken)
+        public async Task<CoreResponse<GitHubUserInfo>> GetUserInfo()
         {
             {
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                http.DefaultRequestHeaders.Add("User-Agent", "Bank Of Secrets"); // Replace "My-CSharp-App" with your own user agent
+                var response = await http.GetAsync(_host+ "api/v1/user?access_token=" + _accessToken);
 
-                var response = await http.GetAsync("https://api.github.com/user");
-
-                var email = await GetUserFirstEmail(http);
+                var email = await GetUserFirstEmail();
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -158,9 +158,9 @@ namespace SCP.Application.Core.OAuth
             }
         }
 
-        private async Task<string> GetUserFirstEmail(HttpClient http)
+        private async Task<string> GetUserFirstEmail()
         {
-            var response = await http.GetFromJsonAsync<List<GitHubUserEmailInfo>>("https://api.github.com/user/emails");
+            var response = await http.GetFromJsonAsync<List<GitHubUserEmailInfo>>(_host+ "api/v1/user/emails?access_token=" + _accessToken);
             foreach (var email in response)
             {
                 Console.WriteLine($"{email.email} {email.verified} {email.primary}");

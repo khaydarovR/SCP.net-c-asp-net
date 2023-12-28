@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SCP.Application.Common;
@@ -26,15 +27,16 @@ namespace SCP.Application.Core.ApiKey
                                ILogger<GoogleOAuthCore> logger,
                                UserAuthCore userAuthCore,
                                JwtService jwtService,
-                               UserManager<AppUser> userManager)
+                               UserManager<AppUser> userManager,
+                               IConfiguration configuration)
         {
             this.http = http;
             this.logger = logger;
             this.userAuthCore = userAuthCore;
             this.jwtService = jwtService;
             this.userManager = userManager;
-            this._clientId = "313139694363-orcunjq74ubditjhrce01n8l2e8jjr8c.apps.googleusercontent.com";
-            this._clientSecret = "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";
+            _clientId = configuration.GetValue<string>("OAuth:Google:clientId")!;
+            _clientSecret = configuration.GetValue<string>("OAuth:Google:clientSecret")!;
         }
 
         /// <summary>

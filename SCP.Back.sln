@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCP.Api", "SCP.Api\SCP.Api.csproj", "{EDD2250A-72BB-4FDB-9A9B-93DD1B0BD8BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Api", "SCP.Api\SCP.Api.csproj", "{EDD2250A-72BB-4FDB-9A9B-93DD1B0BD8BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCP.Domain", "SCP.Domain\SCP.Domain.csproj", "{EDFC0946-D0F5-41BF-A2D6-B6A22FBB3665}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Domain", "SCP.Domain\SCP.Domain.csproj", "{EDFC0946-D0F5-41BF-A2D6-B6A22FBB3665}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCP.Application", "SCP.Application\SCP.Application.csproj", "{3A03B04D-7E61-4AFE-A60C-35FD3810E758}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Application", "SCP.Application\SCP.Application.csproj", "{3A03B04D-7E61-4AFE-A60C-35FD3810E758}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCP.Test", "SCP.Test\SCP.Test.csproj", "{B4781814-4E5A-4E96-95A1-AE65BD7BD3C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Test", "SCP.Test\SCP.Test.csproj", "{B4781814-4E5A-4E96-95A1-AE65BD7BD3C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCP.DAL", "SCP.DAL\SCP.DAL.csproj", "{A0A3298B-47C0-4304-87D0-CE7EAD4B1868}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.DAL", "SCP.DAL\SCP.DAL.csproj", "{A0A3298B-47C0-4304-87D0-CE7EAD4B1868}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

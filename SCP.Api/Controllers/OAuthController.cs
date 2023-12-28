@@ -16,7 +16,7 @@ namespace SCP.Api.Controllers
     {
         private readonly GoogleOAuthCore googleOauthCore;
         private readonly GitHubOAuthCore gitHubOAuthCore;
-        private readonly GitHubOAuthCore gitHubOauthCore;
+        private readonly GiteaOAuthCore giteaOAuthCore;
         private readonly TwoFactorAuthService twoFactorAuthService;
         private readonly EmailService email;
 
@@ -27,12 +27,13 @@ namespace SCP.Api.Controllers
         /// <param name="gitHubOAuthCore"></param>
         /// <param name="twoFactorAuthService"></param>
         /// <param name="email"></param>
-        public OAuthController(GoogleOAuthCore oauthCore, GitHubOAuthCore gitHubOAuthCore, TwoFactorAuthService twoFactorAuthService, EmailService email)
+        public OAuthController(GoogleOAuthCore oauthCore, GitHubOAuthCore gitHubOAuthCore, TwoFactorAuthService twoFactorAuthService, EmailService email, GiteaOAuthCore giteaOAuthCore)
         {
             this.googleOauthCore = oauthCore;
             this.gitHubOAuthCore = gitHubOAuthCore;
             this.twoFactorAuthService = twoFactorAuthService;
             this.email = email;
+            this.giteaOAuthCore = giteaOAuthCore;
         }
 
         /// <summary>
@@ -55,6 +56,15 @@ namespace SCP.Api.Controllers
         public async Task<ActionResult<AuthResponse>> GitHubGetCode([FromQuery] string code, string state)
         {
             var res = await gitHubOAuthCore.GetTokens(code, state);
+            return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
+        }
+
+        [HttpGet("Gitea")]
+        public async Task<ActionResult<AuthResponse>> GiteaGetCode([FromQuery] string code, string state)
+        {
+            Console.WriteLine(code);
+            Console.WriteLine(state);
+            var res = await giteaOAuthCore.GetTokens(code, state);
             return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }
 

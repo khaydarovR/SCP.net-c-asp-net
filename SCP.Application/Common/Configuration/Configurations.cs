@@ -51,14 +51,7 @@ namespace SCP.Application.Common.Configuration
                 .AddUserManager<UserManager<AppUser>>()
                 .AddErrorDescriber<IdentityMessageRu>();
 
-            //OAuth 2.0 google
-            _ = services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-                options.DefaultScheme = GoogleDefaults.AuthenticationScheme;
-
-            })
+            _ = services.AddAuthentication()
             .AddJwtBearer(jwtBearerOptions =>
             {
                 var issuer = config.GetValue<string>("MyOptions:JWT_ISSUER");
@@ -74,13 +67,6 @@ namespace SCP.Application.Common.Configuration
                     RequireExpirationTime = true,
                     ClockSkew = TimeSpan.FromMinutes(5)
                 };
-            })
-            .AddGoogle(googleOptions =>
-            {
-
-                googleOptions.ClientId = config["GoogleOAuth:ClientId"]!;
-                googleOptions.ClientSecret = config["GoogleOAuth:ClientSecret"]!;
-                googleOptions.CallbackPath = "/signin-google";
             });
 
 
@@ -103,6 +89,7 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<GoogleOAuthCore>();
             services.AddScoped<UserCore>();
             services.AddScoped<GitHubOAuthCore>();
+            services.AddScoped<GiteaOAuthCore>();
 
 
 

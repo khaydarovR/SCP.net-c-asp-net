@@ -52,7 +52,7 @@ app.MapControllers();
 app.MapGet("ping", () => "pong");
 
 //Seeding test users
-if (true)
+if (false)
 {
     using (var scope = app.Services.CreateScope())
     {
@@ -63,5 +63,7 @@ if (true)
     }
 }
 
+Console.WriteLine("Start");
+Console.WriteLine(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 
 app.Run();
