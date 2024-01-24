@@ -39,8 +39,6 @@ namespace SCP.Application.Core.Safe
             }
 
             var keys = asymmetricCrypto.GenerateKeys();
-            Console.WriteLine("Public Key: " + keys.publicKeyPem);
-            Console.WriteLine("Private Key: " + keys.privateKeyPem);
 
             string PublickKeyPem = keys.publicKeyPem;
             string PrivateKeyPem = keys.privateKeyPem;

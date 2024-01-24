@@ -102,7 +102,6 @@ namespace SCP.Application.Core.UserAuth
                                                        Guid.Parse(safeId),
                                                        new HashSet<string> { dbUser.Id.ToString() },
                                                        30);
-                Console.WriteLine(res + " Добавлен в сейеф ");
             }
             cache.Delete(CachePrefix.DeferredInvite_ + dbUser.Email);
         }

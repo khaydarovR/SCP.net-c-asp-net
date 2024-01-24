@@ -62,8 +62,6 @@ namespace SCP.Api.Controllers
         [HttpGet("Gitea")]
         public async Task<ActionResult<AuthResponse>> GiteaGetCode([FromQuery] string code, string state)
         {
-            Console.WriteLine(code);
-            Console.WriteLine(state);
             var res = await giteaOAuthCore.GetTokens(code, state);
             return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }

@@ -69,7 +69,6 @@ namespace SCP.Application.Core.OAuth
 
             var result = await ParseOAuthTokenResponse(response);
 
-            Console.WriteLine(result.scope);
             var userInfo = await GetUserInfo(result.access_token);
 
             if (!userInfo.IsSuccess)
