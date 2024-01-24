@@ -1,8 +1,10 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
@@ -22,7 +24,7 @@ namespace SCP.Application.Core.Safe
                         AppDbContext dbContext,
                         AsymmetricCryptoService asymmetricCrypto,
                         SymmetricCryptoService symmetricCrypto,
-                        SafeGuardCore safeGuard)
+                        SafeGuardCore safeGuard, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.cryptorService = cryptorService;
             this.dbContext = dbContext;

@@ -31,15 +31,15 @@ namespace SCP.Application.Core.OAuth
                                UserAuthCore userAuthCore,
                                JwtService jwtService,
                                UserManager<AppUser> userManager,
-                               IConfiguration configuration)
+                               IConfiguration configuration) : base(logger)
         {
             this.http = http;
             this.logger = logger;
             this.userAuthCore = userAuthCore;
             this.jwtService = jwtService;
             this.userManager = userManager;
-            _clientId = configuration.GetValue<string>("OAuth:GitHub:clientId")!;
-            _clientSecret = configuration.GetValue<string>("OAuth:GitHub:clientSecret")!;
+            _clientId = configuration.GetValue<string>("OAuth:GitHub:ClientId")!;
+            _clientSecret = configuration.GetValue<string>("OAuth:GitHub:ClientSecret")!;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SCP.Application.Core.OAuth
         /// <param name="code"></param>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string state)
+        public async Task<CoreResponse<AuthResponse>> GetTokens(string code)
         {
             var requestContent = new Dictionary<string, string>
             {

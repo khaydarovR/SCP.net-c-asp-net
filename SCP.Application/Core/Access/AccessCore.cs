@@ -2,11 +2,13 @@
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
@@ -27,7 +29,7 @@ namespace SCP.Application.Core.Access
                           SafeCore safeCore,
                           SafeGuardCore safeGuard,
                           CacheService cache,
-                          UserManager<AppUser> userMan)
+                          UserManager<AppUser> userMan, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.dbContext = dbContext;
             this.safeCore = safeCore;

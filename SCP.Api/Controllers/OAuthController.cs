@@ -55,14 +55,14 @@ namespace SCP.Api.Controllers
         [HttpGet("Github")]
         public async Task<ActionResult<AuthResponse>> GitHubGetCode([FromQuery] string code, string state)
         {
-            var res = await gitHubOAuthCore.GetTokens(code, state);
+            var res = await gitHubOAuthCore.GetTokens(code);
             return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }
 
         [HttpGet("Gitea")]
         public async Task<ActionResult<AuthResponse>> GiteaGetCode([FromQuery] string code, string state)
         {
-            var res = await giteaOAuthCore.GetTokens(code, state);
+            var res = await giteaOAuthCore.GetTokens(code);
             return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }
 

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.Response;
 using SCP.Application.Core.Access;
+using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.Domain;
@@ -25,7 +27,7 @@ namespace SCP.Application.Core.UserAuth
                             TwoFactorAuthService twoFactorAuthService,
                             SafeCore safeCore,
                             CacheService cache,
-                            AccessCore accessCore)
+                            AccessCore accessCore, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;

@@ -33,7 +33,7 @@ namespace SCP.Application.Core.OAuth
                                UserAuthCore userAuthCore,
                                JwtService jwtService,
                                UserManager<AppUser> userManager,
-                               IConfiguration configuration)
+                               IConfiguration configuration) : base(logger)
         {
             this.http = http;
             this.logger = logger;
@@ -50,7 +50,7 @@ namespace SCP.Application.Core.OAuth
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string state)
+        public async Task<CoreResponse<AuthResponse>> GetTokens(string code)
         {
             var requestContent = new Dictionary<string, string>
             {
@@ -83,6 +83,11 @@ namespace SCP.Application.Core.OAuth
 
             var dbUser = await GetOrCreateDbUser(userInfo.Data);
 
+            if (dbUser.IsSuccess == false)
+            {
+                return Bad<AuthResponse>(dbUser.ErrorList.ToArray());
+            }
+
             var jwt = await jwtService.GenerateJwtToken(dbUser.Data);
 
             return Good(new AuthResponse
@@ -109,7 +114,7 @@ namespace SCP.Application.Core.OAuth
         }
 
 
-        private async Task<CoreResponse<AppUser>> GetOrCreateDbUser(GitHubUserInfo userInfo)
+        private async Task<CoreResponse<AppUser>> GetOrCreateDbUser(GiteaUserInfo userInfo)
         {
             var dbUser = await userManager.FindByEmailAsync(userInfo.email);
 
@@ -118,12 +123,12 @@ namespace SCP.Application.Core.OAuth
                 var createUserResult = await userAuthCore.CreateAccount(new CreateAccountCommand
                 {
                     Email = userInfo.email,
-                    UserName = userInfo.name,
+                    UserName = userInfo.login,
                     FA2Enabled = true,
                     Password = null
                 });
 
-                if (!createUserResult.IsSuccess)
+                if (createUserResult.IsSuccess == false)
                 {
                     return Bad<AppUser>(createUserResult.ErrorList.ToArray());
                 }
@@ -134,7 +139,7 @@ namespace SCP.Application.Core.OAuth
         }
 
 
-        public async Task<CoreResponse<GitHubUserInfo>> GetUserInfo()
+        public async Task<CoreResponse<GiteaUserInfo>> GetUserInfo()
         {
             {
                 var response = await http.GetAsync(_host+ "api/v1/user?access_token=" + _accessToken);
@@ -144,7 +149,7 @@ namespace SCP.Application.Core.OAuth
                 if (response.IsSuccessStatusCode)
                 {
                     var resultString = await response.Content.ReadAsStringAsync();
-                    var userInfo = JsonConvert.DeserializeObject<GitHubUserInfo>(resultString);
+                    var userInfo = JsonConvert.DeserializeObject<GiteaUserInfo>(resultString);
                     userInfo.email = email;
                     logger.LogWarning(resultString);
                     return Good(userInfo);
@@ -153,7 +158,7 @@ namespace SCP.Application.Core.OAuth
                 {
                     var errorString = await response.Content.ReadAsStringAsync();
                     logger.LogError(errorString);
-                    return Bad<GitHubUserInfo>("Error: " + errorString);
+                    return Bad<GiteaUserInfo>("Error: " + errorString);
                 }
 
             }

@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
 using SCP.Application.Core.ApiKey;
@@ -15,7 +16,7 @@ namespace SCP.Application.Core.ApiKeyC
         private readonly AppDbContext dbContext;
         private readonly SafeGuardCore safeGuard;
 
-        public ApiKeyCore(AppDbContext dbContext, SafeGuardCore safeGuard)
+        public ApiKeyCore(AppDbContext dbContext, SafeGuardCore safeGuard, ILogger<ApiKeyCore> logger): base(logger)
         {
             this.dbContext = dbContext;
             this.safeGuard = safeGuard;

@@ -1,11 +1,13 @@
 ﻿using FluentValidation.Results;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
 using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.DAL;
@@ -28,7 +30,7 @@ namespace SCP.Application.Core.Record
                           SymmetricCryptoService symmetricCrypto,
                           SafeCore safeCore,
                           SafeGuardCore safeGuard,
-                          RLogService rLog)
+                          RLogService rLog, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.dbContext = dbContext;
             this.asymmetricCryptoService = asymmetricCryptoService;

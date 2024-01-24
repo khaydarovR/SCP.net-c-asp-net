@@ -1,4 +1,6 @@
-﻿using SCP.Application.Common.Helpers;
+﻿using Microsoft.Extensions.Logging;
+using SCP.Application.Common.Helpers;
+using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Enum;
@@ -11,7 +13,7 @@ namespace SCP.Application.Core.ApiKey
         private readonly AppDbContext dbContext;
         private readonly RLogService rLog;
 
-        public SafeGuardCore(AppDbContext dbContext, RLogService rLog)
+        public SafeGuardCore(AppDbContext dbContext, RLogService rLog, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.dbContext = dbContext;
             this.rLog = rLog;

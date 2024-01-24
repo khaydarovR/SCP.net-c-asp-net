@@ -9,6 +9,7 @@ using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace SCP.Application.Core.ApiKey
 {
@@ -28,15 +29,15 @@ namespace SCP.Application.Core.ApiKey
                                UserAuthCore userAuthCore,
                                JwtService jwtService,
                                UserManager<AppUser> userManager,
-                               IConfiguration configuration)
+                               IConfiguration configuration) : base(logger)
         {
             this.http = http;
             this.logger = logger;
             this.userAuthCore = userAuthCore;
             this.jwtService = jwtService;
             this.userManager = userManager;
-            _clientId = configuration.GetValue<string>("OAuth:Google:clientId")!;
-            _clientSecret = configuration.GetValue<string>("OAuth:Google:clientSecret")!;
+            _clientId = configuration.GetValue<string>("OAuth:Google:ClientId")!;
+            _clientSecret = configuration.GetValue<string>("OAuth:Google:ClientSecret")!;
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace SCP.Application.Core.ApiKey
                 // You can handle error responses here
                 var errorContent = await response.Content.ReadAsStringAsync();
                 logger.LogWarning(errorContent);
-                return Bad<AuthResponse>("Token exchange failed");
+                return Bad<AuthResponse>("Token exchange failed: " + response.Content.ReadAsStringAsync().Result.ToString());
             }
 
             var resultString = await response.Content.ReadAsStringAsync();

@@ -43,7 +43,6 @@
         public Plan plan { get; set; }
     }
 
-
     public class Plan
     {
         public string name { get; set; }

@@ -9,10 +9,12 @@ namespace SCP.Application.Common.PipeLine
     public class ExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionHandlerMiddleware> logger;
 
-        public ExceptionHandlerMiddleware(RequestDelegate next)
+        public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
         {
             _next = next;
+            this.logger = logger;
         }
 
         public async Task Invoke(HttpContext ctx)
@@ -55,7 +57,7 @@ namespace SCP.Application.Common.PipeLine
 
         private Task HandleExceptionAsync(HttpContext ctx, Exception exception)
         {
-
+            logger.LogError(exception.Message + " : " + exception.StackTrace);
             var code = HttpStatusCode.InternalServerError;
 
             ctx.Response.StatusCode = (int)code;
