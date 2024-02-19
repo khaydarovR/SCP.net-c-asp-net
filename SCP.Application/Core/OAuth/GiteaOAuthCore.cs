@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SCP.Application.Common.Response;
+using Newtonsoft.Json;
 using SCP.Application.Common;
+using SCP.Application.Common.Response;
+using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
-using Newtonsoft.Json;
-using SCP.Application.Core.ApiKey;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace SCP.Application.Core.OAuth
 {
@@ -100,7 +100,7 @@ namespace SCP.Application.Core.OAuth
 
         private async Task<HttpResponseMessage> SendOAuthTokenRequest(Dictionary<string, string> requestContent)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _host+"login/oauth/access_token");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _host + "login/oauth/access_token");
             requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             requestMessage.Content = new FormUrlEncodedContent(requestContent);
 
@@ -142,7 +142,7 @@ namespace SCP.Application.Core.OAuth
         public async Task<CoreResponse<GiteaUserInfo>> GetUserInfo()
         {
             {
-                var response = await http.GetAsync(_host+ "api/v1/user?access_token=" + _accessToken);
+                var response = await http.GetAsync(_host + "api/v1/user?access_token=" + _accessToken);
 
                 var email = await GetUserFirstEmail();
 
@@ -166,7 +166,7 @@ namespace SCP.Application.Core.OAuth
 
         private async Task<string> GetUserFirstEmail()
         {
-            var response = await http.GetFromJsonAsync<List<GitHubUserEmailInfo>>(_host+ "api/v1/user/emails?access_token=" + _accessToken);
+            var response = await http.GetFromJsonAsync<List<GitHubUserEmailInfo>>(_host + "api/v1/user/emails?access_token=" + _accessToken);
             return response.First(e => e.verified == true).email;
         }
     }

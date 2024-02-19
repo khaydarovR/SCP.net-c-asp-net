@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
-using SCP.Api.DTO;
 using SCP.Application.Core.UserAuth;
 
 namespace SCP.Api.Controllers

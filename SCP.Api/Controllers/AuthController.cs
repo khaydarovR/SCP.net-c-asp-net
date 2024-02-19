@@ -29,6 +29,7 @@ namespace SCP.Api.Controllers
         public async Task<ActionResult> SignUp([FromBody] CreateAccountDTO dto)
         {
             var command = dto.Adapt<CreateAccountCommand>();
+            command.CurrentIp = CurrentIp;
             var res = await userAuthCore.CreateAccount(command);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

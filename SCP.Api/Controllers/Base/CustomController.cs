@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -13,5 +14,8 @@ namespace SCP.Api.Controllers.Base
         internal Guid ContextUserId => !User.Identity.IsAuthenticated
             ? Guid.Empty
             : Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.NameId)!);
+
+        internal string? CurrentIp => HttpContext.Connection.RemoteIpAddress?.ToString() ?? null;
+
     }
 }

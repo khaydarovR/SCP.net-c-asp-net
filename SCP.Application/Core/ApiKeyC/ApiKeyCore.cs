@@ -16,7 +16,7 @@ namespace SCP.Application.Core.ApiKeyC
         private readonly AppDbContext dbContext;
         private readonly SafeGuardCore safeGuard;
 
-        public ApiKeyCore(AppDbContext dbContext, SafeGuardCore safeGuard, ILogger<ApiKeyCore> logger): base(logger)
+        public ApiKeyCore(AppDbContext dbContext, SafeGuardCore safeGuard, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.dbContext = dbContext;
             this.safeGuard = safeGuard;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Configuration;
@@ -6,6 +7,7 @@ using SCP.Application.Common.Response;
 using SCP.Application.Core.Access;
 using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
+using SCP.Application.Core.UserWhiteIP;
 using SCP.Application.Services;
 using SCP.Domain;
 using SCP.Domain.Entity;
@@ -21,12 +23,14 @@ namespace SCP.Application.Core.UserAuth
         private readonly SafeCore safeCore;
         private readonly AccessCore accessCore;
         private readonly CacheService cache;
+        private readonly UserWhiteIPCore userWhiteIP;
 
         public UserAuthCore(UserManager<AppUser> userManager,
                             JwtService jwtService,
                             TwoFactorAuthService twoFactorAuthService,
                             SafeCore safeCore,
                             CacheService cache,
+                            UserWhiteIPCore userWhiteIP,
                             AccessCore accessCore, ILogger<ApiKeyCore> logger) : base(logger)
         {
             this.userManager = userManager;
@@ -34,6 +38,7 @@ namespace SCP.Application.Core.UserAuth
             this.twoFactorAuthService = twoFactorAuthService;
             this.safeCore = safeCore;
             this.cache = cache;
+            this.userWhiteIP = userWhiteIP;
             this.accessCore = accessCore;
         }
 
@@ -46,6 +51,11 @@ namespace SCP.Application.Core.UserAuth
 
         public async Task<CoreResponse<bool>> CreateAccount(CreateAccountCommand command)
         {
+            if (command.CurrentIp == null)
+            {
+                return Bad<bool>("Не удалось получить ваш IP аддресс");
+            }
+
             if (userManager.Users.Any(u => u.Email == command.Email))
             {
                 return Bad<bool>("Пользователь с email " + command.Email + " уже зарегистрирован");
@@ -54,7 +64,7 @@ namespace SCP.Application.Core.UserAuth
             {
                 UserName = command.UserName,
                 Email = command.Email,
-                TwoFactorEnabled = true,
+                TwoFactorEnabled = false,
             };
 
             IdentityResult result = null;
@@ -86,6 +96,8 @@ namespace SCP.Application.Core.UserAuth
                     });
 
                     TryDeferredInvite(dbUser);
+
+                    await userWhiteIP.Create(dbUser.Id, command.CurrentIp);
 
                     return new CoreResponse<bool>(true);
                 }

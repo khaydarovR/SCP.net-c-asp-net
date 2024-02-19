@@ -30,7 +30,7 @@ namespace SCP.Application.Services
                     new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, await userService.GetRoleFromClaims(user)),
                 }),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddDays(30),
                 Issuer = options.Value.JWT_ISSUER,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

@@ -9,7 +9,6 @@ using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace SCP.Application.Core.ApiKey
 {

@@ -1,16 +1,14 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SCP.Api.DTO;
 using SCP.Application.Common;
 using SCP.Application.Core.Access;
 using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.Domain.Entity;
+using System.Net.Http.Json;
+using System.Text;
 
 namespace SCP.Application.Core.UserAuth
 {

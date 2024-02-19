@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authentication.Google;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +10,7 @@ using SCP.Application.Core.OAuth;
 using SCP.Application.Core.Record;
 using SCP.Application.Core.Safe;
 using SCP.Application.Core.UserAuth;
+using SCP.Application.Core.UserWhiteIP;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
@@ -51,8 +51,12 @@ namespace SCP.Application.Common.Configuration
                 .AddUserManager<UserManager<AppUser>>()
                 .AddErrorDescriber<IdentityMessageRu>();
 
-            _ = services.AddAuthentication()
-            .AddJwtBearer(jwtBearerOptions =>
+            services.AddAuthentication(cfg =>
+            {
+                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme ,jwtBearerOptions =>
             {
                 var issuer = config.GetValue<string>("MyOptions:JWT_ISSUER");
                 var key = config.GetValue<string>("MyOptions:JWT_KEY");
@@ -65,7 +69,7 @@ namespace SCP.Application.Common.Configuration
                     ValidIssuer = issuer,
                     ValidateAudience = false,
                     RequireExpirationTime = true,
-                    ClockSkew = TimeSpan.FromMinutes(5)
+                    ClockSkew = TimeSpan.FromMinutes(5),
                 };
             });
 
@@ -90,6 +94,7 @@ namespace SCP.Application.Common.Configuration
             services.AddScoped<UserCore>();
             services.AddScoped<GitHubOAuthCore>();
             services.AddScoped<GiteaOAuthCore>();
+            services.AddScoped<UserWhiteIPCore>();
 
 
 

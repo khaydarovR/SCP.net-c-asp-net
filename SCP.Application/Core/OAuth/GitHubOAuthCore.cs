@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SCP.Application.Common.Response;
+using Newtonsoft.Json;
 using SCP.Application.Common;
+using SCP.Application.Common.Response;
+using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
-using Newtonsoft.Json;
-using SCP.Application.Core.ApiKey;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace SCP.Application.Core.OAuth
 {

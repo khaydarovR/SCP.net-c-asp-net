@@ -10,5 +10,6 @@
 
         public bool FA2Enabled { get; set; } = true;
 
+        public string? CurrentIp { get; set; }
     }
 }
