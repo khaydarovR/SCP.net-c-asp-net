@@ -1,17 +1,18 @@
-using Microsoft.AspNetCore.Authorization;
 using SCP.Api.ConfigureWebApi;
-using SCP.Api.Middleware;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.PipeLine;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
+
+
+
+//TODO: rabbit - log - elastick, share secret, telegram\discord\email notify, report table
+//TODO: deploy, CI\CD github - jenkins, db replicate, load balancer 
 
 Console.OutputEncoding = Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

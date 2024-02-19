@@ -233,7 +233,7 @@ namespace SCP.Application.Core.Record
             res.Title = bestMatchRec.Title;
             res.Id = bestMatchRec.Id.ToString();
 
-            await rLog.Push("Чтение для расширения на основаннии разрешения пользователя по личному токену: " + SystemSafePermisons.ReadSecrets.Name, res.Id);
+            await rLog.Push("Расширение для браузера | Чтение на основаннии разрешения пользователя по личному токену: " + SystemSafePermisons.ReadSecrets.Name, res.Id);
 
             return Good(res);
 
@@ -324,8 +324,7 @@ namespace SCP.Application.Core.Record
                 return Bad<ReadRecordResponse>("Секрет с идентификатором " + cmd.RecordId + " не найден");
             }
 
-            var msg = "";
-            var keyIsValid = safeGuard.ApiKeyIsValid(apiKey, dbRec.SafeId, out msg);
+            var keyIsValid = safeGuard.ApiKeyIsValid(apiKey, dbRec.SafeId, out var msg, out var keyName);
             if (keyIsValid == false)
             {
                 return Bad<ReadRecordResponse>(msg);
@@ -354,7 +353,7 @@ namespace SCP.Application.Core.Record
                 ForResource = dbRec.ForResource,
                 IsDeleted = dbRec.IsDeleted,
             };
-            await rLog.Push("Чтение секрета на основаннии API KEY: " + SystemSafePermisons.ReadSecrets.Name, data.Id);
+            await rLog.Push($"{keyName}  | Чтение секрета на основаннии API KEY: " + SystemSafePermisons.ReadSecrets.Name, data.Id);
 
             return new CoreResponse<ReadRecordResponse>(data);
 

@@ -84,7 +84,7 @@ namespace SCP.Application.Core.ApiKey
         /// <param name="apiKey"></param>
         /// <param name="safeId"></param>
         /// <returns></returns>
-        public bool ApiKeyIsValid(string apiKey, Guid safeId, out string msg)
+        public bool ApiKeyIsValid(string apiKey, Guid safeId, out string msg, out string? apiKeyName)
         {
             msg = "";
             var res = true;
@@ -93,6 +93,8 @@ namespace SCP.Application.Core.ApiKey
                 .Where(k => k.SafeId == safeId)
                 .Where(k => k.Key == apiKey)
                 .FirstOrDefault();
+
+            apiKeyName = k?.Name ?? null;
 
             if (k == null)
             {
