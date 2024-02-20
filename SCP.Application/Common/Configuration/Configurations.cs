@@ -83,6 +83,7 @@ namespace SCP.Application.Common.Configuration
             services.Configure<EmailServiceOptions>(config.GetSection("EmailService"));
             services.AddScoped<CacheService>();
             services.AddScoped<UserService>();
+            var rabbitMqService = new RabbitMqService(); services.AddSingleton(rabbitMqService);
 
             services.AddScoped<UserAuthCore>();
             services.AddScoped<SafeCore>();

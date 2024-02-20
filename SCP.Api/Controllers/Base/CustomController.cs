@@ -13,7 +13,7 @@ namespace SCP.Api.Controllers.Base
 
         internal Guid ContextUserId => !User.Identity.IsAuthenticated
             ? Guid.Empty
-            : Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.NameId)!);
+            : Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         internal string? CurrentIp => HttpContext.Connection.RemoteIpAddress?.ToString() ?? null;
 

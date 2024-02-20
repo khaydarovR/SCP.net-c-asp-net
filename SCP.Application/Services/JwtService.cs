@@ -27,7 +27,7 @@ namespace SCP.Application.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                    new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, await userService.GetRoleFromClaims(user)),
                 }),
                 Expires = DateTime.UtcNow.AddDays(30),

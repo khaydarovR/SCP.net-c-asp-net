@@ -36,6 +36,7 @@ namespace SCP.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var res = await whiteIPCore.GetAllAllowIP(ContextUserId);
+            var r = User.Claims.ToList();
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
     }
