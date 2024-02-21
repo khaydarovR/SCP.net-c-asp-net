@@ -35,3 +35,9 @@ services:
       - 9300:9300
     volumes:
       - ./elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=elpwd
+    mem_limit: 4GB
