@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Core.ApiKeyC;
 using SCP.DAL;
-using SCP.Domain.Entity;
 
 namespace SCP.Application.Core.UserWhiteIP
 {
@@ -33,8 +32,8 @@ namespace SCP.Application.Core.UserWhiteIP
                 AppUserId = userId,
             };
 
-            await dbContext.UserWhiteIPs.AddAsync(newWhiteIp);
-            await dbContext.SaveChangesAsync();
+            _ = await dbContext.UserWhiteIPs.AddAsync(newWhiteIp);
+            _ = await dbContext.SaveChangesAsync();
             return Good(true);
         }
 
@@ -54,8 +53,8 @@ namespace SCP.Application.Core.UserWhiteIP
 
             if (ipAddressForDelete != null)
             {
-                dbContext.UserWhiteIPs.Remove(ipAddressForDelete);
-                await dbContext.SaveChangesAsync();
+                _ = dbContext.UserWhiteIPs.Remove(ipAddressForDelete);
+                _ = await dbContext.SaveChangesAsync();
             }
 
             return Good(true);

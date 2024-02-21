@@ -5,7 +5,7 @@ using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Enum;
 
-namespace SCP.Application.Core.ApiKey
+namespace SCP.Application.Core.SafeGuard
 {
     public class SafeGuardCore : BaseCore
     {
@@ -72,7 +72,7 @@ namespace SCP.Application.Core.ApiKey
 
             if (res == false)
             {
-                rLog.Push("Не успешная попытка чтения записи на основании прав: " + EnumUtil.MapRightEnumToString(recRight), recId).GetAwaiter();
+                _ = rLog.Push("Не успешная попытка чтения записи на основании прав: " + EnumUtil.MapRightEnumToString(recRight), recId).GetAwaiter();
             }
 
             return res;

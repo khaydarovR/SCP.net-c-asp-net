@@ -22,10 +22,11 @@ namespace SCP.Api.Middleware
             using var scope = context.RequestServices.CreateScope();
             var whiteIPCore = scope.ServiceProvider.GetRequiredService<UserWhiteIPCore>();
 
-            var ipAddress = context.Connection.RemoteIpAddress.MapToIPv4();
+            var ipAddress = context.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+            ipAddress = ipAddress ?? "not found";
             var userId = context.User.FindFirstValue(JwtRegisteredClaimNames.NameId);
 
-            if (ipAddress is null)
+            if (ipAddress == null)
             {
                 var response = new CoreResponse<bool>(errorText: notFoundIp);
 

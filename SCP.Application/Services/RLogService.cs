@@ -21,9 +21,9 @@ namespace SCP.Application.Services
                 LogText = text,
             };
 
-            db.Add(model);
+            _ = db.Add(model);
 
-            await db.SaveChangesAsync();
+            _ = await db.SaveChangesAsync();
         }
 
         public async Task Push(string text, string recordId)
@@ -35,9 +35,9 @@ namespace SCP.Application.Services
                 LogText = text,
             };
 
-            db.Add(model);
+            _ = db.Add(model);
 
-            await db.SaveChangesAsync();
+            _ = await db.SaveChangesAsync();
         }
     }
 }

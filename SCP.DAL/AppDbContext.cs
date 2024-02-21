@@ -73,14 +73,14 @@ namespace SCP.DAL
         private static void ConfigureUserWhiteIps(EntityTypeBuilder<UserWhiteIP> userWhiteIPBuilder)
         {
             // Key and index configurations
-            userWhiteIPBuilder.HasKey(uwip => uwip.Id);
-            userWhiteIPBuilder.HasIndex(uwip => uwip.Id).IsUnique();
+            _ = userWhiteIPBuilder.HasKey(uwip => uwip.Id);
+            _ = userWhiteIPBuilder.HasIndex(uwip => uwip.Id).IsUnique();
 
             // Property configurations
-            userWhiteIPBuilder.Property(uwip => uwip.AllowFrom).IsRequired();
+            _ = userWhiteIPBuilder.Property(uwip => uwip.AllowFrom).IsRequired();
 
             // Relationship configurations
-            userWhiteIPBuilder.HasOne(uwip => uwip.AppUser)
+            _ = userWhiteIPBuilder.HasOne(uwip => uwip.AppUser)
                               .WithMany(au => au.WhiteIPs)
                               .HasForeignKey(uwip => uwip.AppUserId)
                               .OnDelete(DeleteBehavior.Cascade);
@@ -89,15 +89,15 @@ namespace SCP.DAL
         private static void ConfigureActivityLog(EntityTypeBuilder<ActivityLog> activityLogBuilder)
         {
             // Key and index configurations
-            activityLogBuilder.HasKey(a => a.Id);
-            activityLogBuilder.HasIndex(a => a.Id).IsUnique();
+            _ = activityLogBuilder.HasKey(a => a.Id);
+            _ = activityLogBuilder.HasIndex(a => a.Id).IsUnique();
 
             // Property configurations
-            activityLogBuilder.Property(a => a.At).IsRequired();
-            activityLogBuilder.Property(a => a.LogText).IsRequired();
+            _ = activityLogBuilder.Property(a => a.At).IsRequired();
+            _ = activityLogBuilder.Property(a => a.LogText).IsRequired();
 
             // Relationship configurations
-            activityLogBuilder.HasOne(a => a.Record)
+            _ = activityLogBuilder.HasOne(a => a.Record)
                               .WithMany(r => r.ActivityLogs)
                               .HasForeignKey(a => a.RecordId)
                               .OnDelete(DeleteBehavior.Cascade);
@@ -106,31 +106,31 @@ namespace SCP.DAL
         private static void ConfigureRecordRight(EntityTypeBuilder<RecordRight> recordRightBuilder)
         {
             // Setting primary key
-            recordRightBuilder.HasKey(r => r.Id);
+            _ = recordRightBuilder.HasKey(r => r.Id);
 
             // Setting uniqueness of Id
-            recordRightBuilder.HasIndex(r => r.Id).IsUnique();
+            _ = recordRightBuilder.HasIndex(r => r.Id).IsUnique();
 
         }
 
         private static void ConfigureSafe(EntityTypeBuilder<Safe> safeBuilder)
         {
             // Key and index configurations
-            safeBuilder.HasKey(s => s.Id);
-            safeBuilder.HasIndex(s => s.Id).IsUnique();
+            _ = safeBuilder.HasKey(s => s.Id);
+            _ = safeBuilder.HasIndex(s => s.Id).IsUnique();
 
             // Property configurations
-            safeBuilder.Property(s => s.Title).IsRequired();
-            safeBuilder.Property(s => s.Description).IsRequired(false);
-            safeBuilder.Property(s => s.EPrivateKpem).IsRequired(false);
-            safeBuilder.Property(s => s.PublicKpem).IsRequired(false);
+            _ = safeBuilder.Property(s => s.Title).IsRequired();
+            _ = safeBuilder.Property(s => s.Description).IsRequired(false);
+            _ = safeBuilder.Property(s => s.EPrivateKpem).IsRequired(false);
+            _ = safeBuilder.Property(s => s.PublicKpem).IsRequired(false);
 
             // Relationship configurations
-            safeBuilder.HasMany(s => s.Records)
+            _ = safeBuilder.HasMany(s => s.Records)
                        .WithOne()
                        .HasForeignKey(r => r.SafeId)
                        .OnDelete(DeleteBehavior.Cascade);
-            safeBuilder.HasMany(s => s.SafeUsers)
+            _ = safeBuilder.HasMany(s => s.SafeUsers)
                        .WithOne()
                        .HasForeignKey(su => su.SafeId)
                        .OnDelete(DeleteBehavior.Cascade);
@@ -140,27 +140,27 @@ namespace SCP.DAL
         {
 
             // Property settings
-            appUserModelBuilder.Property(au => au.CreatedDate)
+            _ = appUserModelBuilder.Property(au => au.CreatedDate)
                                .IsRequired()
                                .HasDefaultValue(DateTime.UtcNow);
 
             // Relationships
-            appUserModelBuilder.HasMany(au => au.SafeRights)
+            _ = appUserModelBuilder.HasMany(au => au.SafeRights)
                                .WithOne()
                                .HasForeignKey(su => su.AppUserId)
                                .OnDelete(DeleteBehavior.Cascade);
 
-            appUserModelBuilder.HasMany(au => au.RecordRights)
+            _ = appUserModelBuilder.HasMany(au => au.RecordRights)
                                .WithOne()
                                .HasForeignKey(ru => ru.AppUserId)
                                .OnDelete(DeleteBehavior.Cascade);
 
-            appUserModelBuilder.HasMany(au => au.WhiteIPs)
+            _ = appUserModelBuilder.HasMany(au => au.WhiteIPs)
                                .WithOne()
                                .HasForeignKey(wip => wip.AppUserId)
                                .OnDelete(DeleteBehavior.Cascade);
 
-            appUserModelBuilder.HasMany(au => au.ApiKeys)
+            _ = appUserModelBuilder.HasMany(au => au.ApiKeys)
                                .WithOne()
                                .HasForeignKey(b => b.Id)
                                .OnDelete(DeleteBehavior.Cascade);
@@ -169,28 +169,28 @@ namespace SCP.DAL
         private static void ConfigureSafeRight(EntityTypeBuilder<SafeRight> safeRightModelBuilder)
         {
             // Setting primary key
-            safeRightModelBuilder.HasKey(r => r.Id);
+            _ = safeRightModelBuilder.HasKey(r => r.Id);
 
             // Setting uniqueness of Id
-            safeRightModelBuilder.HasIndex(r => r.Id).IsUnique();
+            _ = safeRightModelBuilder.HasIndex(r => r.Id).IsUnique();
 
             // Properties settings
-            safeRightModelBuilder.Property(sr => sr.Permission)
+            _ = safeRightModelBuilder.Property(sr => sr.Permission)
                                  .IsRequired()
                                  .HasMaxLength(200);
 
             //if DeadDate is null -> permission for perpetual rights
-            safeRightModelBuilder.Property(sr => sr.DeadDate)
+            _ = safeRightModelBuilder.Property(sr => sr.DeadDate)
                                  .IsRequired(false);
         }
 
         private static void ConfigureBotRight(EntityTypeBuilder<ApiKeyWhiteIP> botRightModelBuilder)
         {
             // Setting primary key
-            botRightModelBuilder.HasKey(r => r.Id);
+            _ = botRightModelBuilder.HasKey(r => r.Id);
 
             // Setting uniqueness of Id
-            botRightModelBuilder.HasIndex(r => r.Id).IsUnique();
+            _ = botRightModelBuilder.HasIndex(r => r.Id).IsUnique();
 
 
         }
@@ -199,33 +199,33 @@ namespace SCP.DAL
         {
 
             // Setting primary key
-            recordModelBuilder.HasKey(r => r.Id);
+            _ = recordModelBuilder.HasKey(r => r.Id);
 
             // Setting uniqueness of Id
-            recordModelBuilder.HasIndex(r => r.Id).IsUnique();
+            _ = recordModelBuilder.HasIndex(r => r.Id).IsUnique();
 
             // Properties settings
-            recordModelBuilder.Property(r => r.Title)
+            _ = recordModelBuilder.Property(r => r.Title)
                               .IsRequired()
                               .HasMaxLength(100);
-            recordModelBuilder.Property(r => r.ELogin)
+            _ = recordModelBuilder.Property(r => r.ELogin)
                               .IsRequired(false)
                               .HasMaxLength(500);
-            recordModelBuilder.Property(r => r.EPw)
+            _ = recordModelBuilder.Property(r => r.EPw)
                               .IsRequired(false)
                               .HasMaxLength(500);
-            recordModelBuilder.Property(r => r.ESecret)
+            _ = recordModelBuilder.Property(r => r.ESecret)
                               .HasMaxLength(500);
-            recordModelBuilder.Property(r => r.ForResource)
+            _ = recordModelBuilder.Property(r => r.ForResource)
                               .IsRequired(false)
                               .HasMaxLength(200);
 
             // Setting default value for IsDeleted
-            recordModelBuilder.Property(r => r.IsDeleted)
+            _ = recordModelBuilder.Property(r => r.IsDeleted)
                               .HasDefaultValue(false);
 
             // Relationships settings
-            recordModelBuilder.HasOne(r => r.Safe)
+            _ = recordModelBuilder.HasOne(r => r.Safe)
                               .WithMany(s => s.Records)
                               .HasForeignKey(r => r.SafeId)
                               .OnDelete(DeleteBehavior.Cascade);
@@ -235,22 +235,22 @@ namespace SCP.DAL
         private static void ConfigureApiIP(EntityTypeBuilder<ApiKeyWhiteIP> botWhiteIpModelBuilder)
         {
             // Setting primary key
-            botWhiteIpModelBuilder.HasKey(b => b.Id);
+            _ = botWhiteIpModelBuilder.HasKey(b => b.Id);
 
             // Setting uniqueness of Id
-            botWhiteIpModelBuilder.HasIndex(b => b.Id).IsUnique();
+            _ = botWhiteIpModelBuilder.HasIndex(b => b.Id).IsUnique();
 
             // Properties settings
-            botWhiteIpModelBuilder.Property(b => b.AllowFrom)
+            _ = botWhiteIpModelBuilder.Property(b => b.AllowFrom)
                                   .IsRequired()
                                   .HasMaxLength(100);
 
-            botWhiteIpModelBuilder.Property(b => b.AllowFrom)
+            _ = botWhiteIpModelBuilder.Property(b => b.AllowFrom)
                       .IsRequired()
                       .HasMaxLength(100);
 
             // Relationships settings
-            botWhiteIpModelBuilder.HasOne(b => b.ApiKey)
+            _ = botWhiteIpModelBuilder.HasOne(b => b.ApiKey)
                                   .WithMany(b => b.WhiteIPs)
                                   .HasForeignKey(b => b.ApiKeyId)
                                   .OnDelete(DeleteBehavior.Cascade);
@@ -260,27 +260,27 @@ namespace SCP.DAL
         private static void ConfigureApiKey(EntityTypeBuilder<ApiKey> botModelBuilder)
         {
             // Setting primary key
-            botModelBuilder.HasKey(b => b.Id);
+            _ = botModelBuilder.HasKey(b => b.Id);
 
             // Setting uniqueness of Id
-            botModelBuilder.HasIndex(b => b.Id).IsUnique();
+            _ = botModelBuilder.HasIndex(b => b.Id).IsUnique();
 
             // Properties settings
-            botModelBuilder.Property(b => b.Name)
+            _ = botModelBuilder.Property(b => b.Name)
                            .IsRequired()
                            .HasMaxLength(100);
 
-            botModelBuilder.Property(b => b.DeadDate)
+            _ = botModelBuilder.Property(b => b.DeadDate)
                            .IsRequired();
 
             // Relationships settings
-            botModelBuilder.HasOne(b => b.Owner)
+            _ = botModelBuilder.HasOne(b => b.Owner)
                            .WithMany(u => u.ApiKeys)
                            .HasForeignKey(b => b.OwnerId)
                            .OnDelete(DeleteBehavior.Cascade);
 
 
-            botModelBuilder
+            _ = botModelBuilder
                 .HasOne(a => a.Safe)
                 .WithMany(s => s.ApiKeys)
                 .HasForeignKey(a => a.SafeId)

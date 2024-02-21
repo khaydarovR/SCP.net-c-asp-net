@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
-using SCP.Application.Core.ApiKey;
+using SCP.Application.Core.SafeGuard;
 using SCP.DAL;
 using SCP.Domain;
 using System.Security.Cryptography;
@@ -41,8 +41,8 @@ namespace SCP.Application.Core.ApiKeyC
                 SafeId = Guid.Parse(cmd.SafeId),
             };
 
-            dbContext.ApiKeys.Add(model);
-            dbContext.SaveChanges();
+            _ = dbContext.ApiKeys.Add(model);
+            _ = dbContext.SaveChanges();
             return Good(true);
 
         }
@@ -83,8 +83,8 @@ namespace SCP.Application.Core.ApiKeyC
             {
                 return Good(false);
             }
-            dbContext.ApiKeys.Remove(m);
-            dbContext.SaveChanges();
+            _ = dbContext.ApiKeys.Remove(m);
+            _ = dbContext.SaveChanges();
 
             return Good(true);
         }
@@ -94,8 +94,8 @@ namespace SCP.Application.Core.ApiKeyC
         {
             var k = await dbContext.ApiKeys.FirstOrDefaultAsync(k => k.Id == Guid.Parse(keyId));
             k.IsBlocked = isBlock;
-            dbContext.ApiKeys.Update(k);
-            dbContext.SaveChanges();
+            _ = dbContext.ApiKeys.Update(k);
+            _ = dbContext.SaveChanges();
             return Good<bool>(true);
         }
     }

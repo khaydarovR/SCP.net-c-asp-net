@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Configuration;
@@ -45,7 +44,7 @@ namespace SCP.Application.Core.UserAuth
         public async Task<CoreResponse<bool>> Activate2FA(string uId, bool isOn)
         {
             var u = await userManager.FindByIdAsync(uId);
-            await userManager.SetTwoFactorEnabledAsync(u, isOn);
+            _ = await userManager.SetTwoFactorEnabledAsync(u, isOn);
             return Good<bool>(true);
         }
 
@@ -53,7 +52,7 @@ namespace SCP.Application.Core.UserAuth
         {
             if (command.CurrentIp == null)
             {
-                return Bad<bool>("Не удалось получить ваш IP аддресс");
+                return Bad<bool>("Не удалось получить ваш разрешенный IP аддресс");
             }
 
             if (userManager.Users.Any(u => u.Email == command.Email))
@@ -95,9 +94,9 @@ namespace SCP.Application.Core.UserAuth
                         UserId = dbUser.Id,
                     });
 
-                    TryDeferredInvite(dbUser);
+                    _ = TryDeferredInvite(dbUser);
 
-                    await userWhiteIP.Create(dbUser.Id, command.CurrentIp);
+                    _ = await userWhiteIP.Create(dbUser.Id, command.CurrentIp);
 
                     return new CoreResponse<bool>(true);
                 }
@@ -112,7 +111,7 @@ namespace SCP.Application.Core.UserAuth
             if (cache.Exists(CachePrefix.DeferredInvite_ + dbUser.Email))
             {
                 var safeId = cache.Get<string>(CachePrefix.DeferredInvite_ + dbUser.Email)!;
-                var res = await accessCore.AddPermisionsToUsersForSafe(new string[] { SystemSafePermisons.GetBaseSafeInfo.Slug },
+                _ = await accessCore.AddPermisionsToUsersForSafe(new string[] { SystemSafePermisons.GetBaseSafeInfo.Slug },
                                                        Guid.Parse(safeId),
                                                        new HashSet<string> { dbUser.Id.ToString() },
                                                        30);

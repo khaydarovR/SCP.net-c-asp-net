@@ -7,9 +7,9 @@ using SCP.Application.Common;
 using SCP.Application.Common.Configuration;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
-using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
+using SCP.Application.Core.SafeGuard;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
@@ -109,7 +109,7 @@ namespace SCP.Application.Core.Access
                 //добавить разрешения в сейфе для пользователя
                 foreach (var per in permisionSlugs)
                 {
-                    dbContext.SafeRights.Add(new SafeRight
+                    _ = dbContext.SafeRights.Add(new SafeRight
                     {
                         SafeId = safeId,
                         AppUserId = Guid.Parse(uId),
@@ -130,7 +130,7 @@ namespace SCP.Application.Core.Access
 
                     if (existingRight == null)
                     {
-                        dbContext.RecordRights.Add(new RecordRight
+                        _ = dbContext.RecordRights.Add(new RecordRight
                         {
                             AppUserId = Guid.Parse(uId),
                             RecordId = recordID,
@@ -140,7 +140,7 @@ namespace SCP.Application.Core.Access
                 }
             }
 
-            await dbContext.SaveChangesAsync();
+            _ = await dbContext.SaveChangesAsync();
             return true;
         }
 
@@ -163,7 +163,7 @@ namespace SCP.Application.Core.Access
             dbContext.RecordRights.RemoveRange(recRightsForUserInSafe);
             dbContext.SafeRights.RemoveRange(safesPermisons);
 
-            dbContext.SaveChanges();
+            _ = dbContext.SaveChanges();
         }
 
         public CoreResponse<Permision[]> GetSystemPermisions()
@@ -200,7 +200,7 @@ namespace SCP.Application.Core.Access
                 // Добавление всех найденных пользователей в HashSet
                 foreach (var safeRight in safeRights)
                 {
-                    linkedUserIds.Add(safeRight.AppUserId);
+                    _ = linkedUserIds.Add(safeRight.AppUserId);
                 }
             }
 

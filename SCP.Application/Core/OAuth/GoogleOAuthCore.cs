@@ -10,7 +10,7 @@ using SCP.DAL;
 using SCP.Domain.Entity;
 using System.Net.Http.Headers;
 
-namespace SCP.Application.Core.ApiKey
+namespace SCP.Application.Core.OAuth
 {
     public class GoogleOAuthCore : BaseCore
     {
@@ -53,8 +53,8 @@ namespace SCP.Application.Core.ApiKey
                 {
                     {"code", code},
                     {"redirect_uri", "https://localhost:7192/api/OAuth/Google"},
-                    {"client_id", this._clientId},
-                    {"client_secret", this._clientSecret},
+                    {"client_id", _clientId},
+                    {"client_secret", _clientSecret},
                     {"scope", scope},
                     {"grant_type", "authorization_code"}
                 });
@@ -90,7 +90,8 @@ namespace SCP.Application.Core.ApiKey
                     Email = userInfo.Data.email,
                     UserName = userInfo.Data.given_name,
                     FA2Enabled = userInfo.Data.verified_email,
-                    Password = null
+                    Password = null,
+                    CurrentIp = "allow any",
                 });
 
 

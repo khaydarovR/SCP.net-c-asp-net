@@ -7,7 +7,7 @@ namespace SCP.Application.Common.Validators
     {
         public PatchRecordV()
         {
-            RuleFor(x => x.Title).NotEmpty().WithMessage("Укажите название секрета");
+            _ = RuleFor(x => x.Title).NotEmpty().WithMessage("Укажите название секрета");
 
         }
 

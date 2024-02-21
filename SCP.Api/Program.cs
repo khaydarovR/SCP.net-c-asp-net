@@ -1,6 +1,6 @@
 using SCP.Api.ConfigureWebApi;
+using SCP.Api.Middleware;
 using SCP.Application.Common.Configuration;
-using SCP.Application.Common.PipeLine;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -17,8 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
+
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -35,7 +36,7 @@ if (app.Environment.IsDevelopment())
         {
             c.Interceptors = new InterceptorFunctions
             {
-                RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI4ODIzYTNiNi0zZDlkLTQxMjgtOTFmZi01ZDgxZmY5MTBiMTYiLCJyb2xlIjoi0J_QvtC70YzQt9C-0LLQsNGC0LXQu9GMIiwibmJmIjoxNzA4MzI0NDE5LCJleHAiOjE3MTA5MTY0MTksImlhdCI6MTcwODMyNDQxOSwiaXNzIjoiQk9TIn0.iUVIaXi-Jc8qP9nTfe0dUstToyJMfMgdBJRu7yKf_PE'; return req; }"
+                RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJiODhjNzhkMi1kOTM2LTQ0YmQtYTZiYi0xOWU4NjM3MzM3Y2QiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTcwODUyNjY2OCwiZXhwIjoxNzExMTE4NjY4LCJpYXQiOjE3MDg1MjY2NjgsImlzcyI6IkJPUyJ9.6PqcEhsiIWrLdapkRrPQGrI4Hi0-7ef3WswQitUXjb8'; return req; }"
             };
         });
 }

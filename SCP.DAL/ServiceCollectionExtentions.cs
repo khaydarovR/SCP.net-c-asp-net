@@ -8,9 +8,9 @@ namespace SCP.DAL
     {
         public static IServiceCollection InjectDB(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<AppDbContext>(opt =>
+            _ = services.AddDbContext<AppDbContext>(opt =>
             {
-                opt.UseNpgsql(config.GetConnectionString("PostgreDb"), b => b.MigrationsAssembly("SCP.DAL"));
+                _ = opt.UseNpgsql(config.GetConnectionString("PostgreDb"), b => b.MigrationsAssembly("SCP.DAL"));
             });
 
             return services;

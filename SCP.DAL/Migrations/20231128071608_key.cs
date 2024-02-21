@@ -11,7 +11,7 @@ namespace SCP.DAL.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -22,10 +22,10 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                    _ = table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -48,10 +48,10 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    _ = table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Safes",
                 columns: table => new
                 {
@@ -63,10 +63,10 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Safes", x => x.Id);
+                    _ = table.PrimaryKey("PK_Safes", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -78,8 +78,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
@@ -87,7 +87,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -99,8 +99,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_AspNetUserClaims_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
@@ -108,7 +108,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
@@ -119,8 +119,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    _ = table.ForeignKey(
                         name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
@@ -128,7 +128,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
@@ -137,14 +137,14 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    _ = table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
@@ -152,7 +152,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
@@ -163,8 +163,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    _ = table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
@@ -172,7 +172,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "UserWhiteIPs",
                 columns: table => new
                 {
@@ -182,8 +182,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserWhiteIPs", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_UserWhiteIPs", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_UserWhiteIPs_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
@@ -191,7 +191,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "ApiKeys",
                 columns: table => new
                 {
@@ -204,14 +204,14 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApiKeys", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_ApiKeys", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_ApiKeys_AspNetUsers_OwnerId",
                         column: x => x.OwnerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_ApiKeys_Safes_SafeId",
                         column: x => x.SafeId,
                         principalTable: "Safes",
@@ -219,7 +219,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Records",
                 columns: table => new
                 {
@@ -234,8 +234,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Records", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_Records", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_Records_Safes_SafeId",
                         column: x => x.SafeId,
                         principalTable: "Safes",
@@ -243,7 +243,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "SafeRights",
                 columns: table => new
                 {
@@ -255,14 +255,14 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SafeRights", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_SafeRights", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_SafeRights_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_SafeRights_Safes_SafeId",
                         column: x => x.SafeId,
                         principalTable: "Safes",
@@ -270,7 +270,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "ApiKeyWhiteIPs",
                 columns: table => new
                 {
@@ -280,8 +280,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApiKeyWhiteIPs", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_ApiKeyWhiteIPs", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_ApiKeyWhiteIPs_ApiKeys_ApiKeyId",
                         column: x => x.ApiKeyId,
                         principalTable: "ApiKeys",
@@ -289,7 +289,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "ActivityLogs",
                 columns: table => new
                 {
@@ -300,8 +300,8 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ActivityLogs", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_ActivityLogs", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_ActivityLogs_Records_RecordId",
                         column: x => x.RecordId,
                         principalTable: "Records",
@@ -309,7 +309,7 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "RecordRights",
                 columns: table => new
                 {
@@ -320,14 +320,14 @@ namespace SCP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecordRights", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_RecordRights", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_RecordRights_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_RecordRights_Records_RecordId",
                         column: x => x.RecordId,
                         principalTable: "Records",
@@ -335,136 +335,136 @@ namespace SCP.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ActivityLogs_Id",
                 table: "ActivityLogs",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ActivityLogs_RecordId",
                 table: "ActivityLogs",
                 column: "RecordId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_Id",
                 table: "ApiKeys",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_OwnerId",
                 table: "ApiKeys",
                 column: "OwnerId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_SafeId",
                 table: "ApiKeys",
                 column: "SafeId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ApiKeyWhiteIPs_ApiKeyId",
                 table: "ApiKeyWhiteIPs",
                 column: "ApiKeyId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ApiKeyWhiteIPs_Id",
                 table: "ApiKeyWhiteIPs",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
                 table: "AspNetUserClaims",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_RecordRights_AppUserId",
                 table: "RecordRights",
                 column: "AppUserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_RecordRights_Id",
                 table: "RecordRights",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_RecordRights_RecordId",
                 table: "RecordRights",
                 column: "RecordId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Records_Id",
                 table: "Records",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Records_SafeId",
                 table: "Records",
                 column: "SafeId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_SafeRights_AppUserId",
                 table: "SafeRights",
                 column: "AppUserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_SafeRights_Id",
                 table: "SafeRights",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_SafeRights_SafeId",
                 table: "SafeRights",
                 column: "SafeId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Safes_Id",
                 table: "Safes",
                 column: "Id",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_UserWhiteIPs_AppUserId",
                 table: "UserWhiteIPs",
                 column: "AppUserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_UserWhiteIPs_Id",
                 table: "UserWhiteIPs",
                 column: "Id",
@@ -474,49 +474,49 @@ namespace SCP.DAL.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "ActivityLogs");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "ApiKeyWhiteIPs");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetUserClaims");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetUserLogins");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetUserRoles");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "RecordRights");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "SafeRights");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "UserWhiteIPs");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "ApiKeys");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Records");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Safes");
         }
     }

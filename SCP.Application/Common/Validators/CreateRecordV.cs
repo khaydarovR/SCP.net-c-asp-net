@@ -7,10 +7,10 @@ namespace SCP.Application.Common.Validators
     {
         public CreateRecordV()
         {
-            RuleFor(x => x.Title)
+            _ = RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Укажите название секрета");
 
-            RuleFor(x => x.SafeId)
+            _ = RuleFor(x => x.SafeId)
                .NotEmpty().WithMessage("Не указан сейф");
         }
 

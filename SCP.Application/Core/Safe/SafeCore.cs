@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
-using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.ApiKeyC;
+using SCP.Application.Core.SafeGuard;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
@@ -70,10 +70,10 @@ namespace SCP.Application.Core.Safe
             };
 
 
-            await dbContext.Safes.AddAsync(model);
+            _ = await dbContext.Safes.AddAsync(model);
             await dbContext.SafeRights.AddRangeAsync(permisions);
 
-            await dbContext.SaveChangesAsync();
+            _ = await dbContext.SaveChangesAsync();
 
             return new CoreResponse<bool>(true);
         }

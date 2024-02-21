@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
-using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.UserAuth;
 using SCP.Application.Services;
 using SCP.DAL;
@@ -115,7 +114,8 @@ namespace SCP.Application.Core.OAuth
                     Email = userInfo.email,
                     UserName = userInfo.name,
                     FA2Enabled = userInfo.two_factor_authentication,
-                    Password = null
+                    Password = null,
+                    CurrentIp = "allow any",
                 });
 
                 if (!createUserResult.IsSuccess)

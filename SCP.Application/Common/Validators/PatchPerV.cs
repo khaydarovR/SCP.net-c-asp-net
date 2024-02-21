@@ -7,9 +7,9 @@ namespace SCP.Application.Common.Validators
     {
         public PatchPerV()
         {
-            RuleFor(x => x.DayLife).NotEmpty().WithMessage("Укажите срок разрешения");
-            RuleFor(x => x.UserId).NotEmpty().WithMessage("Укажите пользователя");
-            RuleFor(x => x.SafeId).NotEmpty().WithMessage("Укажите сейф");
+            _ = RuleFor(x => x.DayLife).NotEmpty().WithMessage("Укажите срок разрешения");
+            _ = RuleFor(x => x.UserId).NotEmpty().WithMessage("Укажите пользователя");
+            _ = RuleFor(x => x.SafeId).NotEmpty().WithMessage("Укажите сейф");
 
         }
 

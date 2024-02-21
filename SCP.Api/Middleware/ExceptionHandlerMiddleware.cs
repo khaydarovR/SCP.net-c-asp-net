@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
+using SCP.Application.Common;
 using SCP.Application.Common.Exceptions;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 
-namespace SCP.Application.Common.PipeLine
+namespace SCP.Api.Middleware
 {
     public class ExceptionHandlerMiddleware
     {

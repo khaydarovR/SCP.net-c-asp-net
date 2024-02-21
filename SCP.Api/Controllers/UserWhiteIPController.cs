@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
-using SCP.Api.DTO;
 using SCP.Application.Core.UserWhiteIP;
 
 namespace SCP.Api.Controllers
@@ -36,7 +35,7 @@ namespace SCP.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var res = await whiteIPCore.GetAllAllowIP(ContextUserId);
-            var r = User.Claims.ToList();
+            _ = User.Claims.ToList();
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
     }

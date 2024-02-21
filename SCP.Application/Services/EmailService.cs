@@ -30,7 +30,7 @@ namespace SCP.Application.Services
                 {
                     await client.ConnectAsync(_emailServiceOptions.SmtpServer, _emailServiceOptions.SmtpPort, _emailServiceOptions.UseSsl);
                     await client.AuthenticateAsync(_emailServiceOptions.SmtpUsername, _emailServiceOptions.SmtpPassword);
-                    await client.SendAsync(emailMessage);
+                    _ = await client.SendAsync(emailMessage);
                 }
                 catch (Exception ex)
                 {

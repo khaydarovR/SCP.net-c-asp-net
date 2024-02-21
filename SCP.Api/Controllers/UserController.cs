@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
-using SCP.Api.DTO;
-using SCP.Application.Core.UserAuth;
+using SCP.Application.Core.UserInf;
 using SCP.Application.Services;
 
 namespace SCP.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UserController : CustomController
     {
         private readonly UserCore userCore;
@@ -26,7 +23,7 @@ namespace SCP.Api.Controllers
         [HttpGet("Info")]
         public async Task<ActionResult> Info([FromQuery] string? uId)
         {
-            var res = await userCore.GetUserInfo(uId);
+            var res = await userCore.GetUserInfo(uId ?? ContextUserId.ToString());
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }
 
@@ -36,7 +33,7 @@ namespace SCP.Api.Controllers
         public async Task<ActionResult> SendMessageRb(string? data)
         {
             data = data ?? DateTime.UtcNow.ToString();
-            
+
             rabbitMqService.SendMessage(data);
             return Ok("OK");
         }

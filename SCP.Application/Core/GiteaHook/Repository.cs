@@ -1,4 +1,4 @@
-﻿namespace SCP.Application.Core.UserAuth
+﻿namespace SCP.Application.Core.GiteaHook
 {
     public class InternalTracker
     {

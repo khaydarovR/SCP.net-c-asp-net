@@ -10,7 +10,7 @@ using SCP.Domain.Entity;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace SCP.Application.Core.UserAuth
+namespace SCP.Application.Core.GiteaHook
 {
     public class GiteaHookCore : BaseCore
     {
@@ -63,7 +63,7 @@ namespace SCP.Application.Core.UserAuth
 
             // Get the list of repositories for the user
             var repositoriesResponse = await httpClient.GetAsync($"user/repos");
-            repositoriesResponse.EnsureSuccessStatusCode();
+            _ = repositoriesResponse.EnsureSuccessStatusCode();
             var repositories = await repositoriesResponse.Content.ReadFromJsonAsync<List<Repository>>();
 
             // Create the webhook for each repository
@@ -93,7 +93,7 @@ namespace SCP.Application.Core.UserAuth
                     "application/json");
 
                 var createWebhookResponse = await httpClient.PostAsync($"repos/{repository.owner.username}/{repository.name}/hooks", webhookRequestContent);
-                createWebhookResponse.EnsureSuccessStatusCode();
+                _ = createWebhookResponse.EnsureSuccessStatusCode();
             }
 
             return Good(true);

@@ -1,6 +1,6 @@
-﻿namespace SCP.Api.DTO
+﻿namespace SCP.Application.Common.Response
 {
-    public class GoogleUserInfoResponse
+    public class UserInfoResponse
     {
         public string UserId { get; set; }
         public string UserEmail { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
-using SCP.Application.Core.UserAuth;
+using SCP.Application.Core.GiteaHook;
+using SCP.Application.Core.UserInf;
 
 namespace SCP.Api.Controllers
 {

@@ -6,9 +6,9 @@ using SCP.Application.Common;
 using SCP.Application.Common.Helpers;
 using SCP.Application.Common.Response;
 using SCP.Application.Common.Validators;
-using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
+using SCP.Application.Core.SafeGuard;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
@@ -66,7 +66,7 @@ namespace SCP.Application.Core.Record
 
 
             var recordId = Guid.NewGuid();
-            dbContext.Records.Add(new Domain.Entity.Record
+            _ = dbContext.Records.Add(new Domain.Entity.Record
             {
                 ELogin = command.Login,
                 EPw = command.Pw,
@@ -78,7 +78,7 @@ namespace SCP.Application.Core.Record
                 Id = recordId,
             });
 
-            dbContext.RecordRights.Add(new Domain.Entity.RecordRight
+            _ = dbContext.RecordRights.Add(new Domain.Entity.RecordRight
             {
                 AppUserId = Guid.Parse(command.UserId),
                 RecordId = recordId,
@@ -89,7 +89,7 @@ namespace SCP.Application.Core.Record
             var safeUsers = await safeCore.GetAllUsersFromSafe(Guid.Parse(command.SafeId));
             foreach (var user in safeUsers.Data!)
             {
-                dbContext.RecordRights.Add(new Domain.Entity.RecordRight
+                _ = dbContext.RecordRights.Add(new Domain.Entity.RecordRight
                 {
                     AppUserId = user.Id,
                     RecordId = recordId,
@@ -184,8 +184,8 @@ namespace SCP.Application.Core.Record
             dbRec.IsDeleted = command.IsDeleted;
             dbRec.ForResource = command.ForResource;
 
-            dbContext.Records.Update(dbRec);
-            dbContext.SaveChanges();
+            _ = dbContext.Records.Update(dbRec);
+            _ = dbContext.SaveChanges();
             await rLog.Push("Редактирование на основаннии разрешения: " + SystemSafePermisons.ReadAndEditSecrets.Name, command.Id);
             return Good(true);
         }

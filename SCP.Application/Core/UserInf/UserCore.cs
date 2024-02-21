@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using SCP.Api.DTO;
 using SCP.Application.Common;
+using SCP.Application.Common.Response;
 using SCP.Application.Core.Access;
 using SCP.Application.Core.ApiKeyC;
 using SCP.Application.Core.Safe;
 using SCP.Application.Services;
 using SCP.Domain.Entity;
 
-namespace SCP.Application.Core.UserAuth
+namespace SCP.Application.Core.UserInf
 {
     public class UserCore : BaseCore
     {
@@ -37,16 +37,16 @@ namespace SCP.Application.Core.UserAuth
             this.jwt = jwt;
         }
 
-        public async Task<CoreResponse<GoogleUserInfoResponse>> GetUserInfo(string userId)
+        public async Task<CoreResponse<UserInfoResponse>> GetUserInfo(string userId)
         {
             var u = await userManager.FindByIdAsync(userId);
 
             if (u == null)
             {
-                return Bad<GoogleUserInfoResponse>("UserId is not available");
+                return Bad<UserInfoResponse>($"User with id:{userId} not found");
             }
 
-            var result = new GoogleUserInfoResponse();
+            var result = new UserInfoResponse();
 
             result.UserId = userId;
             result.UserName = u.UserName;

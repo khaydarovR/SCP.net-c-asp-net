@@ -13,15 +13,23 @@ public class RabbitMqService
 
     public RabbitMqService()
     {
-        _factory = new ConnectionFactory() { HostName = "localhost", UserName = "admin", Password = "admin" };
-        _connection = _factory.CreateConnection();
-        _channel = _connection.CreateModel();
 
-        _channel.QueueDeclare(queue: "MyQueue",
-                       durable: false,
-                       exclusive: false,
-                       autoDelete: false,
-                       arguments: null);
+        try
+        {
+            _factory = new ConnectionFactory() { HostName = "localhost", UserName = "admin", Password = "admin" };
+            _connection = _factory.CreateConnection();
+            _channel = _connection.CreateModel();
+
+            _ = _channel.QueueDeclare(queue: "MyQueue",
+                           durable: false,
+                           exclusive: false,
+                           autoDelete: false,
+                           arguments: null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
     }
 
     public void SendMessage(object obj)

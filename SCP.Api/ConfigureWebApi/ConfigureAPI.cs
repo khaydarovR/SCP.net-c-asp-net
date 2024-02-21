@@ -34,14 +34,14 @@ namespace SCP.Api.ConfigureWebApi
                     new string[] {}
                 }
             };
-            services.AddSwaggerGen(o =>
+            _ = services.AddSwaggerGen(o =>
             {
                 o.AddSecurityDefinition("Bearer", securityScheme);
                 o.AddSecurityRequirement(securityReq);
                 o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
             });
 
-            services.AddRateLimiter(_ => _
+            _ = services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options =>
                 {
                     options.PermitLimit = 4;
@@ -51,7 +51,7 @@ namespace SCP.Api.ConfigureWebApi
                 }));
 
 
-            services.AddTransient<SystemEntitySeeding>();
+            _ = services.AddTransient<SystemEntitySeeding>();
 
 
             return services;

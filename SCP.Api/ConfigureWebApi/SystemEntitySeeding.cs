@@ -39,11 +39,11 @@ namespace SCP.Api.ConfigureWebApi
                 var user = await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == n);
                 if (user != null)
                 {
-                    dbContext.AppUsers.Remove(user);
+                    _ = dbContext.AppUsers.Remove(user);
                     Console.WriteLine("================Deleted " + user.Email);
                 }
             }
-            dbContext.SaveChanges();
+            _ = dbContext.SaveChanges();
             return this;
         }
 
@@ -53,11 +53,11 @@ namespace SCP.Api.ConfigureWebApi
             var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
             if (user != null)
             {
-                dbContext.AppUsers.Remove(user);
+                _ = dbContext.AppUsers.Remove(user);
                 Console.WriteLine("================Deleted " + user.Email);
             }
 
-            dbContext.SaveChanges();
+            _ = dbContext.SaveChanges();
             return this;
         }
 
@@ -78,7 +78,7 @@ namespace SCP.Api.ConfigureWebApi
 
                 if (res.Succeeded)
                 {
-                    await userManager.AddClaimAsync(u, new Claim(ClaimTypes.Role, "User"));
+                    _ = await userManager.AddClaimAsync(u, new Claim(ClaimTypes.Role, "User"));
                 }
 
                 await GenSafeForUsers(u);

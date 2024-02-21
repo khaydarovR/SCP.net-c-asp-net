@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SCP.Application.Core.ApiKey
+namespace SCP.Application.Core.OAuth
 {
     public class GoogleTokenResponseDTO
     {

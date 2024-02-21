@@ -10,7 +10,7 @@ namespace SCP.DAL.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<DateTime>(
+            _ = migrationBuilder.AlterColumn<DateTime>(
                 name: "CreatedDate",
                 table: "AspNetUsers",
                 type: "timestamp with time zone",
@@ -20,7 +20,7 @@ namespace SCP.DAL.Migrations
                 oldType: "timestamp with time zone",
                 oldDefaultValue: new DateTime(2023, 11, 28, 7, 16, 8, 196, DateTimeKind.Utc).AddTicks(3682));
 
-            migrationBuilder.AddColumn<bool>(
+            _ = migrationBuilder.AddColumn<bool>(
                 name: "IsBlocked",
                 table: "ApiKeys",
                 type: "boolean",
@@ -31,11 +31,11 @@ namespace SCP.DAL.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "IsBlocked",
                 table: "ApiKeys");
 
-            migrationBuilder.AlterColumn<DateTime>(
+            _ = migrationBuilder.AlterColumn<DateTime>(
                 name: "CreatedDate",
                 table: "AspNetUsers",
                 type: "timestamp with time zone",

@@ -1,7 +1,5 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace SCP.Api.Controllers.Base

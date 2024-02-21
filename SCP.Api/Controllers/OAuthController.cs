@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
 using SCP.Application.Common.Response;
-using SCP.Application.Core.ApiKey;
 using SCP.Application.Core.OAuth;
 using SCP.Application.Services;
 
