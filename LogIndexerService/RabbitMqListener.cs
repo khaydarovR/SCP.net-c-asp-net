@@ -14,7 +14,7 @@ public class RabbitMqListener : BackgroundService
     {
         // Не забудьте вынести значения "localhost" и "MyQueue"
         // в файл конфигурации
-        var factory = new ConnectionFactory() { HostName = "localhost", UserName = "admin", Password = "admin" };
+        var factory = new ConnectionFactory() { HostName = "localhost", UserName = "log", Password = "log" };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
         _channel.QueueDeclare(queue: "MyQueue", durable: false, exclusive: false, autoDelete: false, arguments: null);

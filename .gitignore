@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /SCP.Api/appsettings.Development.json
 /postgres
 /rabbitmq
+/elasticsearch

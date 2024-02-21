@@ -27,3 +27,11 @@ services:
     restart: always
     ports:
       - 6379:6379
+  elasticsearch:
+    image: elasticsearch:8.12.1
+    restart: always
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - ./elasticsearch:/usr/share/elasticsearch/data
