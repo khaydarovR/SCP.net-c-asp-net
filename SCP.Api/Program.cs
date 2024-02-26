@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 
 
-//TODO: rabbit - log - elastick, share secret, telegram\discord\email notify, report table
+//TODO: rabbit - log - elastick, share secret, telegram\discord python notify, report table
 //TODO: deploy, CI\CD github - jenkins, db replicate, load balancer 
 
 Console.OutputEncoding = Encoding.UTF8;

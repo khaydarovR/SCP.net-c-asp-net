@@ -2,6 +2,9 @@
 //Micro-service for indexing record logs from Rabbit Queue with elastickSearch
 
 
+using LogIndexerService;
+using Nest;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
