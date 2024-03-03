@@ -10,6 +10,8 @@ using System.Text.Json.Serialization;
 //TODO: rabbit - log - elastick, share secret, telegram\discord python notify, report table
 //TODO: deploy, CI\CD github - jenkins, db replicate, load balancer 
 
+// python tg bot: gRPC, push async notify,  
+
 Console.OutputEncoding = Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);

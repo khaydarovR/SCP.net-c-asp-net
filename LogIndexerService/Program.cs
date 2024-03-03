@@ -3,14 +3,16 @@
 
 
 using LogIndexerService;
+using Microsoft.AspNetCore.Mvc;
 using Nest;
+using SCP.Domain.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSingleton<ElastService>();
 builder.Services.AddHostedService<RabbitMqListener>();
 
 var app = builder.Build();
@@ -45,10 +47,19 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 
+var elas = new ElastService();
+elas.TryCreateIndex(Service.GetIndexName());
 
+app.MapGet("/IndexDoc", ([FromQuery] string findlog) =>
+{
+    var res = elas.Search(findlog);
+    return res;
+});
 
 
 app.Run();
+
+
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
