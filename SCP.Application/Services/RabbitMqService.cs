@@ -28,7 +28,7 @@ public class RabbitMqService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.ToString());
+            Console.WriteLine("RabbitMQ is DOWN");
         }
     }
 
