@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SCP.Api.Controllers.Base;
 using SCP.Application.Core.UserInf;
 using SCP.Application.Services;
@@ -7,7 +8,7 @@ namespace SCP.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UserController : CustomController
     {
         private readonly UserCore userCore;

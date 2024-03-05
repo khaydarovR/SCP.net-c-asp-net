@@ -18,5 +18,15 @@ namespace GrpcTgBot.Services
                 Message = "Hello " + request.Name
             });
         }
+
+        public override Task<LoginResponse> GetToken(LoginRequest request, ServerCallContext context)
+        {
+            var res = request.Name.GetHashCode() + request.Pwd.GetHashCode();
+
+            return Task.FromResult(new LoginResponse
+            {
+                Jwt = res.ToString(),
+            });
+        }
     }
 }

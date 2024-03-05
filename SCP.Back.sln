@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.DAL", "SCP.DAL\SCP.DAL.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogIndexerService", "LogIndexerService\LogIndexerService.csproj", "{94364384-5E9B-4BAE-9897-80757BF591A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcTgBot", "GrpcTgBot\GrpcTgBot.csproj", "{3A705680-C382-4780-9DE7-C9B5BB4CD36E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Grpc", "GrpcTgBot\SCP.Grpc.csproj", "{3A705680-C382-4780-9DE7-C9B5BB4CD36E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
