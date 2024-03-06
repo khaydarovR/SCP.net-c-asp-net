@@ -38,7 +38,7 @@ if (app.Environment.IsDevelopment())
         {
             c.Interceptors = new InterceptorFunctions
             {
-                RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJiODhjNzhkMi1kOTM2LTQ0YmQtYTZiYi0xOWU4NjM3MzM3Y2QiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTcwODUyNjY2OCwiZXhwIjoxNzExMTE4NjY4LCJpYXQiOjE3MDg1MjY2NjgsImlzcyI6IkJPUyJ9.6PqcEhsiIWrLdapkRrPQGrI4Hi0-7ef3WswQitUXjb8'; return req; }"
+                //RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJiODhjNzhkMi1kOTM2LTQ0YmQtYTZiYi0xOWU4NjM3MzM3Y2QiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTcwODUyNjY2OCwiZXhwIjoxNzExMTE4NjY4LCJpYXQiOjE3MDg1MjY2NjgsImlzcyI6IkJPUyJ9.6PqcEhsiIWrLdapkRrPQGrI4Hi0-7ef3WswQitUXjb8'; return req; }"
             };
         });
 }
@@ -53,16 +53,15 @@ app.UseCors(x => x
     .AllowAnyHeader());
 
 
-#if !DEBUG
-app.UseMiddleware<WhiteIPMiddleware>();
-#endif
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.UseRateLimiter();
 app.MapControllers();
+
+app.UseMiddleware<WhiteIpMiddleware>();
+
+app.UseRateLimiter();
 
 app.MapGet("ping", () => "pong");
 
