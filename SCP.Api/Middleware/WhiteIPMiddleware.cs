@@ -49,8 +49,21 @@ namespace SCP.Api.Middleware
                 return;
             }
 
-            var controllerName = context.GetRouteData().Values["controller"].ToString();
-            if (controllerName.Contains("User"))
+            var controller = context.GetRouteData().Values["controller"]?.ToString() ?? "";
+            var action = context.GetRouteData().Values["action"]?.ToString() ?? "";
+            var endpointName = $"{controller}/{action}";
+
+            if (endpointName.Contains("User/Info"))
+            {
+                await _next(context);
+                return;
+            }
+            if (endpointName.Contains("UserWhiteIP/Create"))
+            {
+                await _next(context);
+                return;
+            }
+            if (endpointName.Contains("/ping"))
             {
                 await _next(context);
                 return;
@@ -63,7 +76,7 @@ namespace SCP.Api.Middleware
                 msgq.Jwt = jwt;
                 msgq.Payload = 
                     $"Кто то пытался зайти в ваш аккаунта с запрещенного IP адреса: {ipAddress!}\n" +
-                    $"Браузер: {userAgent!}\n" +
+                    $"Браузер: {userAgent!}\n\n" +
                     $"Добавить этот адресс в список разрешенных?|{ipAddress}" ;
                 rabbitMq.SendMessage(msgq);
 
