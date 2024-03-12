@@ -61,12 +61,17 @@ namespace SCP.Api.ConfigureWebApi
             return this;
         }
 
+        /// <summary>
+        /// tu1@m.r:q123
+        /// </summary>
+        /// <param name="ammount"></param>
+        /// <returns></returns>
         public async Task<SystemEntitySeeding> InitTUsersWithSafe(int ammount)
         {
 
             for (int i = 0; i < ammount; i++)
             {
-                var u = new AppUser { Email = $"tu{i}@m.r", UserName = $"tu{i}_name", TwoFactorEnabled = false };
+                var u = new AppUser { Email = $"tu{i}@mail.ru", UserName = $"tu{i}_name", TwoFactorEnabled = false };
 
                 if (dbContext.AppUsers.Any(db => db.Email == u.Email))
                 {

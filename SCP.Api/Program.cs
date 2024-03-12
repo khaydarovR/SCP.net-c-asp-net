@@ -66,7 +66,7 @@ app.UseRateLimiter();
 app.MapGet("ping", () => "pong");
 
 //Seeding test users
-if (false)
+if (true)
 {
     using (var scope = app.Services.CreateScope())
     {

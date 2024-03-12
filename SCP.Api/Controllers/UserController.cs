@@ -20,7 +20,7 @@ namespace SCP.Api.Controllers
             this.rabbitMqService = rabbitMqService;
         }
 
-
+        [AllowAnonymous]
         [HttpGet("Info")]
         public async Task<ActionResult> Info([FromQuery] string? uId)
         {

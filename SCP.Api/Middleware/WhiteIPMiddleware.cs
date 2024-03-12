@@ -30,7 +30,7 @@ namespace SCP.Api.Middleware
             var ipAddress = context.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             var userAgent = context.Request.Headers["User-Agent"].FirstOrDefault() ?? "User-Agent";
             var jwt = context.Request.Headers["Authorization"].FirstOrDefault() ?? "Jwt";
-            ipAddress = ipAddress ?? "127.321.3213.1";
+            ipAddress = ipAddress ?? "0.0.0.1";
             var userId = Helpers.GetId(context.User);
            
             if (ipAddress == null)
@@ -80,7 +80,7 @@ namespace SCP.Api.Middleware
                     $"Добавить этот адресс в список разрешенных?|{ipAddress}" ;
                 rabbitMq.SendMessage(msgq);
 
-                var response = new CoreResponse<bool>(errorText: accessDenidedMsg);
+                var response = new CoreResponse<bool>(errorText: ipAddress + "|" + accessDenidedMsg);
                 context.Response.StatusCode = 403;
                 await context.Response.WriteAsJsonAsync(response.ErrorList);
                 return;

@@ -17,7 +17,7 @@ namespace SCP.Api.Controllers.Base
             {
                 return Helpers.GetId(User);
             } }
-        internal string? CurrentIp => HttpContext.Connection.RemoteIpAddress?.ToString() ?? null;
+        internal string? CurrentIp => HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
 
     }
 }

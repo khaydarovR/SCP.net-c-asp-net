@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using SCP.Application.Common;
 using SCP.Application.Common.Response;
 using SCP.Application.Core.UserAuth;
+using SCP.Application.Core.UserWhiteIP;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain.Entity;
@@ -19,6 +20,7 @@ namespace SCP.Application.Core.OAuth
         private readonly UserAuthCore userAuthCore;
         private readonly JwtService jwtService;
         private readonly UserManager<AppUser> userManager;
+        private readonly UserWhiteIPCore whiteIPCore;
         private readonly string _clientId;
         private readonly string _clientSecret;
 
@@ -28,7 +30,8 @@ namespace SCP.Application.Core.OAuth
                                UserAuthCore userAuthCore,
                                JwtService jwtService,
                                UserManager<AppUser> userManager,
-                               IConfiguration configuration) : base(logger)
+                               IConfiguration configuration,
+                               UserWhiteIPCore whiteIPCore) : base(logger)
         {
             this.http = http;
             this.logger = logger;
@@ -37,6 +40,7 @@ namespace SCP.Application.Core.OAuth
             this.userManager = userManager;
             _clientId = configuration.GetValue<string>("OAuth:Google:ClientId")!;
             _clientSecret = configuration.GetValue<string>("OAuth:Google:ClientSecret")!;
+            this.whiteIPCore = whiteIPCore;
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace SCP.Application.Core.OAuth
         /// <param name="code"></param>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope)
+        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope, string currentIp)
         {
 
 
@@ -91,7 +95,7 @@ namespace SCP.Application.Core.OAuth
                     UserName = userInfo.Data.given_name,
                     FA2Enabled = userInfo.Data.verified_email,
                     Password = null,
-                    CurrentIp = "allow any",
+                    CurrentIp = currentIp
                 });
 
 
@@ -102,6 +106,7 @@ namespace SCP.Application.Core.OAuth
             }
 
             dbUser = await userManager.FindByEmailAsync(userInfo.Data.email);
+            await whiteIPCore.Create(dbUser.Id, currentIp);
 
             var jwt = await jwtService.GenerateJwtToken(dbUser);
 

@@ -30,6 +30,7 @@ namespace SCP.Api.Controllers
         {
             var command = dto.Adapt<CreateAccountCommand>();
             command.CurrentIp = CurrentIp;
+            Console.WriteLine("=============>IP : " + command.CurrentIp);
             var res = await userAuthCore.CreateAccount(command);
             return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
         }

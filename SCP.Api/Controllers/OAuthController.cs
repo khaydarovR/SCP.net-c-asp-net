@@ -45,7 +45,7 @@ namespace SCP.Api.Controllers
             {
                 return BadRequest("Missing code");
             }
-            var res = await googleOauthCore.GetTokens(code, scope);
+            var res = await googleOauthCore.GetTokens(code, scope, CurrentIp);
 
             return res.IsSuccess ? Redirect($"{state}{res.Data.Jwt}") : BadRequest(res.ErrorList);
         }

@@ -32,6 +32,11 @@ namespace SCP.Application.Core.UserWhiteIP
                 AppUserId = userId,
             };
 
+            var isAlreadyHasIp = IsAllowFrom(newIpAddress , userId);
+            if (isAlreadyHasIp)
+            {
+                return Good(true);
+            }
             _ = await dbContext.UserWhiteIPs.AddAsync(newWhiteIp);
             _ = await dbContext.SaveChangesAsync();
             return Good(true);
@@ -63,8 +68,10 @@ namespace SCP.Application.Core.UserWhiteIP
 
         public bool IsAllowFrom(string ipAddress, Guid userId)
         {
-            var isAllow = dbContext.UserWhiteIPs.Any(i => i.AllowFrom == ipAddress && i.AppUserId == userId);
-            return isAllow;
+            var isAllowIp = dbContext.UserWhiteIPs.Any(i => i.AllowFrom == ipAddress && i.AppUserId == userId);
+            var isAllowAny = dbContext.UserWhiteIPs.Any(i => i.AllowFrom == "allow any" && i.AppUserId == userId);
+
+            return isAllowIp || isAllowAny;
         }
 
 
