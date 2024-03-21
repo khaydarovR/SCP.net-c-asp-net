@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Test", "SCP.Test\SCP.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.DAL", "SCP.DAL\SCP.DAL.csproj", "{A0A3298B-47C0-4304-87D0-CE7EAD4B1868}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCP.Grpc", "GrpcTgBot\SCP.Grpc.csproj", "{3A705680-C382-4780-9DE7-C9B5BB4CD36E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{A0A3298B-47C0-4304-87D0-CE7EAD4B1868}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0A3298B-47C0-4304-87D0-CE7EAD4B1868}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0A3298B-47C0-4304-87D0-CE7EAD4B1868}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A705680-C382-4780-9DE7-C9B5BB4CD36E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A705680-C382-4780-9DE7-C9B5BB4CD36E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A705680-C382-4780-9DE7-C9B5BB4CD36E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A705680-C382-4780-9DE7-C9B5BB4CD36E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
