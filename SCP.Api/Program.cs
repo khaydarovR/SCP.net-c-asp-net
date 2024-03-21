@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment())
         });
 }
 
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+//app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
@@ -66,7 +66,7 @@ app.UseRateLimiter();
 app.MapGet("ping", () => "pong");
 
 //Seeding test users
-if (true)
+if (false)
 {
     using (var scope = app.Services.CreateScope())
     {
