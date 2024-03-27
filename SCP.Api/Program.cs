@@ -59,7 +59,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<WhiteIpMiddleware>();
+//app.UseMiddleware<WhiteIpMiddleware>();
 
 app.UseRateLimiter();
 
