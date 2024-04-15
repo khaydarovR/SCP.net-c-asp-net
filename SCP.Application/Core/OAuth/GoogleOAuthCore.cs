@@ -51,6 +51,7 @@ namespace SCP.Application.Core.OAuth
             _clientSecret = configuration.GetValue<string>("OAuth:Google:ClientSecret")!;
             this.whiteIPCore = whiteIPCore;
 
+
             _clientId = configuration.GetValue<string>("OAuth:GoogleOAuth:ClientId")!;
             _clientSecret = configuration.GetValue<string>("OAuth:GoogleOAuth:ClientSecret")!;
             logger.LogCritical("SECRETS CONSTRUCTOR INJECT: " + _clientId + " ==== " +_clientSecret);
