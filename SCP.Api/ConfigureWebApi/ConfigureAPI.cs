@@ -53,6 +53,7 @@ namespace SCP.Api.ConfigureWebApi
 
             _ = services.AddTransient<SystemEntitySeeding>();
 
+            services.AddHttpContextAccessor();
 
             return services;
         }

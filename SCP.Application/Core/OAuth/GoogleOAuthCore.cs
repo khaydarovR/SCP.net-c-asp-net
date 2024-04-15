@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -49,21 +50,24 @@ namespace SCP.Application.Core.OAuth
         /// <param name="code"></param>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope, string currentIp)
+        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope, IHttpContextAccessor httpContextAccessor)
         {
-
+            var request = httpContextAccessor.HttpContext!.Request;
+            var host = $"{request.Scheme}://{request.Host}";
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    {"code", code},
-                    {"redirect_uri", "https://localhost:7192/api/OAuth/Google"},
-                    {"client_id", _clientId},
-                    {"client_secret", _clientSecret},
-                    {"scope", scope},
-                    {"grant_type", "authorization_code"}
-                });
+            {
+                {"code", code},
+                {"redirect_uri", $"{host}/api/OAuth/Google"},
+                {"client_id", _clientId},
+                {"client_secret", _clientSecret},
+                {"scope", scope},
+                {"grant_type", "authorization_code"}
+            });
 
             logger.LogWarning(scope);
+            logger.LogWarning(_clientId);
+            logger.LogWarning(_clientSecret);
             var response = await http.PostAsync("https://oauth2.googleapis.com/token", content);
 
 
