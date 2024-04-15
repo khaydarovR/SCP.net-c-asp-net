@@ -67,8 +67,8 @@ namespace SCP.Application.Core.OAuth
         public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope, string currentIp)
         {
             var request = httpContextAccessor.HttpContext!.Request;
-            var host = $"{request.Scheme}://{request.Host}";
-
+            var host = $"{request.Scheme + "s"}://{request.Host}";
+            
             var redirect_uri = $"{host}/api/OAuth/Google";
             var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
