@@ -65,9 +65,9 @@ namespace SCP.Application.Core.OAuth
                 {"grant_type", "authorization_code"}
             });
 
-            logger.LogWarning(scope);
-            logger.LogWarning(_clientId);
-            logger.LogWarning(_clientSecret);
+            logger.LogWarning("SCOPE: " + scope);
+            logger.LogWarning("CLIENT ID: " + _clientId);
+            logger.LogWarning("CLIENT SEC: " + _clientSecret);
             var response = await http.PostAsync("https://oauth2.googleapis.com/token", content);
 
 
