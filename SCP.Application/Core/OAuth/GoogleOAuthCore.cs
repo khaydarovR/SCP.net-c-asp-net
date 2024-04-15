@@ -69,10 +69,11 @@ namespace SCP.Application.Core.OAuth
             var request = httpContextAccessor.HttpContext!.Request;
             var host = $"{request.Scheme}://{request.Host}";
 
+            var redirect_uri = $"{host}/api/OAuth/Google";
             var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 {"code", code},
-                {"redirect_uri", $"{host}/api/OAuth/Google"},
+                {"redirect_uri", redirect_uri},
                 {"client_id", _clientId},
                 {"client_secret", _clientSecret},
                 {"scope", scope},
@@ -82,6 +83,7 @@ namespace SCP.Application.Core.OAuth
             logger.LogWarning("SCOPE: " + scope);
             logger.LogWarning("CLIENT ID: " + _clientId);
             logger.LogWarning("CLIENT SEC: " + _clientSecret);
+            logger.LogWarning("REDIRECT URI " + redirect_uri);
             var response = await http.PostAsync("https://oauth2.googleapis.com/token", content);
 
 
