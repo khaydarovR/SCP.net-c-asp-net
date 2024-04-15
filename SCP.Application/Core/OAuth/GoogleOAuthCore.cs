@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,7 @@ namespace SCP.Application.Core.OAuth
         private readonly UserAuthCore userAuthCore;
         private readonly JwtService jwtService;
         private readonly UserManager<AppUser> userManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserWhiteIPCore whiteIPCore;
         private readonly string _clientId;
         private readonly string _clientSecret;
@@ -32,6 +34,7 @@ namespace SCP.Application.Core.OAuth
                                JwtService jwtService,
                                UserManager<AppUser> userManager,
                                IConfiguration configuration,
+                               IHttpContextAccessor httpContextAccessor,
                                UserWhiteIPCore whiteIPCore) : base(logger)
         {
             this.http = http;
@@ -39,6 +42,7 @@ namespace SCP.Application.Core.OAuth
             this.userAuthCore = userAuthCore;
             this.jwtService = jwtService;
             this.userManager = userManager;
+            this.httpContextAccessor = httpContextAccessor;
             _clientId = configuration.GetValue<string>("OAuth:Google:ClientId")!;
             _clientSecret = configuration.GetValue<string>("OAuth:Google:ClientSecret")!;
             this.whiteIPCore = whiteIPCore;
@@ -50,7 +54,7 @@ namespace SCP.Application.Core.OAuth
         /// <param name="code"></param>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope, IHttpContextAccessor httpContextAccessor)
+        public async Task<CoreResponse<AuthResponse>> GetTokens(string code, string scope, string currentIp)
         {
             var request = httpContextAccessor.HttpContext!.Request;
             var host = $"{request.Scheme}://{request.Host}";
