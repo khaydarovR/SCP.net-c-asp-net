@@ -22,6 +22,7 @@ namespace SCP.Application.Core.OAuth
         private readonly UserAuthCore userAuthCore;
         private readonly JwtService jwtService;
         private readonly UserManager<AppUser> userManager;
+        private readonly IConfiguration configuration;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserWhiteIPCore whiteIPCore;
         private readonly string _clientId;
@@ -42,7 +43,10 @@ namespace SCP.Application.Core.OAuth
             this.userAuthCore = userAuthCore;
             this.jwtService = jwtService;
             this.userManager = userManager;
+            this.configuration = configuration;
             this.httpContextAccessor = httpContextAccessor;
+            this.whiteIPCore = whiteIPCore;
+
             _clientId = configuration.GetValue<string>("OAuth:Google:ClientId")!;
             _clientSecret = configuration.GetValue<string>("OAuth:Google:ClientSecret")!;
             logger.LogCritical("SECRETS CONSTRUCTOR INJECT: " + _clientId + " ==== " +_clientSecret);
