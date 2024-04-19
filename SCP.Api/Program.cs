@@ -5,11 +5,10 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Text;
 using System.Text.Json.Serialization;
 
-
+//TODO: возможность поделиться, генерация однаразового url с ID секрета и ключом доступа (для разработчика)
 
 //TODO: rabbit - log - elastick, share secret, telegram\discord python notify, report table
-//TODO: deploy, CI\CD github - jenkins, db replicate, load balancer 
-
+//TODO: deploy, CI\CD github - jenkins, db replicate, load balancer
 // python tg bot: gRPC, push async notify,  
 
 Console.OutputEncoding = Encoding.UTF8;

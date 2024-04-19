@@ -63,7 +63,7 @@ namespace SCP.Application.Core.UserAuth
             {
                 UserName = command.UserName,
                 Email = command.Email,
-                TwoFactorEnabled = false,
+                TwoFactorEnabled = true,
             };
 
             IdentityResult result = null;
