@@ -7,7 +7,7 @@
 - #### Backend - код серверной части ИС (asp net web api) : https://github.com/khaydarovR/.net-c-asp-net
 - #### Frontend - SPA Клиент на Angular: https://github.com/khaydarovR/SCP.Front
 - #### Nuget пакет для убобной работы с API: https://github.com/khaydarovR/BosClient
-- #### Расширение для браузера на JS: https://disk.yandex.ru/d/WTaGyoCYPOR5uQ
+- #### Расширение для браузера на JS: https://github.com/khaydarovR/SCP.GhromExt
 
 
 Проблемы:
