@@ -84,7 +84,7 @@ namespace SCP.Application.Core.UserAuth
                     new Claim(ClaimTypes.Role, SystemRoles.User)
                 };
 
-                var claimRes = await userManager.AddClaimsAsync(dbUser, claims);
+                var claimRes = await userManager.AddClaimAsync(dbUser, new Claim(ClaimTypes.Role, SystemRoles.User));
                 if (claimRes.Succeeded)
                 {
                     _ = await safeCore.CreateUserSafe(new CreateSafeCommand
