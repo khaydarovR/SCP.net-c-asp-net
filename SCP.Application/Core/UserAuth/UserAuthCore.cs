@@ -55,7 +55,8 @@ namespace SCP.Application.Core.UserAuth
                 return Bad<bool>("Не удалось получить ваш разрешенный IP аддресс");
             }
 
-            if (userManager.Users.Any(u => u.Email == command.Email))
+            var u = await userManager.FindByEmailAsync(command.Email);
+            if (u != null)
             {
                 return Bad<bool>("Пользователь с email " + command.Email + " уже зарегистрирован");
             }
@@ -80,13 +81,15 @@ namespace SCP.Application.Core.UserAuth
             if (result.Succeeded)
             {
                 var dbUser = await userManager.FindByEmailAsync(command.Email);
-                var claims = new Claim[] {
-                    new Claim(ClaimTypes.Role, SystemRoles.User)
-                };
+                //var claims = new Claim[] {
+                //    new Claim(ClaimTypes.Role, SystemRoles.User)
+                //};
 
                 var claimRes = await userManager.AddClaimAsync(dbUser, new Claim(ClaimTypes.Role, SystemRoles.User));
                 if (claimRes.Succeeded)
                 {
+                    Console.WriteLine("Пользователь " + dbUser.UserName + " создан");
+                    Console.WriteLine("Добавлены новые claims");
                     _ = await safeCore.CreateUserSafe(new CreateSafeCommand
                     {
                         Title = dbUser.NormalizedUserName!,
@@ -100,7 +103,7 @@ namespace SCP.Application.Core.UserAuth
 
                     return new CoreResponse<bool>(true);
                 }
-
+                Console.WriteLine("Не удалось добавить claims. " + claimRes.Errors.Select(e => e.Description));
                 return new CoreResponse<bool>(claimRes.Errors.Select(e => e.Description));
             }
             return new CoreResponse<bool>(result.Errors.Select(e => e.Description + ". Использовать латинские буквы!"));
