@@ -19,6 +19,8 @@
         public static Permision EditUserRecordRight = new Permision { Slug = "Менять права пользователей для конкретной записи", Name = "Менять права пользователей для конкретной записи" };
         public static Permision EditSafe = new Permision { Slug = "Редактировать сейф", Name = "Редактировать сейф" };
         public static Permision ApiKeyGen = new Permision { Slug = "Подключать ботов. Создовать токены доступа", Name = "Создовать API ключи для сейфа" };
+        public static Permision ImportExcelFileToSafe = new Permision { Slug = "Импортировать из Excel", Name = "Импортировать секреты из Excel в сейф" };
+        public static Permision ExportRecordsToExcel = new Permision { Slug = "Экспортировать секреты в Excel", Name = "Экспортировать секреты из сейфа в Excel" };
         public static Permision EditUserSafeRights = new Permision { Slug = "Редактировать права пользователей для сейфа", Name = "Редактировать права пользователей для сейфа" };
         public static Permision ItIsThisSafeCreator = new Permision { Slug = "Является создателем сейфа", Name = "Является создателем сейфа" };
 
@@ -36,6 +38,8 @@
             EditUserRecordRight,
             EditSafe,
             ApiKeyGen,
+            ImportExcelFileToSafe,
+            ExportRecordsToExcel,
             EditUserSafeRights,
             ItIsThisSafeCreator,
         };

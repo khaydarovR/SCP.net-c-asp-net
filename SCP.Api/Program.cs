@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 //TODO: возможность поделиться, генерация однаразового url с ID секрета и ключом доступа (для разработчика)
+//импорт\экспорт записей в сейфе
 
 //TODO: rabbit - log - elastick, share secret, telegram\discord python notify, report table
 //TODO: deploy, CI\CD github - jenkins, db replicate, load balancer
