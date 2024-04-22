@@ -1,3 +1,4 @@
+using OfficeOpenXml;
 using SCP.Api.ConfigureWebApi;
 using SCP.Api.Middleware;
 using SCP.Application.Common.Configuration;
@@ -66,7 +67,7 @@ app.UseRateLimiter();
 app.MapGet("ping", () => "pong");
 
 //Seeding test users
-if (false)
+if (true)
 {
     using (var scope = app.Services.CreateScope())
     {
@@ -76,6 +77,6 @@ if (false)
         //await seedingService.ClearUser("razil.khayka@gmail.com");
     }
 }
-
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 app.Run();

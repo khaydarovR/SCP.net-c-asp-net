@@ -42,6 +42,20 @@ namespace SCP.Api.Controllers
         }
 
         /// <summary>
+        /// Импорт записей из Excel
+        /// </summary>
+        /// <param name="safeId"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost(nameof(Import))]
+        public async Task<IActionResult> Import([FromQuery] Guid safeId, [FromForm] IFormFile file)
+        {
+            var res = await recordCore.ImportFromExcel(safeId.ToString(), ContextUserId, file);
+            return res.IsSuccess ? Ok(res.Data) : BadRequest(res.ErrorList);
+        }
+
+
+        /// <summary>
         /// Чтение записи на оснвании Api ключа
         /// </summary>
         /// <param name="apiKey"></param>

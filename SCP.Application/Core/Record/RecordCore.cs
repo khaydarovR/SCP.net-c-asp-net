@@ -12,7 +12,11 @@ using SCP.Application.Core.SafeGuard;
 using SCP.Application.Services;
 using SCP.DAL;
 using SCP.Domain;
+using OfficeOpenXml;
 using SCP.Domain.Enum;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Components.Web;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SCP.Application.Core.Record
 {
@@ -40,7 +44,7 @@ namespace SCP.Application.Core.Record
             this.rLog = rLog;
         }
 
-        public async Task<CoreResponse<bool>> CreateRecord(CreateRecordCommand command)
+        public async Task<CoreResponse<bool>> CreateRecord(CreateRecordCommand command, Guid? genId = null)
         {
             var prk = safeCore.GetClearPrivateKeyFromSafe(command.SafeId);
 
@@ -66,6 +70,10 @@ namespace SCP.Application.Core.Record
 
 
             var recordId = Guid.NewGuid();
+            if (genId != null)
+            {
+                recordId = genId.Value;
+            }
             _ = dbContext.Records.Add(new Domain.Entity.Record
             {
                 ELogin = command.Login,
@@ -129,6 +137,68 @@ namespace SCP.Application.Core.Record
             return Good(records);
         }
 
+
+        public async Task<CoreResponse<bool>> ImportFromExcel(string safeId, Guid authorId, IFormFile file)
+        {
+            var isAccess = safeGuard.AuthorHasAccessToSafe(Guid.Parse(safeId), authorId, SystemSafePermisons.ImportExcelFileToSafe.Slug);
+            if (!isAccess)
+            {
+                return Bad<bool>("Отсутствует разрешение: " + SystemSafePermisons.ImportExcelFileToSafe.Name);
+            }
+            var pubK = safeCore.GetPubKForSafe(safeId);
+
+            using (var excelPackage = new ExcelPackage(file.OpenReadStream()))
+            {
+                var worksheet = excelPackage.Workbook.Worksheets.First(); // Предполагаем, что данные находятся на первом листе
+
+                // Проходимся по строкам и столбцам для чтения данных
+                var rowCount = worksheet.Dimension.Rows;
+                var records = new List<Domain.Entity.Record>();
+                var u = dbContext.AppUsers.FirstOrDefault(u => u.Id == authorId);
+
+                for (int row = 2; row <= rowCount; row++) // Предполагаем, что первая строка - заголовки
+                {
+                    var record = new Domain.Entity.Record
+                    {
+                        ELogin = worksheet.Cells[row, 1].Value?.ToString(),
+                        EPw = worksheet.Cells[row, 2].Value?.ToString(),
+                        ESecret = worksheet.Cells[row, 3].Value?.ToString(),
+                        ForResource = worksheet.Cells[row, 4].Value?.ToString(),
+                        Title = worksheet.Cells[row, 5].Value?.ToString(),
+                        IsDeleted = false,
+                        SafeId = Guid.Parse(safeId),
+                        Id = Guid.NewGuid()
+                    };
+
+                    record.ELogin = asymmetricCryptoService.EncryptDataForClient(record.ELogin, pubK.Data!);
+                    record.EPw = asymmetricCryptoService.EncryptDataForClient(record.EPw, pubK.Data!);
+                    record.ESecret = asymmetricCryptoService.EncryptDataForClient(record.ESecret, pubK.Data!);
+
+                    var res = await CreateRecord(new CreateRecordCommand
+                    {
+                        Title = record.Title,
+                        ForResource = record.ForResource,
+                        Login = record.ELogin,
+                        Pw = record.EPw,
+                        Secret = record.ESecret,
+                        UserId = authorId.ToString(),
+                        SafeId = safeId,
+                    }, record.Id);
+
+                    if (res.IsSuccess == false)
+                    {
+                        return Bad<bool>(res.ErrorList.ToArray());
+                    }
+
+                    if (res.IsSuccess)
+                    {
+                        await rLog.Push($"Импорт секрета {record.Title} пользователем {u?.UserName} на основании разрешения " +
+                            $"{SystemSafePermisons.ImportExcelFileToSafe.Name}", record.Id);
+                    }
+                }
+                return Good(true);
+            }
+        }
 
         /// <summary>
         /// Обновить секрет
