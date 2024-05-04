@@ -178,40 +178,27 @@ namespace SCP.Application.Core.Access
         /// </summary>
         /// <param name="rootUserId"></param>
         /// <returns></returns>
-        public async Task<CoreResponse<List<GetUserResponse>>> GetLinkedUsersFromSafes(Guid currentUserId)
+        public async Task<CoreResponse<List<GetUserResponse>>> GetLinkedUsersFromSafes(Guid userId)
         {
-            HashSet<Guid> linkedUserIds = new HashSet<Guid>();
-
-            // Получение всех сейфов, связанных с текущим пользователем
-            var currentUserSafesResponse = await safeCore.GetLinked(new GetLinkedSafesQuery { UserId = currentUserId });
+            var currentUserSafesResponse = await safeCore.GetLinked(new GetLinkedSafesQuery { UserId = userId });
 
             if (!currentUserSafesResponse.IsSuccess)
             {
                 return Bad<List<GetUserResponse>>(currentUserSafesResponse.ErrorList.ToArray());
             }
 
-            // Получение всех пользователей, связанных с каждым сейфом
-            foreach (var safe in currentUserSafesResponse.Data!)
-            {
-                var safeRights = await dbContext.SafeRights
-                    .Where(sr => sr.SafeId == Guid.Parse(safe.Id))
-                    .ToListAsync();
+            var linkedUserIds = new HashSet<Guid>(currentUserSafesResponse.Data!.Select(s => Guid.Parse(s.Id)));
 
-                // Добавление всех найденных пользователей в HashSet
-                foreach (var safeRight in safeRights)
-                {
-                    _ = linkedUserIds.Add(safeRight.AppUserId);
-                }
-            }
-
-            var linkedUsers = await dbContext.AppUsers
-                .Where(u => u.Id != currentUserId)
-                .Where(u => linkedUserIds.Contains(u.Id))
+            var linkedUsers = await dbContext.SafeRights
+                .Where(sr => linkedUserIds.Contains(sr.SafeId))
+                .Select(sr => sr.AppUserId)
+                .Distinct()
+                .Where(id => id != userId)
+                .Join(dbContext.AppUsers, id => id, u => u.Id, (id, u) => u)
                 .ProjectToType<GetUserResponse>()
                 .ToListAsync();
 
             return Good<List<GetUserResponse>>(linkedUsers);
-
         }
 
 
