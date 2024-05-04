@@ -157,10 +157,6 @@ namespace SCP.Application.Core.Safe
                 {
                     canEditPerCounter++;
                 }
-                if (safeGuard.AuthorHasAccessToSafe(safeId, user.Id, SystemSafePermisons.EditUserSafeRights.Slug))
-                {
-                    canEditPerCounter++;
-                }
             }
 
 
