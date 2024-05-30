@@ -151,7 +151,16 @@ namespace SCP.Application.Core.Record
             {
                 var worksheet = excelPackage.Workbook.Worksheets.First(); // Предполагаем, что данные находятся на первом листе
 
-                // Проходимся по строкам и столбцам для чтения данных
+                // Проверка заголовка колонок
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Логин" ||
+                    worksheet.Cells[1, 2].Value?.ToString() != "Пароль" ||
+                    worksheet.Cells[1, 3].Value?.ToString() != "Секрет" ||
+                    worksheet.Cells[1, 4].Value?.ToString() != "Ресурс" ||
+                    worksheet.Cells[1, 5].Value?.ToString() != "Название")
+                {
+                    return Bad<bool>("Заголовок колонок должен быть: Логин, Пароль, Секрет, Ресурс, Название");
+                }
+
                 var rowCount = worksheet.Dimension.Rows;
                 var records = new List<Domain.Entity.Record>();
                 var u = dbContext.AppUsers.FirstOrDefault(u => u.Id == authorId);
